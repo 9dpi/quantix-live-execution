@@ -2,77 +2,16 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Signal Genius AI - Simple Signal Card</title>
-
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
-
-    <!-- Simple Signal Card CSS -->
-    <link rel="stylesheet" href="signal-card-simple.css">
-
-    <style>
-        body {
-            margin: 0;
-            padding: 20px;
-            background: linear-gradient(135deg, #0a0e1a 0%, #1a1f35 100%);
-            min-height: 100vh;
-            font-family: Inter, system-ui, sans-serif;
-        }
-
-        .container {
-            max-width: 600px;
-            margin: 0 auto;
-        }
-
-        header {
-            text-align: center;
-            padding: 40px 20px;
-            color: #fff;
-        }
-
-        h1 {
-            font-size: 2rem;
-            margin-bottom: 10px;
-            background: linear-gradient(135deg, #0066ff, #00d4ff);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        .subtitle {
-            color: #94a3b8;
-            font-size: 0.9rem;
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <title>Signal Genius AI</title>
 </head>
 
 <body>
-    <div class="container">
-        <header>
-            <h1>Signal Genius AI</h1>
-            <p class="subtitle">Simple, Clean, Trader-Focused</p>
-        </header>
 
-        <!-- Signal Container - ONLY NEED THIS -->
-        <div id="signal-root"></div>
-    </div>
+  <h2>Latest Signal</h2>
+  <div id="signal-card"></div>
 
-    <!-- Simple Signal Renderer -->
-    <script src="signal-renderer-simple.js"></script>
-
-    <!-- Fetch and Render -->
-    <script>
-        const API_URL = "https://signalgeniusai-production.up.railway.app/api/v1/signal/latest";
-
-        // Initial load
-        fetchAndRenderSignal(API_URL);
-
-        // Auto-refresh every 30 seconds
-        setInterval(() => {
-            fetchAndRenderSignal(API_URL);
-        }, 30000);
-    </script>
+  <script src="./signals.js"></script>
 </body>
 
 </html>

@@ -3,6 +3,8 @@
  * Single source of truth for signal data
  */
 
+import { renderCard, renderTelegramMessage } from "./signals.js";
+
 const API_URL = "https://signalgeniusai-production.up.railway.app/api/v1/signal/latest";
 
 function updateUI(data) {
@@ -10,24 +12,28 @@ function updateUI(data) {
     if (!root) return;
 
     // Render as HTML card for web
-    root.innerHTML = renderSignalCard(data);
+    root.innerHTML = renderCard(data);
+
+    // Also log Telegram message to console (ready for bot)
+    if (data && data.status === "ok") {
+        console.log("📱 Telegram Preview:\n" + renderTelegramMessage(data));
+    }
 }
 
 // Initial fetch
-fetch(API_URL)
-    .then(res => res.json())
-    .then(data => updateUI(data))
-    .catch((err) => {
+async function fetchLatestSignal() {
+    try {
+        const response = await fetch(API_URL);
+        const data = await response.json();
+        updateUI(data);
+    } catch (err) {
         console.error("Fetch error:", err);
-        // updateUI(null); // Optional: handle error state
-    });
+        updateUI(null);
+    }
+}
+
+// Initial load
+fetchLatestSignal();
 
 // Auto-refresh every 30 seconds
-setInterval(() => {
-    fetch(API_URL)
-        .then(res => res.json())
-        .then(data => updateUI(data))
-        .catch(() => {
-            // Silent fail on auto-refresh
-        });
-}, 30000);
+setInterval(fetchLatestSignal, 30000);

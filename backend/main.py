@@ -24,11 +24,7 @@ app = FastAPI(
 # CORS middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "https://9dpi.github.io",
-        "http://localhost:8080",
-        "http://127.0.0.1:8080"
-    ],
+    allow_origins=["*"],  # Temporarily allow all for troubleshooting
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

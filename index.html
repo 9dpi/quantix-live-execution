@@ -3,15 +3,22 @@
 
 <head>
   <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Signal Genius AI</title>
+  <link rel="stylesheet" href="signal-card-simple.css" />
 </head>
 
 <body>
 
   <h2>Latest Signal</h2>
-  <div id="signal-card"></div>
+  <div id="signal-root"></div>
 
+  <!-- Formatter (reusable) -->
   <script src="./signals.js"></script>
+
+  <!-- Data fetching + rendering -->
+  <script src="./payload.js"></script>
+
 </body>
 
 </html>

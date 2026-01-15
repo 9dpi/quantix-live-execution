@@ -242,32 +242,6 @@ function renderWaitingState() {
   container.innerHTML = html;
 }
 
-// Start auto-refresh
-function startAutoRefresh() {
-  if (refreshTimer) {
-    clearInterval(refreshTimer);
-  }
-
-  refreshTimer = setInterval(() => {
-    console.log('🔄 Auto-refreshing signal...');
-    loadSignal();
-  }, CONFIG.REFRESH_INTERVAL);
-
-  console.log(`✅ Auto-refresh enabled (every ${CONFIG.REFRESH_INTERVAL / 1000}s)`);
-}
-
-// Update refresh indicator
-function updateRefreshIndicator() {
-  setInterval(() => {
-    const indicator = document.getElementById('refresh-indicator');
-    if (indicator && lastUpdateTime) {
-      const secondsAgo = Math.floor((new Date() - lastUpdateTime) / 1000);
-      const nextRefresh = Math.max(0, CONFIG.REFRESH_INTERVAL / 1000 - secondsAgo);
-      indicator.textContent = `Next refresh in ${nextRefresh}s`;
-    }
-  }, 1000);
-}
-
 // Format date time
 function formatDateTime(isoString) {
   const date = new Date(isoString);

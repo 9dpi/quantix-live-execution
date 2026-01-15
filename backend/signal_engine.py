@@ -1,61 +1,122 @@
 from datetime import datetime, timezone, timedelta
+import math
 
 def calc_ema(values, period):
-    if not values:
-        return 0
+    if not values or len(values) < period:
+        return values[-1] if values else 0
     k = 2 / (period + 1)
-    ema = values[0]
-    for v in values[1:]:
+    ema = sum(values[:period]) / period # Simple Start
+    for v in values[period:]:
         ema = v * k + ema * (1 - k)
     return ema
 
+def calc_rsi(closes, period=14):
+    if len(closes) < period + 1:
+        return 50
+    gains = []
+    losses = []
+    for i in range(1, len(closes)):
+        diff = closes[i] - closes[i-1]
+        gains.append(max(0, diff))
+        losses.append(max(0, -diff))
+    
+    avg_gain = sum(gains[-period:]) / period
+    avg_loss = sum(losses[-period:]) / period
+    
+    if avg_loss == 0: return 100
+    rs = avg_gain / avg_loss
+    return 100 - (100 / (1 + rs))
+
+def calc_atr(candles, period=14):
+    if len(candles) < period:
+        return 0.0010 # Default for EUR/USD
+    tr_list = []
+    for i in range(1, len(candles)):
+        h = float(candles[i]['high'])
+        l = float(candles[i]['low'])
+        pc = float(candles[i-1]['close'])
+        tr = max(h - l, abs(h - pc), abs(l - pc))
+        tr_list.append(tr)
+    return sum(tr_list[-period:]) / period
+
 def generate_signal(candles, timeframe="M15"):
     closes = [float(c["close"]) for c in candles]
-
-    if len(closes) < 50:
-        # Fallback if not enough data
-        ema20 = calc_ema(closes[-20:], 20) if len(closes) >= 20 else closes[-1]
-        ema50 = ema20
+    current_price = closes[-1]
+    
+    # 1. Calculate Indicators
+    ema20 = calc_ema(closes, 20)
+    ema50 = calc_ema(closes, 50)
+    rsi = calc_rsi(closes)
+    atr = calc_atr(candles)
+    
+    # 2. Determine Direction
+    # Rule: Primary Trend via EMA, Secondary via RSI/Price
+    is_up = ema20 > ema50
+    direction = "BUY" if is_up else "SELL"
+    
+    # 3. Confidence Scoring (Points System)
+    score = 0
+    # EMA Trend (30 pts)
+    if (direction == "BUY" and ema20 > ema50) or (direction == "SELL" and ema20 < ema50):
+        score += 30
+        
+    # RSI Region (25 pts)
+    if (direction == "BUY" and rsi > 55) or (direction == "SELL" and rsi < 45):
+        score += 25
+    elif 45 <= rsi <= 55:
+        score += 10 # Neutral momentum
+        
+    # ATR Volatility (15 pts)
+    # Average ATR for EUR/USD M15 is around 5-10 pips
+    if atr > 0.0005: 
+        score += 15
+        
+    # Candle Confirm (15 pts)
+    if (direction == "BUY" and current_price > ema20) or (direction == "SELL" and current_price < ema20):
+        score += 15
+        
+    # Session Score (15 pts) - Simulating London/NY logic
+    hour = datetime.now(timezone.utc).hour
+    if 8 <= hour <= 18: # Common overlap/active hours
+        score += 15
     else:
-        ema20 = calc_ema(closes[-20:], 20)
-        ema50 = calc_ema(closes[-50:], 50)
+        score += 5
 
-    direction = "BUY" if ema20 > ema50 else "SELL"
+    confidence = min(score, 95)
+    conf_level = "HIGH" if confidence >= 90 else "MEDIUM" if confidence >= 75 else "LOW"
 
-    # trend_score: based on EMA distance
-    trend_score = 40 if abs(ema20 - ema50) / ema50 > 0.0005 else 25
+    # 4. Entry / TP / SL (ATR-based)
+    # TP: 2.0 * ATR, SL: 1.2 * ATR
+    entry = round(current_price, 5)
+    dist_tp = atr * 2.0
+    dist_sl = atr * 1.2
     
-    # momentum_score: price change over last 5 candles
-    momentum_score = min(40, abs(closes[-1] - closes[-5]) * 10000) if len(closes) >= 5 else 20
-    
-    # session_score: placeholder for session logic
-    session_score = 15  
+    # Ensure minimum distances for realistic demo
+    dist_tp = max(dist_tp, 0.0030)
+    dist_sl = max(dist_sl, 0.0020)
 
-    confidence = int(trend_score + momentum_score + session_score)
-    confidence = min(confidence, 95)
+    tp = round(entry + dist_tp if direction == "BUY" else entry - dist_tp, 5)
+    sl = round(entry - dist_sl if direction == "BUY" else entry + dist_sl, 5)
 
-    price = closes[-1]
-    pip = 0.0001
+    # 5. Timing
+    now = datetime.now(timezone.utc)
+    expiry = now + timedelta(minutes=30) # M15 * 2
 
-    entry = [round(price - pip*2, 5), round(price + pip*2, 5)]
-    tp = round(price + pip*35 if direction == "BUY" else price - pip*35, 5)
-    sl = round(price - pip*25 if direction == "BUY" else price + pip*25, 5)
-
-    expiry = datetime.now(timezone.utc) + timedelta(minutes=20)
-
-    # Added session and source to match simplified FE needs
-    # Note: sources in FE were hardcoded or based on data.source
     return {
-        "status": "ok",
-        "source": "twelvedata",
-        "asset": "EUR/USD",
+        "valid": True,
+        "symbol": "EUR/USD",
+        "asset": "EUR/USD", # Compatibility
+        "timeframe": timeframe,
         "direction": direction,
-        "confidence": confidence,
-        "confidence_note": "EMA trend + momentum + session",
         "entry": entry,
         "tp": tp,
         "sl": sl,
-        "timeframe": timeframe,
-        "session": "London/NY Overlap", # Logic placeholder
-        "expires_at": expiry.isoformat()
+        "confidence": confidence,
+        "confidence_level": conf_level,
+        "strategy": "EMA20-50 + RSI + ATR",
+        "session": "London-NewYork" if 8 <= hour <= 18 else "Asian-Sidney",
+        "generated_at": now.isoformat(),
+        "expires_at": expiry.isoformat(),
+        "source": "rule-engine",
+        "market": "real"
     }

@@ -55,9 +55,14 @@ def root():
 
 @app.get("/health")
 def health_check():
-    """Health check endpoint"""
+    """Health check endpoint with DB status"""
+    from backend.services.supabase_client import is_db_connected
+    
+    db_status = "connected" if is_db_connected() else "disconnected"
+    
     return {
         "status": "ok",
+        "database": db_status,
         "timestamp": datetime.now(timezone.utc).isoformat(),
         "service": "signal-genius-ai-api"
     }

@@ -1,9 +1,6 @@
-// Signal Genius AI - Frontend Logic
-// Auto-refresh every 10 seconds
-
 const CONFIG = {
   API_ENDPOINT: 'https://signalgeniusai-production.up.railway.app/api/v1/lab/market-reference',
-  REFRESH_INTERVAL: 10000, // 10 seconds
+  REFRESH_INTERVAL: 30000, // 30 seconds
   SYMBOL: 'EURUSD',
   TIMEFRAME: 'M15'
 };
@@ -14,10 +11,36 @@ let lastUpdateTime = null;
 // Initialize app
 document.addEventListener('DOMContentLoaded', () => {
   console.log('🚀 Signal Genius AI - Initializing...');
+  initTheme();
   loadSignal();
   startAutoRefresh();
   updateRefreshIndicator();
 });
+
+// Theme Management
+function initTheme() {
+  const themeToggle = document.getElementById('theme-toggle');
+  const body = document.body;
+  const themeIcon = themeToggle.querySelector('.theme-icon');
+
+  // Check saved theme
+  const savedTheme = localStorage.getItem('theme') || 'dark';
+  body.setAttribute('data-theme', savedTheme);
+  updateThemeIcon(savedTheme, themeIcon);
+
+  themeToggle.addEventListener('click', () => {
+    const currentTheme = body.getAttribute('data-theme');
+    const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+
+    body.setAttribute('data-theme', newTheme);
+    localStorage.setItem('theme', newTheme);
+    updateThemeIcon(newTheme, themeIcon);
+  });
+}
+
+function updateThemeIcon(theme, iconElement) {
+  iconElement.textContent = theme === 'dark' ? '🌙' : '☀️';
+}
 
 // Load signal data
 async function loadSignal() {
@@ -174,7 +197,7 @@ function renderSignal(signal) {
             </div>
             <div class="price-item">
               <span class="price-label">AI Confidence:</span>
-              <span class="confidence-badge">${signal.confidence}% ⭐</span>
+              <span class="confidence-badge">⭐ ${signal.confidence}%</span>
             </div>
           </div>
         </div>
@@ -205,13 +228,12 @@ function renderWaitingState() {
   const html = `
     <div class="bento-card signal-card animate-in">
       <div class="waiting-state">
-        <div class="waiting-icon">🕒</div>
-        <h3 class="waiting-title">No High-Confidence Signal Yet</h3>
-        <p class="waiting-description">
-          Signal Genius AI only publishes signals when AI Confidence ≥ 95%.
+        <div class="waiting-icon" style="color: var(--primary-cyan)">🎯</div>
+        <h3 class="waiting-title" style="font-weight: 800; color: var(--text-primary);">Scanning Market...</h3>
+        <p class="waiting-description" style="color: var(--text-secondary); font-weight: 500;">
+          Signal Genius AI is analyzing EUR/USD market liquidity and momentum.
           <br><br>
-          The system is continuously analyzing EUR/USD M15 market conditions.
-          Check back soon or wait for our Telegram notification.
+          <span style="color: var(--primary-cyan); font-weight: 700;">Wait for 95% + Confidence.</span>
         </p>
       </div>
     </div>

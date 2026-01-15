@@ -1,72 +1,73 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Signal Genius AI - Professional EUR/USD Forex Trading Signals powered by Advanced AI">
+  <meta name="description"
+    content="Signal Genius AI - Professional EUR/USD Forex Trading Signals powered by Advanced AI">
   <meta name="keywords" content="forex signals, EUR/USD, trading signals, AI trading, forex analysis">
   <meta name="author" content="Signal Genius AI">
-  
+
   <!-- Open Graph / Social Media -->
   <meta property="og:type" content="website">
   <meta property="og:title" content="Signal Genius AI - Professional Forex Signals">
-  <meta property="og:description" content="High-confidence EUR/USD trading signals powered by advanced AI. Only signals with 95%+ confidence.">
+  <meta property="og:description"
+    content="High-confidence EUR/USD trading signals powered by advanced AI. Only signals with 95%+ confidence.">
   <meta property="og:image" content="./logo.svg">
-  
+
   <title>Signal Genius AI - Professional Forex Signals</title>
-  
+
   <!-- Favicon -->
   <link rel="icon" type="image/svg+xml" href="./favicon.svg">
-  
+
   <!-- Styles -->
   <link rel="stylesheet" href="./styles.css">
 </head>
-<body>
+
+<body data-theme="dark">
   <!-- Header -->
   <header class="header">
     <div class="header-content">
       <div class="logo-container">
-        <img src="./logo.svg" alt="Signal Genius AI Logo" class="logo">
         <h1 class="brand-name">Signal Genius AI</h1>
       </div>
-      <p class="tagline">Professional EUR/USD Signals • AI Confidence ≥ 95%</p>
+      <div class="header-actions">
+        <p class="tagline">Professional EUR/USD Signals • AI Confidence ≥ 95%</p>
+        <button class="theme-toggle" id="theme-toggle" aria-label="Toggle theme">
+          <span class="theme-icon">🌙</span>
+        </button>
+      </div>
     </div>
   </header>
 
   <!-- Main Content -->
   <main class="container">
+    <!-- Signal Container (Mobile First - Top Priority) -->
+    <div id="signal-container">
+      <!-- Signal will be loaded here by JavaScript -->
+    </div>
+
     <!-- Stats Overview -->
     <div class="stats-grid">
       <div class="bento-card stat-card">
         <div class="stat-value">EUR/USD</div>
         <div class="stat-label">Trading Pair</div>
       </div>
-      
+
       <div class="bento-card stat-card">
         <div class="stat-value">M15</div>
         <div class="stat-label">Timeframe</div>
       </div>
-      
+
       <div class="bento-card stat-card">
         <div class="stat-value">≥95%</div>
         <div class="stat-label">Min. Confidence</div>
       </div>
-      
-      <div class="bento-card stat-card">
-        <div class="stat-value">10s</div>
-        <div class="stat-label">Auto-Refresh</div>
-      </div>
-    </div>
 
-    <!-- Signal Container -->
-    <div id="signal-container">
-      <!-- Signal will be loaded here by JavaScript -->
-      <div class="bento-card signal-card">
-        <div class="waiting-state">
-          <div class="waiting-icon">⏳</div>
-          <h3 class="waiting-title">Loading Signal...</h3>
-          <p class="waiting-description">Please wait while we fetch the latest market analysis.</p>
-        </div>
+      <div class="bento-card stat-card">
+        <div class="stat-value">30s</div>
+        <div class="stat-label">Auto-Refresh</div>
       </div>
     </div>
 
@@ -75,23 +76,23 @@
       <div class="bento-card">
         <h3 style="margin-bottom: var(--spacing-sm); color: var(--primary-cyan);">🎯 How It Works</h3>
         <p style="color: var(--text-secondary); font-size: 0.875rem; line-height: 1.8;">
-          Signal Genius AI analyzes EUR/USD market conditions every 10 seconds using advanced algorithms. 
+          Signal Genius AI analyzes EUR/USD market conditions every 10 seconds using advanced algorithms.
           Signals are only published when AI confidence reaches 95% or higher, ensuring quality over quantity.
         </p>
       </div>
-      
+
       <div class="bento-card">
         <h3 style="margin-bottom: var(--spacing-sm); color: var(--primary-cyan);">⚡ Real-Time Updates</h3>
         <p style="color: var(--text-secondary); font-size: 0.875rem; line-height: 1.8;">
-          This page automatically refreshes every 10 seconds to show the latest signal. 
+          This page automatically refreshes every 10 seconds to show the latest signal.
           No need to manually reload. Telegram subscribers receive one high-confidence signal per day.
         </p>
       </div>
-      
+
       <div class="bento-card">
         <h3 style="margin-bottom: var(--spacing-sm); color: var(--primary-cyan);">🛡️ Risk Management</h3>
         <p style="color: var(--text-secondary); font-size: 0.875rem; line-height: 1.8;">
-          Every signal includes clear entry zones, take profit, and stop loss levels. 
+          Every signal includes clear entry zones, take profit, and stop loss levels.
           We recommend risking only 0.5-1% per trade and following the expiry rules strictly.
         </p>
       </div>
@@ -121,4 +122,5 @@
   <!-- Scripts -->
   <script src="./signals.js"></script>
 </body>
+
 </html>

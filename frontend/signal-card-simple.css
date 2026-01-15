@@ -1,0 +1,136 @@
+/**
+ * Signal Card Styles - Minimal MVP-Safe CSS
+ * Simple, clean, trader-focused
+ */
+
+.signal-card {
+    max-width: 420px;
+    padding: 16px;
+    border-radius: 12px;
+    background: #0f172a;
+    color: #e5e7eb;
+    font-family: Inter, system-ui, sans-serif;
+    margin: 20px auto;
+}
+
+.signal-card.buy {
+    border-left: 5px solid #22c55e;
+}
+
+.signal-card.sell {
+    border-left: 5px solid #ef4444;
+}
+
+.signal-header {
+    display: flex;
+    justify-content: space-between;
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 12px;
+}
+
+.signal-meta {
+    margin-top: 8px;
+    margin-bottom: 16px;
+    font-size: 13px;
+    opacity: 0.85;
+    line-height: 1.6;
+}
+
+.price-box {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin: 16px 0;
+    padding: 12px;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 8px;
+}
+
+.price-box label {
+    display: block;
+    font-size: 11px;
+    opacity: 0.6;
+    margin-bottom: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.price-box .price {
+    font-size: 15px;
+    font-weight: 600;
+    font-family: 'Courier New', monospace;
+}
+
+.price.tp {
+    color: #22c55e;
+}
+
+.price.sl {
+    color: #ef4444;
+}
+
+.signal-footer {
+    margin-top: 12px;
+    font-size: 14px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 12px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.signal-footer .confidence {
+    font-weight: 600;
+}
+
+.signal-footer .source {
+    font-size: 12px;
+    opacity: 0.6;
+}
+
+.warning {
+    margin-top: 12px;
+    padding: 10px;
+    background: rgba(250, 204, 21, 0.1);
+    border: 1px solid rgba(250, 204, 21, 0.3);
+    border-radius: 6px;
+    color: #facc15;
+    font-size: 13px;
+}
+
+.disclaimer {
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+    font-size: 11px;
+    opacity: 0.5;
+    text-align: center;
+}
+
+.signal-card.error {
+    background: #1f2933;
+    color: #fca5a5;
+    text-align: center;
+    padding: 24px;
+    font-size: 14px;
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+    .signal-card {
+        margin: 10px;
+        padding: 14px;
+    }
+
+    .price-box {
+        grid-template-columns: 1fr;
+        gap: 10px;
+    }
+
+    .signal-footer {
+        flex-direction: column;
+        gap: 8px;
+        align-items: flex-start;
+    }
+}

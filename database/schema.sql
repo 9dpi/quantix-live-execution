@@ -32,6 +32,7 @@ CREATE TABLE IF NOT EXISTS signals (
     
     -- Timestamps
     posted_at_utc TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    posted_date DATE GENERATED ALWAYS AS (DATE(posted_at_utc)) STORED,
     expires_at_utc TIMESTAMPTZ,
     
     -- Expiry Rules
@@ -47,19 +48,18 @@ CREATE TABLE IF NOT EXISTS signals (
     
     -- Metadata
     created_at TIMESTAMPTZ DEFAULT NOW(),
-    updated_at TIMESTAMPTZ DEFAULT NOW()
+    updated_at TIMESTAMPTZ DEFAULT NOW(),
+    
+    -- Unique constraint: one signal per asset per direction per day
+    CONSTRAINT unique_signal_per_day UNIQUE (asset, direction, posted_date)
 );
 
 -- Create indexes for performance
 CREATE INDEX idx_signals_asset ON signals(asset);
 CREATE INDEX idx_signals_posted_at ON signals(posted_at_utc DESC);
+CREATE INDEX idx_signals_posted_date ON signals(posted_date);
 CREATE INDEX idx_signals_status ON signals(status);
 CREATE INDEX idx_signals_confidence ON signals(confidence);
-
--- Create unique index for one signal per asset per direction per day
--- Using expression index with DATE() function
-CREATE UNIQUE INDEX idx_unique_signal_per_day 
-ON signals (asset, direction, DATE(posted_at_utc));
 
 -- =====================================================
 -- Table: signal_history

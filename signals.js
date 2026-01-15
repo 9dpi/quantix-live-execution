@@ -2,10 +2,10 @@
 // Auto-refresh every 10 seconds
 
 const CONFIG = {
-    API_ENDPOINT: '/api/v1/lab/market-reference',
-    REFRESH_INTERVAL: 10000, // 10 seconds
-    SYMBOL: 'EURUSD',
-    TIMEFRAME: 'M15'
+  API_ENDPOINT: 'https://signalgeniusai-production.up.railway.app/api/v1/lab/market-reference',
+  REFRESH_INTERVAL: 10000, // 10 seconds
+  SYMBOL: 'EURUSD',
+  TIMEFRAME: 'M15'
 };
 
 let refreshTimer = null;
@@ -13,90 +13,104 @@ let lastUpdateTime = null;
 
 // Initialize app
 document.addEventListener('DOMContentLoaded', () => {
-    console.log('🚀 Signal Genius AI - Initializing...');
-    loadSignal();
-    startAutoRefresh();
-    updateRefreshIndicator();
+  console.log('🚀 Signal Genius AI - Initializing...');
+  loadSignal();
+  startAutoRefresh();
+  updateRefreshIndicator();
 });
 
 // Load signal data
 async function loadSignal() {
-    try {
-        // For now, use mock data since API is not ready
-        const signal = await fetchSignalData();
+  try {
+    const signal = await fetchSignalData();
 
-        if (signal && signal.confidence >= 95) {
-            renderSignal(signal);
-        } else {
-            renderWaitingState();
-        }
-
-        lastUpdateTime = new Date();
-    } catch (error) {
-        console.error('Error loading signal:', error);
-        renderWaitingState();
+    if (signal && signal.confidence >= 95) {
+      renderSignal(signal);
+    } else {
+      renderWaitingState();
     }
+
+    lastUpdateTime = new Date();
+  } catch (error) {
+    console.error('Error loading signal:', error);
+    renderWaitingState();
+  }
 }
 
-// Fetch signal data (mock for now)
+// Fetch signal data from Railway API
 async function fetchSignalData() {
-    // TODO: Replace with actual API call when backend is ready
-    // const response = await fetch(`${CONFIG.API_ENDPOINT}?symbol=${CONFIG.SYMBOL}&tf=${CONFIG.TIMEFRAME}`);
-    // return await response.json();
+  try {
+    const response = await fetch(`${CONFIG.API_ENDPOINT}?symbol=${CONFIG.SYMBOL}&tf=${CONFIG.TIMEFRAME}`);
 
-    // Mock data for demonstration
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const data = await response.json();
+
+    // Check if API returned "no signal" message
+    if (data.message) {
+      console.log('No high-confidence signal available');
+      return null;
+    }
+
+    return data;
+  } catch (error) {
+    console.error('API call failed, using mock data:', error);
+    // Fallback to mock data if API fails
     return getMockSignal();
+  }
 }
 
 // Mock signal generator
 function getMockSignal() {
-    const now = new Date();
-    const confidence = 96; // High confidence for demo
+  const now = new Date();
+  const confidence = 96; // High confidence for demo
 
-    if (confidence < 95) {
-        return null;
-    }
+  if (confidence < 95) {
+    return null;
+  }
 
-    return {
-        asset: "EUR/USD",
-        direction: "BUY",
-        direction_icon: "🟢",
-        timeframe: "M15",
-        session: "London → New York Overlap",
+  return {
+    asset: "EUR/USD",
+    direction: "BUY",
+    direction_icon: "🟢",
+    timeframe: "M15",
+    session: "London → New York Overlap",
 
-        price_levels: {
-            entry_zone: ["1.16710", "1.16750"],
-            take_profit: "1.17080",
-            stop_loss: "1.16480"
-        },
+    price_levels: {
+      entry_zone: ["1.16710", "1.16750"],
+      take_profit: "1.17080",
+      stop_loss: "1.16480"
+    },
 
-        trade_details: {
-            target_pips: 35,
-            risk_reward: "1 : 1.40",
-            suggested_risk: "0.5% – 1%"
-        },
+    trade_details: {
+      target_pips: 35,
+      risk_reward: "1 : 1.40",
+      suggested_risk: "0.5% – 1%"
+    },
 
-        trade_type: "Intraday",
-        confidence: confidence,
+    trade_type: "Intraday",
+    confidence: confidence,
 
-        posted_at_utc: now.toISOString(),
+    posted_at_utc: now.toISOString(),
 
-        expiry_rules: {
-            session_only: true,
-            expires_at: "NY_CLOSE",
-            invalidate_if_missed_entry: true
-        },
+    expiry_rules: {
+      session_only: true,
+      expires_at: "NY_CLOSE",
+      invalidate_if_missed_entry: true
+    },
 
-        disclaimer: "Not financial advice. Trade responsibly."
-    };
+    disclaimer: "Not financial advice. Trade responsibly."
+  };
 }
 
 // Render signal card
 function renderSignal(signal) {
-    const container = document.getElementById('signal-container');
-    const directionClass = signal.direction.toLowerCase();
+  const container = document.getElementById('signal-container');
+  const directionClass = signal.direction.toLowerCase();
 
-    const html = `
+  const html = `
     <div class="bento-card signal-card animate-in">
       <div class="signal-header">
         <div>
@@ -181,14 +195,14 @@ function renderSignal(signal) {
     </div>
   `;
 
-    container.innerHTML = html;
+  container.innerHTML = html;
 }
 
 // Render waiting state
 function renderWaitingState() {
-    const container = document.getElementById('signal-container');
+  const container = document.getElementById('signal-container');
 
-    const html = `
+  const html = `
     <div class="bento-card signal-card animate-in">
       <div class="waiting-state">
         <div class="waiting-icon">🕒</div>
@@ -203,54 +217,54 @@ function renderWaitingState() {
     </div>
   `;
 
-    container.innerHTML = html;
+  container.innerHTML = html;
 }
 
 // Start auto-refresh
 function startAutoRefresh() {
-    if (refreshTimer) {
-        clearInterval(refreshTimer);
-    }
+  if (refreshTimer) {
+    clearInterval(refreshTimer);
+  }
 
-    refreshTimer = setInterval(() => {
-        console.log('🔄 Auto-refreshing signal...');
-        loadSignal();
-    }, CONFIG.REFRESH_INTERVAL);
+  refreshTimer = setInterval(() => {
+    console.log('🔄 Auto-refreshing signal...');
+    loadSignal();
+  }, CONFIG.REFRESH_INTERVAL);
 
-    console.log(`✅ Auto-refresh enabled (every ${CONFIG.REFRESH_INTERVAL / 1000}s)`);
+  console.log(`✅ Auto-refresh enabled (every ${CONFIG.REFRESH_INTERVAL / 1000}s)`);
 }
 
 // Update refresh indicator
 function updateRefreshIndicator() {
-    setInterval(() => {
-        const indicator = document.getElementById('refresh-indicator');
-        if (indicator && lastUpdateTime) {
-            const secondsAgo = Math.floor((new Date() - lastUpdateTime) / 1000);
-            const nextRefresh = Math.max(0, CONFIG.REFRESH_INTERVAL / 1000 - secondsAgo);
-            indicator.textContent = `Next refresh in ${nextRefresh}s`;
-        }
-    }, 1000);
+  setInterval(() => {
+    const indicator = document.getElementById('refresh-indicator');
+    if (indicator && lastUpdateTime) {
+      const secondsAgo = Math.floor((new Date() - lastUpdateTime) / 1000);
+      const nextRefresh = Math.max(0, CONFIG.REFRESH_INTERVAL / 1000 - secondsAgo);
+      indicator.textContent = `Next refresh in ${nextRefresh}s`;
+    }
+  }, 1000);
 }
 
 // Format date time
 function formatDateTime(isoString) {
-    const date = new Date(isoString);
-    const options = {
-        month: 'short',
-        day: 'numeric',
-        year: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit',
-        timeZone: 'UTC'
-    };
-    return date.toLocaleString('en-US', options) + ' UTC';
+  const date = new Date(isoString);
+  const options = {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+    timeZone: 'UTC'
+  };
+  return date.toLocaleString('en-US', options) + ' UTC';
 }
 
 // Export for testing
 if (typeof module !== 'undefined' && module.exports) {
-    module.exports = {
-        loadSignal,
-        getMockSignal,
-        formatDateTime
-    };
+  module.exports = {
+    loadSignal,
+    getMockSignal,
+    formatDateTime
+  };
 }

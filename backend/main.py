@@ -31,9 +31,10 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=[
         "https://9dpi.github.io",
+        "https://9dpi.github.io/signal-genius-ai",
         "http://localhost:5173",
         "http://localhost:3000",
-        "http://127.0.0.1:5500", # Common Live Server port
+        "http://127.0.0.1:5500",
     ],
     allow_credentials=True,
     allow_methods=["*"],
@@ -95,9 +96,9 @@ def latest_signal(asset: str = Query("EUR/USD", description="Trading asset")):
                 status_code=200,
                 content={
                     "status": "no_signal",
-                    "message": "No high-confidence signal available",
+                    "message": "No actionable signal available",
                     "confidence": signal.get("confidence", 0),
-                    "threshold": 95
+                    "threshold": 85
                 }
             )
         

@@ -10,9 +10,19 @@ let lastUpdateTime = null;
 // Initialize app
 document.addEventListener('DOMContentLoaded', () => {
   console.log('🚀 Signal Genius AI - Initializing...');
-  initTheme();
-  loadSignal();
-  startAutoRefresh();
+  try {
+    if (typeof initTheme === 'function') initTheme();
+    if (typeof loadSignal === 'function') loadSignal();
+
+    // Global safety check for auto-refresh
+    if (typeof startAutoRefresh === 'function') {
+      startAutoRefresh();
+    } else {
+      console.warn('startAutoRefresh not defined, running single load');
+    }
+  } catch (err) {
+    console.error('Initialization error:', err);
+  }
 });
 
 function startAutoRefresh() {

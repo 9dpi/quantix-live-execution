@@ -6,14 +6,11 @@
 const API_URL = "https://signalgeniusai-production.up.railway.app/api/v1/signal/latest";
 
 function updateUI(data) {
-    const root = document.getElementById("signal-root");
+    const root = document.getElementById("signal-card");
     if (!root) return;
 
     // Render as HTML card for web
-    root.innerHTML = renderSignalHTML(data);
-
-    // Also log Telegram message to console (ready for bot)
-    console.log("📱 Telegram Preview:\n" + renderTelegramMessage(data));
+    root.innerHTML = renderSignalCard(data);
 }
 
 // Initial fetch
@@ -22,7 +19,7 @@ fetch(API_URL)
     .then(data => updateUI(data))
     .catch((err) => {
         console.error("Fetch error:", err);
-        updateUI(null);
+        // updateUI(null); // Optional: handle error state
     });
 
 // Auto-refresh every 30 seconds

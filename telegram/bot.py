@@ -42,12 +42,12 @@ async def fetch_signal() -> Optional[Dict]:
 
 
 def format_signal_message(signal: Dict) -> str:
-    """Format signal data into Telegram message using the exact template"""
+    """Format signal data into Telegram message using the exact requested template"""
     
     # Extract data
     asset = signal.get('asset', 'EUR/USD')
-    direction = signal.get('direction', 'BUY')
-    direction_icon = signal.get('direction_icon', '🟢')
+    direction = signal.get('direction', 'BUY').upper()
+    direction_icon = "🟢" if direction == "BUY" else "🔴"
     timeframe = signal.get('timeframe', 'M15')
     session = signal.get('session', 'London → New York Overlap')
     
@@ -70,9 +70,9 @@ def format_signal_message(signal: Dict) -> str:
         dt = datetime.fromisoformat(posted_at.replace('Z', '+00:00'))
         posted_str = dt.strftime('%b %d, %Y — %H:%M UTC')
     except:
-        posted_str = 'N/A'
+        posted_str = datetime.now(timezone.utc).strftime('%b %d, %Y — %H:%M UTC')
     
-    # Build message using exact template
+    # Build message using EXACT template
     message = f"""Asset: {asset}
 
 📌 Trade: {direction_icon} {direction} (expect price to go {"up" if direction == "BUY" else "down"})
@@ -81,14 +81,14 @@ def format_signal_message(signal: Dict) -> str:
 🌍 Session: {session}
 
 💰 Price Levels:
-• Entry Zone: {entry_zone[0]} – {entry_zone[1]}
-• Take Profit (TP): {take_profit}
-• Stop Loss (SL): {stop_loss}
+* Entry Zone: {entry_zone[0]} – {entry_zone[1]}
+* Take Profit (TP): {take_profit}
+* Stop Loss (SL): {stop_loss}
 
 📏 Trade Details:
-• Target: +{target_pips} pips
-• Risk–Reward: {risk_reward}
-• Suggested Risk: {suggested_risk} per trade
+* Target: +{target_pips} pips
+* Risk–Reward: {risk_reward}
+* Suggested Risk: {suggested_risk} per trade
 
 🕒 Trade Type: {trade_type}
 🧠 AI Confidence: {confidence}% ⭐
@@ -96,9 +96,9 @@ def format_signal_message(signal: Dict) -> str:
 ⏰ Posted: {posted_str}
 
 ⏳ Auto-Expiry Rules:
-• Signal is valid for this session only
-• Expires at New York close or if TP or SL is hit
-• Do not enter if price has already moved significantly beyond the entry zone
+* Signal is valid for this session only
+* Expires at New York close or if TP or SL is hit
+* Do not enter if price has already moved significantly beyond the entry zone
 
 —
 ⚠️ Not financial advice. Trade responsibly."""

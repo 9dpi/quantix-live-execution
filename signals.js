@@ -13,8 +13,15 @@ document.addEventListener('DOMContentLoaded', () => {
   initTheme();
   loadSignal();
   startAutoRefresh();
-  updateRefreshIndicator();
 });
+
+function startAutoRefresh() {
+  console.log("[AutoRefresh] Enabled (10s)");
+  if (refreshTimer) clearInterval(refreshTimer);
+  refreshTimer = setInterval(() => {
+    loadSignal();
+  }, 10000);
+}
 
 // Theme Management
 function initTheme() {

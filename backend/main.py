@@ -12,7 +12,7 @@ import uvicorn
 # Import services
 from backend.services.quantix_client import fetch_quantix_signal
 from backend.services.signal_service import get_latest_signal
-from backend.services.supabase_client import save_signal_to_db, get_active_signals
+from backend.core.supabase_client import init_supabase, save_signal_to_db, get_active_signals, is_db_connected
 
 # Initialize FastAPI app
 app = FastAPI(
@@ -20,6 +20,11 @@ app = FastAPI(
     description="Professional EUR/USD Forex Trading Signals powered by Quantix AI Core",
     version="1.0.0"
 )
+
+@app.on_event("startup")
+async def startup_event():
+    """Initialize core services on startup"""
+    init_supabase()
 
 # CORS middleware
 app.add_middleware(
@@ -56,7 +61,6 @@ def root():
 @app.get("/health")
 def health_check():
     """Health check endpoint with DB status"""
-    from backend.services.supabase_client import is_db_connected
     
     db_status = "connected" if is_db_connected() else "disconnected"
     

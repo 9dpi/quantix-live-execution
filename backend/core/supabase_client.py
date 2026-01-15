@@ -1,51 +1,51 @@
-"""
-Supabase Client
-Handles database operations for Signal Genius AI
-"""
-
+from supabase import create_client, Client
 import os
-from typing import Dict, List, Optional
-from datetime import datetime, timezone
 import logging
-
-try:
-    from supabase import create_client, Client
-except ImportError:
-    logging.warning("Supabase client not installed. Database features disabled.")
-    create_client = None
-    Client = None
+from typing import Dict, List, Optional
 
 logger = logging.getLogger(__name__)
 
-# Configuration
-SUPABASE_URL = os.getenv("SUPABASE_URL", "")
-SUPABASE_KEY = os.getenv("SUPABASE_SERVICE_KEY", "")
+supabase: Client | None = None
 
-# Initialize Supabase client
-supabase: Optional[Client] = None
+def init_supabase():
+    """
+    Standardize Supabase initialization.
+    No proxy, no headers, no options.
+    """
+    global supabase
+    url = os.getenv("SUPABASE_URL")
+    key = os.getenv("SUPABASE_SERVICE_KEY") or os.getenv("SUPABASE_ANON_KEY")
+    
+    if not url or not key:
+        logger.warning("Supabase credentials missing. DB features disabled.")
+        return None
 
-# CLEAN INITIALIZATION (Supabase 2.x compatible)
-if create_client and SUPABASE_URL and SUPABASE_KEY:
     try:
-        # User fix: Do NOT pass proxy or options that might conflict
-        supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
+        supabase = create_client(url, key)
         logger.info("Supabase initialized successfully")
     except Exception as e:
         logger.error(f"Supabase init failed: {e}")
         supabase = None
-else:
-    logger.warning("Supabase not configured. Database features disabled.")
+
+    return supabase
+
+def get_supabase() -> Optional[Client]:
+    """Get the initialized supabase client"""
+    return supabase
+
+def is_db_connected() -> bool:
+    """Check if database is connected and responsive"""
+    return supabase is not None
+
+# --- Database Operations ---
 
 def save_signal_to_db(signal: Dict) -> Optional[str]:
-    """
-    Save signal to Supabase database (updated for rich format)
-    """
-    if not supabase:
-        logger.warning("Supabase not available. Skipping database save.")
+    """Save signal to Supabase database"""
+    client = get_supabase()
+    if not client:
         return None
     
     try:
-        # Extract from rich format
         price_levels = signal.get("price_levels", {})
         entry_zone = price_levels.get("entry_zone", ["0", "0"])
         trade_details = signal.get("trade_details", {})
@@ -70,38 +70,33 @@ def save_signal_to_db(signal: Dict) -> Optional[str]:
             "is_active": True
         }
         
-        response = supabase.table("signals").insert(data).execute()
+        response = client.table("signals").insert(data).execute()
         
         if response.data:
             signal_id = response.data[0]["id"]
-            logger.info(f"Signal saved to database: {signal_id}")
-            
-            # Save snapshot
             save_signal_snapshot(signal_id, signal)
-            
             return signal_id
-        
+            
     except Exception as e:
-        logger.error(f"Failed to save signal to database: {e}")
-    
+        logger.error(f"Failed to save signal: {e}")
     return None
 
 def save_signal_snapshot(signal_id: str, signal: Dict) -> bool:
-    """Save signal snapshot for audit/rendering"""
-    if not supabase: return False
+    client = get_supabase()
+    if not client: return False
     try:
         data = {"signal_id": signal_id, "snapshot": signal}
-        supabase.table("signal_snapshots").insert(data).execute()
+        client.table("signal_snapshots").insert(data).execute()
         return True
     except Exception as e:
         logger.error(f"Failed to save snapshot: {e}")
         return False
 
 def get_active_signals(limit: int = 10) -> List[Dict]:
-    """Fetch active signals for the UI"""
-    if not supabase: return []
+    client = get_supabase()
+    if not client: return []
     try:
-        response = supabase.table("signals")\
+        response = client.table("signals")\
             .select("*")\
             .eq("is_active", True)\
             .order("created_at", desc=True)\
@@ -111,7 +106,3 @@ def get_active_signals(limit: int = 10) -> List[Dict]:
     except Exception as e:
         logger.error(f"Failed to fetch active signals: {e}")
         return []
-
-def is_db_connected() -> bool:
-    """Check if database is connected and responsive"""
-    return supabase is not None

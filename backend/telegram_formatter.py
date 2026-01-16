@@ -42,7 +42,16 @@ def render_telegram_message(signal_data: dict) -> str:
 💰 <b>TP:</b> {tp}
 🛑 <b>SL:</b> {sl}
 
-⭐ <b>Confidence:</b> {conf_label}
+⭐ <b>Confidence:</b> {conf_label}"""
+
+    # Add Volatility Info if available
+    vol = signal_data.get('volatility')
+    if vol:
+        atr_pct = vol.get('atr_percent', 0)
+        state = vol.get('state', 'normal').capitalize()
+        message += f"\n📉 <b>Volatility:</b> {atr_pct}% ({state})"
+
+    message += f"""
 ⏳ <b>Expires:</b> {expiry}
 🧠 <b>Strategy:</b> {strategy}
 

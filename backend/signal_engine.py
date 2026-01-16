@@ -102,6 +102,30 @@ def calc_atr(candles, period=14):
         tr_list.append(tr)
     return sum(tr_list[-period:]) / period
 
+def calc_atr_percent(atr: float, price: float) -> float:
+    """Calculate ATR as a percentage of price."""
+    if not price: return 0
+    return round((atr / price) * 100, 3)
+
+def confidence_from_atr_percent(atr_pct: float) -> int:
+    """
+    Map ATR% to Confidence Score (Trader-grade logic).
+    
+    ATR% Thresholds:
+    < 0.05% : Flat market (Low confidence)
+    0.05 - 0.15% : Healthy trend (Medium confidence)
+    0.15 - 0.30% : Strong momentum (High confidence)
+    > 0.30% : Over-volatility (Medium-Low confidence)
+    """
+    if atr_pct < 0.05:
+        return random.randint(45, 55)  # LOW
+    elif atr_pct < 0.15:
+        return random.randint(60, 75)  # MEDIUM
+    elif atr_pct < 0.30:
+        return random.randint(85, 92)  # HIGH
+    else:
+        return random.randint(60, 68)  # MEDIUM-LOW
+
 def generate_stabilizer_signal(current_price, direction="BUY", reason="Market Stabilizer"):
     """
     FALLBACK SIGNAL: Logic cực đơn giản để luôn có signal hợp lệ.
@@ -169,25 +193,22 @@ def generate_signal(candles, timeframe="M15"):
     is_up = ema20 > ema50
     direction = "BUY" if is_up else "SELL"
     
-    # 3. Confidence Scoring
-    score = 0
-    # Trend
-    if is_up and direction == "BUY": score += 30
-    if not is_up and direction == "SELL": score += 30
+    # 3. Confidence Scoring (ATR% Driven)
+    atr_pct = calc_atr_percent(atr, current_price)
+    base_confidence = confidence_from_atr_percent(atr_pct)
     
-    # RSI
+    # Adjustments based on indicators
+    adjustment = 0
+    
+    # RSI Alignment
     if (direction == "BUY" and rsi > 50) or (direction == "SELL" and rsi < 50):
-        score += 20
-        
-    # ATR check
-    if atr > 0.0005: score += 15
+        adjustment += 5
     
-    # Session (Basic check)
-    hour = datetime.now(timezone.utc).hour
-    if 8 <= hour <= 20: score += 15
-    else: score += 5
+    # Trend Strength (EMA Alignment)
+    if is_up and direction == "BUY": adjustment += 5
+    if not is_up and direction == "SELL": adjustment += 5
 
-    confidence = min(score + 10, 95) # Base boost
+    confidence = min(base_confidence + adjustment, 95)
     
     # 4. SAFETY NET: Nếu confidence quá thấp, chuyển sang Stabilizer mode
     if confidence < 50:
@@ -234,5 +255,10 @@ def generate_signal(candles, timeframe="M15"):
         "expires_at": expiry_time.isoformat(),  # Backward compatibility
         "status": "ACTIVE",
         "source": "rule-engine",
+        "volatility": {
+            "atr": round(atr, 5),
+            "atr_percent": atr_pct,
+            "state": "healthy" if 0.05 <= atr_pct <= 0.30 else "low" if atr_pct < 0.05 else "high"
+        },
         "market": "real"
     }

@@ -63,7 +63,7 @@ export function renderCard(data) {
 
     <div style="margin-top: 16px; padding: 10px; background: rgba(255,255,255,0.03); border-radius: 6px; font-size: 11px; color: #9ca3af;">
         🔍 <b>Strategy:</b> ${p.strategy}<br/>
-        🌍 <b>Session:</b> ${p.session}
+        🌍 <b>Session:</b> ${p.session}${p.volatility ? `<br/>📉 <b>Volatility:</b> ${p.volatility.atr_percent}% (${p.volatility.state})` : ""}
     </div>
 
     ${p.confidence_meta?.telegram ? `

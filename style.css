@@ -64,6 +64,76 @@ body {
   border-color: rgba(239, 68, 68, 0.3);
 }
 
+/* Confidence Badge Styles */
+.confidence-badge {
+  padding: 6px 14px;
+  border-radius: 999px;
+  font-weight: 700;
+  font-size: 13px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 16px;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.confidence-75 {
+  background: #16a34a;
+  color: white;
+  box-shadow: 0 4px 12px rgba(22, 163, 74, 0.2);
+}
+
+.confidence-60 {
+  background: #2563eb;
+  color: white;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+}
+
+.confidence-50 {
+  background: #ca8a04;
+  color: white;
+  box-shadow: 0 4px 12px rgba(202, 138, 4, 0.2);
+}
+
+.confidence-low {
+  background: #dc2626;
+  color: white;
+  box-shadow: 0 4px 12px rgba(220, 38, 38, 0.2);
+}
+
+/* Expiry Bar Styles */
+.expiry-container {
+  margin-top: 16px;
+  padding-bottom: 8px;
+}
+
+.expiry-label {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  color: #9ca3af;
+  margin-bottom: 6px;
+  text-transform: uppercase;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+.expiry-bar {
+  width: 100%;
+  height: 6px;
+  background: #1f2937;
+  border-radius: 999px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.expiry-progress {
+  height: 100%;
+  background: linear-gradient(90deg, #22c55e, #3b82f6);
+  transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
 @media (max-width: 480px) {
   .container {
     padding: 15px;

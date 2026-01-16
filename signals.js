@@ -9,7 +9,7 @@ export function getConfidenceMeta(confidence) {
       label: "STRONG",
       class: "confidence-75",
       color: "#16a34a",
-      icon: "⭐",
+      icon: "🟢",
       warning: null
     }
   }
@@ -18,7 +18,7 @@ export function getConfidenceMeta(confidence) {
       label: "NORMAL",
       class: "confidence-60",
       color: "#2563eb",
-      icon: "�",
+      icon: "🔵",
       warning: "Trade with caution. Wait for confirmation."
     }
   }
@@ -27,7 +27,7 @@ export function getConfidenceMeta(confidence) {
       label: "LOW",
       class: "confidence-50",
       color: "#ca8a04",
-      icon: "⚠️",
+      icon: "🟡",
       warning: "Low probability setup. For reference only."
     }
   }
@@ -35,7 +35,7 @@ export function getConfidenceMeta(confidence) {
     label: "NO TRADE",
     class: "confidence-low",
     color: "#dc2626",
-    icon: "🚫",
+    icon: "�",
     warning: "Risky market conditions. No trade recommended."
   }
 }
@@ -105,7 +105,7 @@ export function renderCard(data) {
     <div class="expiry-container">
       <div class="expiry-label">
         <span>⏳ Signal Validity</span>
-        <span>${timeLeft}m remaining</span>
+        <span>${timeLeft} / ${expiryMinutes} min</span>
       </div>
       <div class="expiry-bar">
         <div class="expiry-progress" style="width: ${100 - expiryPercent}%"></div>

@@ -1,27 +1,27 @@
-"""
-Telegram Message Formatter (HTML - Production Safe)
-Formats signal data for Telegram using HTML parse mode
-"""
+
+def confidence_label(c: int) -> str:
+    """Map confidence score to trader-grade labels."""
+    if c >= 85: return f"🟢 HIGH ({c}%)"
+    if c >= 60: return f"🟡 MEDIUM ({c}%)"
+    return f"🔴 LOW ({c}%)"
+
+def expiry_by_tf(tf: str) -> str:
+    """Estimated expiry window based on timeframe."""
+    mapping = {
+        "M1": "5 min",
+        "M5": "15 min",
+        "M15": "45 min",
+        "M30": "1.5 hours",
+        "H1": "3 hours",
+        "H4": "12 hours",
+        "D1": "2 days"
+    }
+    return mapping.get(tf, "Unknown")
 
 def render_telegram_message(signal_data: dict) -> str:
     """
     Format signal data for Telegram using HTML.
-    
-    Args:
-        signal_data: Signal payload with keys:
-            - symbol: Trading pair (e.g., "EUR/USD")
-            - timeframe: Timeframe (e.g., "M15")
-            - direction: "BUY" or "SELL"
-            - entry: Entry price
-            - tp: Take profit
-            - sl: Stop loss
-            - confidence: Confidence percentage
-            - strategy: Strategy name
-            
-    Returns:
-        str: HTML-formatted message ready for Telegram
     """
-    # Extract data with fallbacks
     symbol = signal_data.get('symbol') or signal_data.get('asset', 'EUR/USD')
     timeframe = signal_data.get('timeframe', 'M15')
     direction = signal_data.get('direction', 'BUY')
@@ -31,10 +31,10 @@ def render_telegram_message(signal_data: dict) -> str:
     confidence = signal_data.get('confidence', 0)
     strategy = signal_data.get('strategy', 'Rule Engine')
     
-    # Direction emoji
     dir_emoji = "🟢" if direction == "BUY" else "🔴"
+    conf_label = confidence_label(confidence)
+    expiry = expiry_by_tf(timeframe)
     
-    # Format message (HTML - no escaping needed)
     message = f"""<b>📊 {symbol} | {timeframe}</b>
 {dir_emoji} <b>{direction}</b>
 
@@ -42,64 +42,41 @@ def render_telegram_message(signal_data: dict) -> str:
 💰 <b>TP:</b> {tp}
 🛑 <b>SL:</b> {sl}
 
-⭐ <b>Confidence:</b> {confidence}%
+⭐ <b>Confidence:</b> {conf_label}
+⏳ <b>Expires:</b> {expiry}
 🧠 <b>Strategy:</b> {strategy}
 
-⚠️ <i>Not financial advice</i>"""
+⚠️ <i>Educational purpose only</i>"""
     
     return message.strip()
 
+def render_telegram_payload(signal_data: dict) -> dict:
+    """
+    Generate full Telegram payload including inline keyboard.
+    """
+    symbol = signal_data.get('symbol') or signal_data.get('asset', 'EUR/USD')
+    # Use a real chart URL template (TradingView example)
+    clean_symbol = symbol.replace("/", "").replace("-", "")
+    chart_url = f"https://www.tradingview.com/chart/?symbol=FX:{clean_symbol}"
+    
+    return {
+        "text": render_telegram_message(signal_data),
+        "parse_mode": "HTML",
+        "reply_markup": {
+            "inline_keyboard": [
+                [
+                    {"text": "📈 View Chart", "url": chart_url},
+                    {"text": "🔄 Refresh", "callback_data": "refresh_signal"}
+                ],
+                [
+                    {"text": "📊 Stats", "callback_data": "stats"}
+                ]
+            ]
+        }
+    }
 
 def render_telegram_message_with_id(signal_data: dict) -> str:
-    """
-    Format signal with Signal ID for traceability.
-    
-    Args:
-        signal_data: Signal payload (same as render_telegram_message)
-        
-    Returns:
-        str: HTML-formatted message with Signal ID
-    """
-    # Get signal ID if available
+    """Format signal with ID for traceability."""
     signal_id = signal_data.get('signal_id', 'N/A')
-    
-    # Get base message
     base_message = render_telegram_message(signal_data)
-    
-    # Add signal ID at the top
-    message = f"""🆔 <code>{signal_id}</code>
-
-{base_message}"""
-    
-    return message.strip()
-
-
-# Example usage:
-if __name__ == "__main__":
-    # Test data
-    test_signal = {
-        "signal_id": "SIG-EURUSD-20260116-1530",
-        "symbol": "EUR/USD",
-        "timeframe": "M15",
-        "direction": "BUY",
-        "entry": 1.16112,
-        "tp": 1.16412,
-        "sl": 1.15912,
-        "confidence": 65,
-        "strategy": "EMA Trend + RSI + ATR"
-    }
-    
-    # Format message
-    message = render_telegram_message(test_signal)
-    print("=" * 50)
-    print("TELEGRAM MESSAGE (HTML)")
-    print("=" * 50)
-    print(message)
-    print("=" * 50)
-    
-    # Format with ID
-    message_with_id = render_telegram_message_with_id(test_signal)
-    print("\nTELEGRAM MESSAGE WITH ID (HTML)")
-    print("=" * 50)
-    print(message_with_id)
-    print("=" * 50)
+    return f"🆔 <code>{signal_id}</code>\n\n{base_message}".strip()

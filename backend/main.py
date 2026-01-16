@@ -6,12 +6,12 @@ try:
     from external_client import fetch_candles
     from signal_engine import generate_signal, generate_stabilizer_signal
     from signal_ledger import append_signal, calculate_stats, get_all_signals
-    from telegram_formatter import render_telegram_message
+    from telegram_formatter import render_telegram_message, render_telegram_payload
 except ImportError:
     from backend.external_client import fetch_candles
     from backend.signal_engine import generate_signal, generate_stabilizer_signal
     from backend.signal_ledger import append_signal, calculate_stats, get_all_signals
-    from backend.telegram_formatter import render_telegram_message
+    from backend.telegram_formatter import render_telegram_message, render_telegram_payload
 
 app = FastAPI(title="Signal Genius AI MVP")
 
@@ -102,7 +102,7 @@ def get_history(limit: int = 50):
 
 BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN", "")
 
-def send_telegram_message(chat_id: int, text: str, parse_mode: str = "HTML"):
+def send_telegram_message(chat_id: int, text: str, parse_mode: str = "HTML", reply_markup: dict = None):
     """
     Send message to Telegram chat.
     
@@ -110,6 +110,7 @@ def send_telegram_message(chat_id: int, text: str, parse_mode: str = "HTML"):
         chat_id: Telegram chat ID
         text: Message text
         parse_mode: HTML (default) or Markdown
+        reply_markup: Optional inline keyboard or other markup
         
     Returns:
         bool: True if sent successfully
@@ -136,6 +137,8 @@ def send_telegram_message(chat_id: int, text: str, parse_mode: str = "HTML"):
         "text": text,
         "parse_mode": parse_mode
     }
+    if reply_markup:
+        payload["reply_markup"] = reply_markup
     
     try:
         print(f"📤 Sending to chat_id={chat_id}, length={len(text)}, mode={parse_mode}")
@@ -156,14 +159,42 @@ def send_telegram_message(chat_id: int, text: str, parse_mode: str = "HTML"):
 async def telegram_webhook(request: Request):
     """
     Telegram Bot Webhook Handler
-    
-    Receives updates from Telegram and responds to commands.
     """
     try:
         update = await request.json()
         print(f"📥 Telegram Update: {update}")
         
-        # Extract message
+        # 1. Handle Callback Queries (Buttons)
+        if "callback_query" in update:
+            cb = update["callback_query"]
+            chat_id = cb["message"]["chat"]["id"]
+            cb_id = cb["id"]
+            data = cb["data"]
+            
+            # Answer callback immediately to stop loading spinner
+            requests.post(f"https://api.telegram.org/bot{BOT_TOKEN}/answerCallbackQuery", 
+                         json={"callback_query_id": cb_id})
+            
+            if data == "refresh_signal":
+                try:
+                    candles = await fetch_candles()
+                    signal = generate_signal(candles)
+                    payload = render_telegram_payload(signal)
+                    send_telegram_message(chat_id, payload["text"], reply_markup=payload["reply_markup"])
+                except Exception as e:
+                    send_telegram_message(chat_id, f"⚠️ Refresh failed: {str(e)[:50]}")
+            
+            elif data == "stats":
+                try:
+                    stats = calculate_stats()
+                    msg = f"<b>📊 Performance Statistics</b>\n\nTotal Signals: {stats['total_signals']}\nWin Rate: {stats.get('win_rate', 0)}%"
+                    send_telegram_message(chat_id, msg)
+                except Exception:
+                    send_telegram_message(chat_id, "⚠️ Stats unavailable")
+            
+            return {"ok": True}
+
+        # 2. Handle Messages
         message = update.get("message")
         if not message:
             return {"ok": True}
@@ -188,14 +219,13 @@ async def telegram_webhook(request: Request):
                 send_telegram_message(chat_id, "⚠️ Error processing command")
         
         elif text == "/signal":
-            # Fetch latest signal
             try:
                 candles = await fetch_candles()
                 signal = generate_signal(candles)
                 
-                # Use centralized formatter (HTML safe)
-                msg = render_telegram_message(signal)
-                send_telegram_message(chat_id, msg)
+                # Use interactive payload
+                payload = render_telegram_payload(signal)
+                send_telegram_message(chat_id, payload["text"], reply_markup=payload["reply_markup"])
                 
             except Exception as e:
                 print(f"❌ /signal error: {e}")
@@ -210,6 +240,7 @@ async def telegram_webhook(request: Request):
                 msg = f"""<b>📊 Performance Statistics</b>
 
 Total Signals: {stats['total_signals']}
+Win Rate: {stats.get('win_rate', 0)}%
 Avg Confidence: {stats['avg_confidence']}%
 
 <b>By Tier:</b>
@@ -250,7 +281,6 @@ LOW: {stats['by_tier'].get('LOW', {}).get('count', 0)} signals"""
         
     except Exception as e:
         print(f"❌ Webhook critical error: {e}")
-        # Always return ok to prevent Telegram from retrying
         return {"ok": True, "error": "Internal error"}
 
 

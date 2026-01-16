@@ -139,18 +139,22 @@ async def telegram_webhook(request: Request):
         chat_id = message["chat"]["id"]
         text = message.get("text", "")
         
-        # Command handlers
+        # Command handlers with error handling
         if text == "/start":
-            send_telegram_message(
-                chat_id,
-                "🤖 *Signal Genius AI*\n\n"
-                "Bot đã hoạt động\\!\n\n"
-                "Commands:\n"
-                "/signal \\- Get latest signal\n"
-                "/stats \\- View performance\n"
-                "/help \\- Show this message",
-                parse_mode="MarkdownV2"
-            )
+            try:
+                send_telegram_message(
+                    chat_id,
+                    "🤖 *Signal Genius AI*\n\n"
+                    "Bot đã hoạt động\\!\n\n"
+                    "Commands:\n"
+                    "/signal \\- Get latest signal\n"
+                    "/stats \\- View performance\n"
+                    "/help \\- Show this message",
+                    parse_mode="MarkdownV2"
+                )
+            except Exception as e:
+                print(f"❌ /start error: {e}")
+                send_telegram_message(chat_id, "⚠️ Error processing command")
         
         elif text == "/signal":
             # Fetch latest signal
@@ -175,14 +179,16 @@ async def telegram_webhook(request: Request):
                 send_telegram_message(chat_id, msg, parse_mode="MarkdownV2")
                 
             except Exception as e:
+                print(f"❌ /signal error: {e}")
                 send_telegram_message(
                     chat_id,
-                    f"❌ Error fetching signal: {str(e)}"
+                    f"⚠️ Signal temporarily unavailable\nReason: {str(e)[:100]}"
                 )
         
         elif text == "/stats":
-            stats = calculate_stats()
-            msg = f"""📊 *Performance Statistics*
+            try:
+                stats = calculate_stats()
+                msg = f"""📊 *Performance Statistics*
 
 Total Signals: {stats['total_signals']}
 Avg Confidence: {stats['avg_confidence']}%
@@ -191,31 +197,42 @@ Avg Confidence: {stats['avg_confidence']}%
 HIGH: {stats['by_tier'].get('HIGH', {}).get('count', 0)} signals
 MEDIUM: {stats['by_tier'].get('MEDIUM', {}).get('count', 0)} signals
 LOW: {stats['by_tier'].get('LOW', {}).get('count', 0)} signals"""
-            
-            send_telegram_message(chat_id, msg)
+                
+                send_telegram_message(chat_id, msg)
+            except Exception as e:
+                print(f"❌ /stats error: {e}")
+                send_telegram_message(chat_id, "⚠️ Stats temporarily unavailable")
         
         elif text == "/help":
-            send_telegram_message(
-                chat_id,
-                "🤖 *Signal Genius AI Bot*\n\n"
-                "*Commands:*\n"
-                "/signal - Get latest trading signal\n"
-                "/stats - View performance statistics\n"
-                "/start - Show welcome message\n\n"
-                "⚠️ Signals are for educational purposes only."
-            )
+            try:
+                send_telegram_message(
+                    chat_id,
+                    "🤖 *Signal Genius AI Bot*\n\n"
+                    "*Commands:*\n"
+                    "/signal - Get latest trading signal\n"
+                    "/stats - View performance statistics\n"
+                    "/start - Show welcome message\n\n"
+                    "⚠️ Signals are for educational purposes only."
+                )
+            except Exception as e:
+                print(f"❌ /help error: {e}")
+                send_telegram_message(chat_id, "⚠️ Error processing command")
         
         else:
-            send_telegram_message(
-                chat_id,
-                "❓ Unknown command. Send /help for available commands."
-            )
+            try:
+                send_telegram_message(
+                    chat_id,
+                    "❓ Unknown command. Send /help for available commands."
+                )
+            except Exception as e:
+                print(f"❌ Unknown command error: {e}")
         
         return {"ok": True}
         
     except Exception as e:
-        print(f"❌ Webhook error: {e}")
-        return {"ok": False, "error": str(e)}
+        print(f"❌ Webhook critical error: {e}")
+        # Always return ok to prevent Telegram from retrying
+        return {"ok": True, "error": "Internal error"}
 
 
 if __name__ == "__main__":

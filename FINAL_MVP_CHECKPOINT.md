@@ -1,7 +1,7 @@
-# 🏁 SIGNAL GENIUS AI - FINAL MVP CHECKPOINT (v1.0)
+# 🏁 SIGNAL GENIUS AI - FINAL MVP CHECKPOINT (v1.0.1)
 
 **Date:** 2026-01-16
-**Status:** ✅ PRODUCTION-READY MVP
+**Status:** ✅ PRODUCTION-READY MVP (Refined UI)
 **Architecture:** Distributed (FastAPI Backend + GitHub Pages Frontend)
 
 ---
@@ -13,62 +13,57 @@
 | **Backend** | Python / FastAPI | Signal Generation, API, Webhooks, Ledger |
 | **Logic Engine** | Quant-based (ATR/RSI/EMA) | Explainable AI confidence & timing |
 | **Database** | JSON Ledger (Immutable) | Transparency & outcome tracking |
-| **Frontend** | Vanilla JS / CSS / HTML | Real-time Dashboard & Public History |
+| **Frontend** | Vanilla JS / CSS / HTML | Premium Dashboard & Public History |
 | **Bot** | Telegram Bot API | High-confidence signal delivery & interactivity |
 
 ---
 
 ## 🧠 2. KEY LOGIC IMPLEMENTED
 
-### ✅ Quant-Driven Confidence (Phase 8-9)
-- **ATR% Model:** Volatility defines the confidence score, not heuristics.
-- **Explainability:** Confidence labels (STRONG/NORMAL/LOW) sync across Web/Telegram.
-- **Stabilizer Mode:** Always returns a signal, even in dead markets, ensuring 100% uptime.
+### ✅ Quant-Driven Confidence
+- **ATR% Model:** Volatility defines the confidence score.
+- **Explainability:** Synced labels (STRONG/NORMAL/LOW) + Confidence Note explanation.
+- **Stabilizer Mode:** 100% uptime with trend-following logic.
 
-### ✅ Daily Signal Policy (Phase G)
-- **1 Signal / Day:** Prevents over-trading and spam.
-- **Daily Cache:** In-memory caching ensures consistent analysis per asset/timeframe per UTC day.
-- **Status Tagging:** Signals are marked as `fresh` or `replay`.
+### ✅ Daily Signal Policy
+- **1 Signal / Day / Asset:** Enforces trading discipline.
+- **Daily Cache:** In-memory caching for UTC-day consistency.
+- **Status Tagging:** `fresh` vs `replay` indicators.
 
-### ✅ Dispatch Guard (Phase G)
-- **Spam Protection:** Only `fresh` + `≥60% confidence` signals are pushed to Telegram.
-- **VIP Logic:** Protects the reputation of premium channels.
-
-### ✅ Outcome Tracker (Closing the Loop)
-- **Auto-Monitoring:** Backend checks for TP/SL/Expiry hits.
-- **Immutable Ledger:** Every signal and its result is recorded.
+### ✅ Dispatch Guard
+- **Telegram Push Filter:** Only `fresh` + `≥60% confidence` pushed to Telegram.
 
 ---
 
-## 📊 3. INVESTOR-GRADE UI (WEB & TELEGRAM)
+## 💎 3. INSTITUTIONAL-GRADE UI (NEW V1.0.1)
 
-### 📈 Web Dashboard
-- **Glassmorphism Design:** Premium look and feel.
-- **Expiry Progress Bar:** Real-time visual countdown of signal validity.
-- **Public History:** Immutable table of all past performance with win rate stats.
+### 📈 Web Dashboard (Modernized)
+- **Branding:** Gold "AI" Badge logo with professional tagline.
+- **Glassmorphism:** Premium blur effects and deep dark (#05070a) background.
+- **Meta Info:** Clear refresh rate (30s) and Session validity indicators.
+- **Mobile-App Feel:** Clean 420px centered container (optimized for iOS/Android).
+- **Public History:** Immutable ledger with performance stats, styled to match the core app.
 
-### 🤖 Telegram Bot
-- **Interactive UI:** Inline buttons for Refresh, Stats, and View Chart.
-- **Synced UX:** Exactly the same labeling and timing logic as the Web UI.
-- **Traceability:** Unique Signal IDs (`SIG-...`) for cross-channel verification.
+### 🤖 Telegram Bot (Synced)
+- **Shared Formatter:** Visual parity between Web and Telegram.
+- **Traceability:** Unique Signal IDs for auditing across channels.
 
 ---
 
 ## 💾 4. DATA SECURITY & BACKUP
 
-- **Source Control:** 100% Committed to Git (Main Branch).
-- **Environment:** Secrets managed in Railway (API Keys, Bot Tokens).
-- **Ledger:** Local Persistent JSON (Ready for Supabase/PostgreSQL migration).
+- **Source Control:** 100% Pushed to GitHub (Main Branch).
+- **Environment:** Secrets secured in Railway (API Keys, Bot Tokens).
+- **Integrity Check:** `datetime` runtime dependency fixed and verified.
 
 ---
 
 ## 🎯 5. NEXT STEPS (PHASE 2)
-1. **Multi-Asset Support:** Scale beyond EUR/USD.
-2. **Database Migration:** Move from JSON to SQL (PostgreSQL).
-3. **Advanced AI:** Integrate LLM reasoning for fundamental analysis.
-4. **Subscription Tier:** Stripe integration for VIP bot access.
+1. **Multi-Asset Scaling:** Adding Gold (XAU/USD) and Major Indices.
+2. **SQL Migration:** Moving JSON Ledger to PostgreSQL for high-scale performance.
+3. **VIP Subscriptions:** Integrated Telegram payment/Stripe gateway.
 
 ---
 
-**Checkpoint Saved. System is fully operational and battle-tested.**
-*"Quantix AI Core - Transparency is our Edge."*
+**Checkpoint Saved. System is fully operational, branded, and battle-tested.**
+*"Quantix AI Core - Intelligence behind every trade."*

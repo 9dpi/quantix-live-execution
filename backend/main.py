@@ -7,11 +7,13 @@ try:
     from signal_engine import generate_signal, generate_stabilizer_signal
     from signal_ledger import append_signal, calculate_stats, get_all_signals
     from telegram_formatter import render_telegram_message, render_telegram_payload
+    from rate_limit import get_cached_daily_signal, save_daily_signal, should_push_telegram
 except ImportError:
     from backend.external_client import fetch_candles
     from backend.signal_engine import generate_signal, generate_stabilizer_signal
     from backend.signal_ledger import append_signal, calculate_stats, get_all_signals
     from backend.telegram_formatter import render_telegram_message, render_telegram_payload
+    from backend.rate_limit import get_cached_daily_signal, save_daily_signal, should_push_telegram
 
 app = FastAPI(title="Signal Genius AI MVP")
 
@@ -27,13 +29,28 @@ def health():
     return {"status": "ok"}
 
 @app.get("/api/v1/signal/latest")
-async def latest_signal():
+async def latest_signal(symbol: str = "EUR/USD", timeframe: str = "M15"):
     try:
-        # 1. Try Real Fetch
-        candles = await fetch_candles()
-        signal = generate_signal(candles)
+        # 1. Check Daily Cache
+        cached = get_cached_daily_signal(symbol, timeframe)
+        if cached:
+            # Mark as replay
+            if "meta" not in cached: cached["meta"] = {}
+            cached["meta"]["status"] = "replay"
+            return {"status": "ok", "payload": cached}
+
+        # 2. Try Real Fetch (Fresh)
+        candles = await fetch_candles(symbol=symbol)
+        signal = generate_signal(candles, timeframe=timeframe)
         
-        # 2. Log to immutable ledger
+        # Mark as fresh
+        if "meta" not in signal: signal["meta"] = {}
+        signal["meta"]["status"] = "fresh"
+        
+        # 3. Save to Cache
+        save_daily_signal(symbol, timeframe, signal)
+        
+        # 4. Log to immutable ledger
         append_signal(signal)
         
         return {
@@ -44,16 +61,13 @@ async def latest_signal():
     except Exception as e:
         print(f"⚠️ Error fetching/generating signal: {e}")
         
-        # 3. EMERGENCY FALLBACK
+        # EMERGENCY FALLBACK
         fallback_price = 1.0850 
         fallback_signal = generate_stabilizer_signal(
             fallback_price, 
-            direction="BUY", 
+            timeframe=timeframe,
             reason="Emergency Fallback"
         )
-        
-        # Log fallback too
-        append_signal(fallback_signal)
         
         return {
             "status": "ok",
@@ -177,10 +191,24 @@ async def telegram_webhook(request: Request):
             
             if data == "refresh_signal":
                 try:
-                    candles = await fetch_candles()
-                    signal = generate_signal(candles)
+                    # Respect daily policy
+                    signal = get_cached_daily_signal("EUR/USD", "M15")
+                    status_text = ""
+                    
+                    if not signal:
+                        candles = await fetch_candles()
+                        signal = generate_signal(candles)
+                        if "meta" not in signal: signal["meta"] = {}
+                        signal["meta"]["status"] = "fresh"
+                        save_daily_signal("EUR/USD", "M15", signal)
+                        append_signal(signal)
+                    else:
+                        today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+                        status_text = f"<b>ℹ️ Today's signal replayed</b>\n📅 Date: {today}\nStatus: Replay\n\n"
+                    
                     payload = render_telegram_payload(signal)
-                    send_telegram_message(chat_id, payload["text"], reply_markup=payload["reply_markup"])
+                    final_text = status_text + payload["text"]
+                    send_telegram_message(chat_id, final_text, reply_markup=payload["reply_markup"])
                 except Exception as e:
                     send_telegram_message(chat_id, f"⚠️ Refresh failed: {str(e)[:50]}")
             
@@ -220,12 +248,25 @@ async def telegram_webhook(request: Request):
         
         elif text == "/signal":
             try:
-                candles = await fetch_candles()
-                signal = generate_signal(candles)
+                # Check Daily Cache
+                signal = get_cached_daily_signal("EUR/USD", "M15")
+                status_text = ""
+                
+                if not signal:
+                    candles = await fetch_candles()
+                    signal = generate_signal(candles)
+                    if "meta" not in signal: signal["meta"] = {}
+                    signal["meta"]["status"] = "fresh"
+                    save_daily_signal("EUR/USD", "M15", signal)
+                    append_signal(signal)
+                else:
+                    today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+                    status_text = f"<b>ℹ️ You are viewing today's signal</b>\n📅 Date: {today}\nStatus: Replay\n\n"
                 
                 # Use interactive payload
                 payload = render_telegram_payload(signal)
-                send_telegram_message(chat_id, payload["text"], reply_markup=payload["reply_markup"])
+                final_text = status_text + payload["text"]
+                send_telegram_message(chat_id, final_text, reply_markup=payload["reply_markup"])
                 
             except Exception as e:
                 print(f"❌ /signal error: {e}")

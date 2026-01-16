@@ -36,12 +36,10 @@ def should_dispatch(data: dict) -> bool:
     """
     Determine if signal should be sent to Telegram.
     
-    Rules:
-    - R1: Only send if confidence >= 60%
-    - R2: Don't resend same direction + entry zone
-    - R3: One signal per asset/timeframe per 24h (unless changed)
-    - R4: Restart-safe (uses persistent state)
-    - R5: All decisions are logged
+    Rules (Phase G Sync):
+    - R1: Only send if 'meta.status' is 'fresh' (Block replays)
+    - R2: Only send if confidence >= 60% (Quality Bar)
+    - R3: Don't resend if already sent within current 24h window
     
     Args:
         data: Full API response with payload
@@ -54,66 +52,48 @@ def should_dispatch(data: dict) -> bool:
         return False
     
     p = data.get("payload", {})
-    
-    # Extract key fields
+    meta = p.get("meta", {})
+    confidence = p.get("confidence", 0)
     asset = p.get("symbol") or p.get("asset", "EUR/USD")
     timeframe = p.get("timeframe", "M15")
-    confidence = p.get("confidence", 0)
-    direction = p.get("direction", "BUY")
-    entry = p.get("entry", 0)
     
-    # Get confidence tier metadata
-    confidence_meta = p.get("confidence_meta", {})
-    
-    # Create unique key for this asset/timeframe pair
-    key = f"{asset}_{timeframe}"
-    
-    # R1: Telegram eligibility (tier-based)
-    if not confidence_meta.get("telegram", False):
-        tier = confidence_meta.get("tier", "UNKNOWN")
-        print(f"❌ R1: Not eligible for Telegram (tier: {tier}, confidence: {confidence}%)")
-        print(f"   💡 Tip: Only HIGH tier signals (≥85%) are sent to Telegram")
+    # R1: Block Replays
+    if meta.get("status") == "replay":
+        print(f"❌ R1: Blocked Replay signal for {asset}")
         return False
     
-    # Load previous state
+    # R2: Confidence Bar (Phase G: >= 60)
+    if confidence < 60:
+        print(f"❌ R2: Low confidence ({confidence}%). Minimum 60% required for Telegram.")
+        return False
+    
+    # R3: Dispatch History Check
+    key = f"{asset}_{timeframe}"
     state = load_state()
     last = state.get(key)
-    
     now = datetime.now(timezone.utc)
     
-    # If we have previous signal for this pair
     if last:
         try:
             last_time = datetime.fromisoformat(last["last_sent"])
-            time_diff = now - last_time
-            
-            # R3: Check 24h window
-            if time_diff < timedelta(hours=24):
-                # R2: Check if signal is essentially the same
-                if (last["direction"] == direction and 
-                    last["entry"] == entry):
-                    print(f"❌ R2: Duplicate signal (same direction + entry)")
-                    print(f"   Last sent: {time_diff.seconds // 3600}h ago")
-                    return False
-                else:
-                    print(f"✅ R2: Signal changed (direction or entry different)")
-            else:
-                print(f"✅ R3: 24h window passed ({time_diff.days} days ago)")
-        except Exception as e:
-            print(f"⚠️ Error parsing last state: {e}")
-    
+            # Already checked R1 (freshness), but R3 adds extra protection
+            if now - last_time < timedelta(hours=24):
+                print(f"❌ R3: Already sent a signal for {key} in the last 24h")
+                return False
+        except Exception:
+            pass
+
+    # APPROVED
     # Update state
     state[key] = {
         "last_sent": now.isoformat(),
-        "direction": direction,
-        "entry": entry,
+        "direction": p.get("direction"),
+        "entry": p.get("entry"),
         "confidence": confidence
     }
-    
     save_state(state)
     
-    # R5: Log decision
-    print(f"✅ DISPATCH APPROVED: {asset} {direction} @ {confidence}%")
+    print(f"✅ DISPATCH APPROVED: {asset} @ {confidence}% (FRESH)")
     return True
 
 

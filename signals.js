@@ -81,6 +81,12 @@ export function renderCard(data) {
       ${meta.icon} ${p.confidence}% ${meta.label}
     </div>
 
+    ${p.meta?.status === 'replay' ? `
+      <div class="badge-replay">
+        🔁 Today's Signal (Replay)
+      </div>
+    ` : ''}
+
     ${meta.warning ? `<div class="warning" style="margin-top: 0; margin-bottom: 16px;">${meta.warning}</div>` : ""}
 
     <div class="signal-details" style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; background: rgba(255,255,255,0.02); padding: 16px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.05);">

@@ -62,18 +62,17 @@ export function renderCard(data) {
   const timeLeft = Math.max(0, Math.round(expiryMinutes * (1 - expiryPercent / 100)));
 
   // Handle entry as single value or array
-  const entryDisplay = Array.isArray(p.entry)
-    ? `${p.entry[0]}`
-    : p.entry;
+  const entryDisplay = Array.isArray(p.entry) ? p.entry.join(' – ') : p.entry;
+  const expiryPercent_for_html = calcExpiryPercent(p.generated_at, p.expiry?.minutes || 45);
 
   return `
   <div class="signal-card">
-    <div class="signal-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
-      <h2 style="margin: 0; font-size: 18px; color: #9ca3af; font-weight: 500;">${p.symbol || p.asset}</h2>
-      <span style="font-size: 9px; background: rgba(255,255,255,0.05); color: #6b7280; padding: 2px 6px; border-radius: 4px; border: 1px solid rgba(255,255,255,0.05);">${p.mode || 'NORMAL'}</span>
+    <div class="signal-header">
+      <h2>${p.symbol || p.asset}</h2>
+      <span>${p.mode || 'NORMAL'}</span>
     </div>
 
-    <div style="font-size: 28px; font-weight: 800; color: ${p.direction === 'BUY' ? '#22c55e' : '#ef4444'}; margin-bottom: 16px;">
+    <div class="signal-direction ${p.direction === 'BUY' ? 'buy' : 'sell'}">
       ${p.direction === 'BUY' ? '🟢 BUY' : '🔴 SELL'}
     </div>
 
@@ -87,44 +86,44 @@ export function renderCard(data) {
       </div>
     ` : ''}
 
-    ${meta.warning ? `<div class="warning" style="margin-top: 0; margin-bottom: 16px;">${meta.warning}</div>` : ""}
+    ${meta.warning ? `<div class="warning">⚠️ ${meta.warning}</div>` : ""}
 
-    <div class="signal-details" style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; background: rgba(255,255,255,0.02); padding: 16px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.05);">
-      <div class="detail-item">
-        <b>Entry</b>
-        <div style="font-size: 18px; font-weight: 700; color: #fff;">${entryDisplay}</div>
+    <div class="detail-grid">
+      <div class="detail-box">
+        <label>Entry</label>
+        <span>${entryDisplay}</span>
       </div>
-      <div class="detail-item">
-        <b>Timeline</b>
-        <div style="font-size: 18px; font-weight: 700; color: #fff;">${p.timeframe}</div>
+      <div class="detail-box">
+        <label>Timeframe</label>
+        <span>${p.timeframe}</span>
       </div>
-      <div class="detail-item">
-        <b>Take Profit</b>
-        <div style="font-size: 18px; font-weight: 700; color: #22c55e;">${p.tp}</div>
+      <div class="detail-box">
+        <label>Take Profit</label>
+        <span class="success">${p.tp}</span>
       </div>
-      <div class="detail-item">
-        <b>Stop Loss</b>
-        <div style="font-size: 18px; font-weight: 700; color: #ef4444;">${p.sl}</div>
+      <div class="detail-box">
+        <label>Stop Loss</label>
+        <span class="danger">${p.sl}</span>
       </div>
     </div>
 
     <div class="expiry-container">
       <div class="expiry-label">
-        <span>⏳ Signal Validity</span>
-        <span>${timeLeft} / ${expiryMinutes} min</span>
+        <span>Validity</span>
+        <span>${p.expiry?.label || '45 min'}</span>
       </div>
       <div class="expiry-bar">
-        <div class="expiry-progress" style="width: ${100 - expiryPercent}%"></div>
+        <div class="expiry-progress" style="width: ${expiryPercent_for_html}%"></div>
       </div>
     </div>
 
-    <div style="margin-top: 16px; padding: 12px; background: rgba(0,0,0,0.2); border-radius: 6px; font-size: 11px; color: #9ca3af; border: 1px solid rgba(255,255,255,0.03);">
-        🔍 <b>Strategy:</b> ${p.strategy}<br/>
-        🌍 <b>Session:</b> ${p.session}${p.volatility ? `<br/>📉 <b>Volatility:</b> ${p.volatility.atr_percent}% (${p.volatility.state})` : ""}
-    </div>
-
-    <div style="margin-top: 16px; text-align: center; color: #4b5563; font-size: 10px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase;">
-      Quantix AI Core V1.0
+    <div class="signal-footer">
+      <div class="signal-id">
+        ID: <code>${p.signal_id || 'N/A'}</code>
+      </div>
+      <div class="signal-volatility">
+        VOL: <span>${p.volatility?.atr_percent || '0.00'}%</span>
+      </div>
     </div>
   </div>
   `;

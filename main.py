@@ -13,14 +13,17 @@ HISTORY = []
 CURRENT_SIGNAL = None  # Live Proof Baseline
 
 @app.middleware("http")
-async def global_guard(request: Request, call_next):
+async def observability_and_guard(request: Request, call_next):
+    # Log mỗi request
+    print(f"📡 [{request.method}] {request.url.path}")
     try:
-        return await call_next(request)
+        response = await call_next(request)
+        return response
     except Exception as e:
-        print("🔥 GLOBAL CRASH PREVENTED:", repr(e))
+        print(f"🔥 CRITICAL ERROR: {repr(e)}")
         return JSONResponse(
             status_code=500,
-            content={"status": "error", "message": "Execution Engine Error"}
+            content={"status": "error", "message": "Internal Execution Error"}
         )
 
 app.add_middleware(
@@ -32,7 +35,8 @@ app.add_middleware(
 
 @app.get("/health")
 def health():
-    return {"status": "ok", "mode": "LIVE_PROOF", "executed": CURRENT_SIGNAL is not None}
+    # always 200
+    return {"status": "ok"}
 
 @app.get("/signal/latest")
 def latest():

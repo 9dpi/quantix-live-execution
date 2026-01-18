@@ -111,7 +111,7 @@ function startTimer() {
         }
         const timerEl = document.getElementById("refresh-indicator");
         if (timerEl) {
-            timerEl.innerText = `[LIVE PROOF] Execution Locked`;
+            timerEl.innerText = `Syncing status... (${countdown}s)`;
         }
     }, 1000);
 }
@@ -119,5 +119,5 @@ function startTimer() {
 // Initial Run
 document.addEventListener("DOMContentLoaded", () => {
     loadSignal();
-    // startTimer(); // ❌ Disabled for LIVE PROOF
+    startTimer(); // ✅ Enabled: Syncs UI without re-generating signal
 });

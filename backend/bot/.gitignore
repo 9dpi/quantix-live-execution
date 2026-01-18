@@ -1,5 +1,0 @@
-# Bot secrets and state
-.env
-dispatch_state.json
-*.pyc
-__pycache__/

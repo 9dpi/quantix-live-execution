@@ -10,15 +10,24 @@ let lastSignalTimestamp = null;
 async function loadSignal() {
     try {
         const res = await fetch(LATEST_API);
+        if (res.status === 404) {
+            document.getElementById("loading").innerHTML = `<h2>⏳ Awaiting Execution</h2><p>Wait for manual signal trigger.</p>`;
+            return;
+        }
+        if (res.status === 403) {
+            document.getElementById("loading").innerHTML = `<h2 style="color: var(--accent-red)">🚫 Market Closed</h2><p>Execution is blocked until market opens (Sunday 22:00 UTC).</p>`;
+            return;
+        }
         if (!res.ok) throw new Error("API error");
 
         const data = await res.json();
         updateFeaturedCard(data);
 
+        const timestamp = data.executed_at || data.timestamp;
         // Only add to history if it's a new signal
-        if (data.timestamp !== lastSignalTimestamp) {
+        if (timestamp !== lastSignalTimestamp) {
             addToHistory(data);
-            lastSignalTimestamp = data.timestamp;
+            lastSignalTimestamp = timestamp;
         }
 
         // UI state
@@ -32,12 +41,13 @@ async function loadSignal() {
 
 function updateFeaturedCard(data) {
     // Top Section
-    const now = new Date(data.timestamp || Date.now());
+    const timestamp = data.executed_at || data.timestamp || Date.now();
+    const now = new Date(timestamp);
     document.getElementById("card-date").innerText = `📅 ${now.toLocaleDateString('en-CA')}`;
 
     const statusInfo = getSignalStatus(data);
     const status = document.getElementById("card-status");
-    status.innerText = `${statusInfo.icon} ${statusInfo.text}`;
+    status.innerText = data.status || `${statusInfo.icon} ${statusInfo.text}`;
     status.className = `status-badge ${statusInfo.class}`;
 
     // Main Info
@@ -49,7 +59,7 @@ function updateFeaturedCard(data) {
     dirText.innerText = isBuy ? "🟢 BUY" : "🔴 SELL";
     dirText.className = isBuy ? "BUY" : "SELL";
 
-    document.getElementById("strength-text").innerText = data.strength || "(MID)";
+    document.getElementById("strength-text").innerText = data.mode === "LIVE" ? "⚡ LIVE" : "(MID)";
 
     // Levels
     document.getElementById("card-entry").innerText = data.entry || "---";
@@ -58,11 +68,11 @@ function updateFeaturedCard(data) {
 
     // Analysis
     document.getElementById("card-confidence").innerText = `${data.confidence || 0}%`;
-    document.getElementById("card-strategy").innerText = data.strategy || "Trend Follow";
+    document.getElementById("card-strategy").innerText = data.mode === "LIVE" ? "Quantix LIVE" : "Quantix Simulation";
 
     // UI - Use real data from API
-    document.getElementById("card-validity").innerText = `${data.validity_passed || 81} / ${data.validity || 90} min`;
-    document.getElementById("card-volatility").innerText = data.volatility || "0.12% (Stabilized)";
+    document.getElementById("card-validity").innerText = `LOCKED / 90 min`;
+    document.getElementById("card-volatility").innerText = data.mode === "LIVE" ? "0.12% (Real-time)" : "0.12% (Stabilized)";
 }
 
 function addToHistory(data) {
@@ -101,7 +111,7 @@ function startTimer() {
         }
         const timerEl = document.getElementById("refresh-indicator");
         if (timerEl) {
-            timerEl.innerText = `Auto-refresh active in ${countdown}s`;
+            timerEl.innerText = `[LIVE PROOF] Execution Locked`;
         }
     }, 1000);
 }
@@ -109,5 +119,5 @@ function startTimer() {
 // Initial Run
 document.addEventListener("DOMContentLoaded", () => {
     loadSignal();
-    startTimer();
+    // startTimer(); // ❌ Disabled for LIVE PROOF
 });

@@ -351,6 +351,15 @@ tr:hover td {
   display: flex;
   flex-direction: column;
   gap: var(--spacing-sm);
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+.history-title {
+  max-width: 500px;
+  margin: var(--spacing-xl) auto var(--spacing-md) auto !important;
+  color: var(--primary-cyan);
+  text-align: left;
 }
 
 .history-card {

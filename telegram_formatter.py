@@ -1,35 +1,42 @@
 import os
 import requests
+from datetime import datetime, timezone
 
 def send_telegram(chat_id, signal):
     """
-    Minimalist, machine-readable Telegram formatter for Quantix Live Execution.
-    Focuses on raw data and speed.
+    Standard Copier Format for Quantix Live Execution.
+    Fixed format - DO NOT ALTER.
     """
     bot_token = os.getenv("TELEGRAM_BOT_TOKEN")
     if not bot_token or not chat_id:
         return None
 
-    # Format machine-readable block
+    # Parse time for standard display
+    ts_str = signal.get('executed_at') or signal.get('timestamp')
+    try:
+        ts = datetime.fromisoformat(ts_str.replace("Z", "+00:00"))
+        time_formatted = ts.strftime("%Y-%m-%d %H:%M UTC")
+    except:
+        time_formatted = ts_str
+
+    # FIXED COPIER FORMAT
     msg = (
-        f"🚀 QUANTIX_EXECUTION_REPORT\n"
-        f"ID: {signal.get('signal_id', 'N/A')}\n"
-        f"ASSET: {signal['asset']}\n"
-        f"DIR: {signal['direction']}\n"
-        f"ENTRY: {signal['entry']}\n"
-        f"TP: {signal['tp']}\n"
+        f"#QX_SIGNAL\n"
+        f"PAIR: {signal['asset'].replace('/', '')}\n"
+        f"TYPE: {signal['direction']}\n"
+        f"ENTRY: MARKET\n"
         f"SL: {signal['sl']}\n"
-        f"CONF: {signal['confidence']}%\n"
-        f"MODE: {signal.get('mode', 'LIVE')}\n"
-        f"TIME: {signal.get('executed_at') or signal.get('timestamp')}\n"
-        f"---"
+        f"TP: {signal['tp']}\n"
+        f"TIMEFRAME: M15\n"
+        f"SIGNAL_TIME: {time_formatted}\n"
+        f"TTL: 90"
     )
 
     try:
         url = f"https://api.telegram.org/bot{bot_token}/sendMessage"
         payload = {
             "chat_id": chat_id,
-            "text": f"<code>{msg}</code>",
+            "text": msg,
             "parse_mode": "HTML"
         }
         r = requests.post(url, json=payload, timeout=10)

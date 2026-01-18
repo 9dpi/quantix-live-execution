@@ -158,42 +158,51 @@ def stats():
     }
 
 @app.post("/telegram/webhook")
-async def telegram_webhook(req: Request):
+async def telegram_webhook(request: Request):
+    """
+    STRICT TELEGRAM WEBHOOK PROTOCOL:
+    1. POST only (Checked by FastAPI)
+    2. Never block/sync
+    3. Never crash on malformed payloads
+    4. Always return 200 OK to Telegram
+    """
     try:
-        data = await req.json()
-        print("📥 Telegram update:", data)
+        data = await request.json()
+    except:
+        return {"ok": True} # Trả về OK ngay cả khi payload không phải JSON chuẩn
 
-        message = data.get("message")
-        if not message:
-            return {"ok": True}  # Bỏ qua mọi event khác
+    # Log sơ bộ để quan sát
+    print(f"📥 Telegram Webhook: {data.get('update_id')}")
 
-        chat = message.get("chat")
+    try:
+        message = data.get("message", {})
+        chat_id = message.get("chat", {}).get("id")
         text = message.get("text", "")
 
-        if not chat:
+        if not chat_id or not text:
             return {"ok": True}
 
-        chat_id = chat["id"]
-
         if text.startswith("/signal"):
-            signal = get_latest_signal_safe()
-            send_telegram(chat_id, signal)
+            # Lấy tín hiệu cuối cùng (Frozen)
+            # Không dùng get_latest_signal_safe() để tránh sinh signal mới vô ý
+            from main import CURRENT_SIGNAL
+            if CURRENT_SIGNAL:
+                send_telegram(chat_id, CURRENT_SIGNAL)
+            else:
+                send_simple_message(chat_id, "⏳ No signal executed yet. Check dashboard.")
             
         elif text.startswith("/start") or text.startswith("/help"):
             welcome_msg = (
-                "🚀 *Signal Genius AI Bot v1.1*\n\n"
-                "Welcome trader! I am synced with the Web Dashboard.\n\n"
-                "Commands:\n"
-                "/signal - Get the latest AI signal\n"
-                "/dashboard - Web link"
+                "🚀 *Quantix Live Bot*\n\n"
+                "I follow the ONE signal - ONE execution protocol.\n\n"
+                "/signal - Get the frozen live signal"
             )
             send_simple_message(chat_id, welcome_msg)
 
-        return {"ok": True}
-
     except Exception as e:
-        print("❌ TELEGRAM WEBHOOK ERROR:", repr(e))
-        return {"ok": True}  # QUAN TRỌNG: KHÔNG ĐƯỢC CRASH
+        print(f"⚠️ Webhook logic error (Suppressed): {e}")
+    
+    return {"status": "received", "ok": True}
 
 def send_simple_message(chat_id, text):
     bot_token = os.getenv("TELEGRAM_BOT_TOKEN")

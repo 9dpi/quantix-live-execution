@@ -3,18 +3,11 @@ import requests
 from datetime import datetime, timezone
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
-try:
-    from external_client import fetch_candles
-    from signal_engine import generate_signal, generate_stabilizer_signal
-    from signal_ledger import append_signal, calculate_stats, get_all_signals
-    from telegram_formatter import render_telegram_message, render_telegram_payload
-    from rate_limit import get_cached_daily_signal, save_daily_signal, should_push_telegram
-except ImportError:
-    from backend.external_client import fetch_candles
-    from backend.signal_engine import generate_signal, generate_stabilizer_signal
-    from backend.signal_ledger import append_signal, calculate_stats, get_all_signals
-    from backend.telegram_formatter import render_telegram_message, render_telegram_payload
-    from backend.rate_limit import get_cached_daily_signal, save_daily_signal, should_push_telegram
+from external_client import fetch_candles
+from signal_engine import generate_signal, generate_stabilizer_signal
+from signal_ledger import append_signal, calculate_stats, get_all_signals
+from telegram_formatter import render_telegram_message, render_telegram_payload
+from rate_limit import get_cached_daily_signal, save_daily_signal, should_push_telegram
 
 app = FastAPI(title="Signal Genius AI MVP")
 
@@ -38,6 +31,10 @@ logger = logging.getLogger("quantix-api")
 
 # Check Environment
 logger.info(f"TWELVE_DATA_API_KEY Configured: {bool(os.getenv('TWELVE_DATA_API_KEY'))}")
+
+@app.get("/health")
+def health():
+    return {"status": "ok"}
 
 @app.get("/api/v1/signal/latest")
 async def latest_signal(symbol: str = "EUR/USD", timeframe: str = "M15"):

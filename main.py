@@ -2,11 +2,14 @@ from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from signal_engine import get_latest_signal_safe
-from telegram import send_telegram
+from telegram_formatter import send_telegram
 import os
 import requests
 
 app = FastAPI()
+
+# Global History Cache (MPV Simple Ledger)
+HISTORY = []
 
 @app.middleware("http")
 async def global_guard(request: Request, call_next):
@@ -32,7 +35,24 @@ def health():
 
 @app.get("/signal/latest")
 def latest():
-    return get_latest_signal_safe()
+    sig = get_latest_signal_safe()
+    # Add to in-memory ledger if not duplicate
+    if not HISTORY or sig['timestamp'] != HISTORY[0].get('timestamp'):
+        HISTORY.insert(0, sig)
+        if len(HISTORY) > 50: HISTORY.pop()
+    return sig
+
+@app.get("/signal/history")
+def history():
+    return HISTORY
+
+@app.get("/signal/stats")
+def stats():
+    return {
+        "total_signals": len(HISTORY),
+        "status": "operational",
+        "engine": "Quantix AI Core v1.1"
+    }
 
 @app.post("/telegram/webhook")
 async def telegram_webhook(req: Request):

@@ -5,6 +5,8 @@ const LATEST_API = `${API_BASE}/signal/latest`;
 let refreshInterval = 60;
 let countdown = refreshInterval;
 
+let lastSignalTimestamp = null;
+
 async function loadSignal() {
     try {
         const res = await fetch(LATEST_API);
@@ -12,7 +14,12 @@ async function loadSignal() {
 
         const data = await res.json();
         updateFeaturedCard(data);
-        addToHistory(data);
+
+        // Only add to history if it's a new signal
+        if (data.timestamp !== lastSignalTimestamp) {
+            addToHistory(data);
+            lastSignalTimestamp = data.timestamp;
+        }
 
         // UI state
         document.getElementById("loading").classList.add("hidden");

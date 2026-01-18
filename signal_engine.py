@@ -1,4 +1,4 @@
-from market import get_price
+from external_client import get_price
 from datetime import datetime, timezone
 import random
 

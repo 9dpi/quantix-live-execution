@@ -92,9 +92,9 @@ function startTimer() {
             countdown = refreshInterval;
             loadSignal();
         }
-        const timerEl = document.getElementById("refresh-timer");
+        const timerEl = document.getElementById("refresh-indicator");
         if (timerEl) {
-            timerEl.innerText = `Refreshing in ${countdown}s`;
+            timerEl.innerText = `Auto-refresh active in ${countdown}s`;
         }
     }, 1000);
 }

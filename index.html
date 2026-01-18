@@ -28,12 +28,8 @@
 <body>
   <!-- Main Content -->
   <main class="container">
-    <div class="header-content" style="margin-bottom: var(--spacing-lg);">
-      <div class="logo-container">
-        <img src="./logo.svg" alt="Signal Genius AI Logo" class="logo">
-        <h1 class="brand-name">Signal Genius AI</h1>
-      </div>
-      <span id="refresh-timer" class="tagline">Refreshing in 60s</span>
+    <div class="header-content" style="margin-bottom: var(--spacing-lg); flex-direction: column; text-align: center;">
+      <h1 class="brand-name">Signal Genius <span class="ai-badge">AI</span></h1>
     </div>
 
     <!-- Loading State -->
@@ -148,7 +144,7 @@
   <!-- Auto-refresh Indicator -->
   <div class="refresh-indicator">
     <div class="refresh-dot"></div>
-    <span id="refresh-indicator">Auto-refresh active</span>
+    <span id="refresh-indicator">Auto-refresh active in 60s</span>
   </div>
 
   <!-- Scripts -->

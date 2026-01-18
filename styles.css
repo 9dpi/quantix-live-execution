@@ -37,28 +37,39 @@ body {
 
 .header-content {
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
   margin-bottom: var(--spacing-lg);
+  text-align: center;
 }
 
 h1.brand-name {
-  font-size: 1.5rem;
-  background: linear-gradient(135deg, var(--primary-cyan), var(--primary-blue));
+  font-size: 2.5rem;
+  font-weight: 800;
+  background: linear-gradient(135deg, var(--primary-cyan), #a855f7, var(--primary-cyan));
+  background-size: 200% auto;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+  animation: shine 3s linear infinite;
 }
 
-.logo-container {
-  display: flex;
-  align-items: center;
-  gap: 10px;
+@keyframes shine {
+  to {
+    background-position: 200% center;
+  }
 }
 
-.logo {
-  width: 32px;
-  height: 32px;
+.ai-badge {
+  display: inline-block;
+  border: 2px solid #ffd700;
+  color: #ffd700 !important;
+  padding: 0 10px;
+  border-radius: 4px;
+  -webkit-text-fill-color: #ffd700 !important;
+  font-size: 2rem;
+  vertical-align: middle;
+  margin-left: 5px;
 }
 
 .tagline {

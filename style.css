@@ -12,23 +12,23 @@
   --text-primary: #ffffff;
   --text-secondary: #a0aec0;
   --border-color: rgba(0, 212, 255, 0.2);
-  
+
   /* Gradients */
   --gradient-primary: linear-gradient(135deg, var(--primary-cyan), var(--primary-blue));
   --gradient-accent: linear-gradient(135deg, var(--accent-green), var(--primary-cyan));
-  
+
   /* Spacing */
   --spacing-xs: 0.5rem;
   --spacing-sm: 1rem;
   --spacing-md: 1.5rem;
   --spacing-lg: 2rem;
   --spacing-xl: 3rem;
-  
+
   /* Border Radius */
   --radius-sm: 8px;
   --radius-md: 16px;
   --radius-lg: 24px;
-  
+
   /* Shadows */
   --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
   --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.4);
@@ -308,8 +308,17 @@ body {
 }
 
 @keyframes pulse {
-  0%, 100% { opacity: 0.5; transform: scale(1); }
-  50% { opacity: 1; transform: scale(1.1); }
+
+  0%,
+  100% {
+    opacity: 0.5;
+    transform: scale(1);
+  }
+
+  50% {
+    opacity: 1;
+    transform: scale(1.1);
+  }
 }
 
 .waiting-title {
@@ -383,32 +392,32 @@ body {
     flex-direction: column;
     text-align: center;
   }
-  
+
   .tagline {
     margin-left: 0;
   }
-  
+
   .brand-name {
     font-size: 1.25rem;
   }
-  
+
   .logo {
     width: 40px;
     height: 40px;
   }
-  
+
   .bento-grid {
     grid-template-columns: 1fr;
   }
-  
+
   .signal-details {
     grid-template-columns: 1fr;
   }
-  
+
   .asset-name {
     font-size: 1.5rem;
   }
-  
+
   .stats-grid {
     grid-template-columns: 1fr;
   }
@@ -420,6 +429,7 @@ body {
     opacity: 0;
     transform: translateY(20px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -456,6 +466,13 @@ body {
 }
 
 @keyframes blink {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.3; }
+
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.3;
+  }
 }

@@ -1,28 +1,19 @@
 /**
  * Payload – Data Fetching and Orchestration
- * Production Bento UI Version
+ * Production Card UI Version
  */
 
-import { renderRow, renderStats } from "./signals.js";
+import { renderCard, renderStats } from "./signals.js";
 
 const API_BASE = "https://signalgeniusai-production.up.railway.app";
 const LATEST_API = `${API_BASE}/signal/latest`;
 
 function updateUI(data) {
-    // Bento UI structure usually has 'signal-container' or similar, 
-    // but if the user insists on 'signals-tbody' logic from Bento Grid Table version:
-    // Wait, user's provided logic references 'signals-tbody'.
-    // Let's stick EXACTLY to user's provided code for payload.js
+    const root = document.getElementById("signal-container");
 
-    const root = document.getElementById("signals-tbody");
-    const statsRoot = document.getElementById("stats-container");
+    if (!root || !data) return;
 
-    if (!root || !statsRoot || !data) return;
-
-    // Adapt to the data structure - if data IS the signal (flat), wrap it?
-    // Or if renderRow handles the object directly.
-    root.innerHTML = renderRow(data);
-    statsRoot.innerHTML = renderStats(data);
+    root.innerHTML = renderCard(data);
 }
 
 async function fetchLatestSignal() {

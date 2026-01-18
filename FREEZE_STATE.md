@@ -16,7 +16,7 @@ Frontend:
 ### Scope Control (FREEZE RULES)
 **STRICTLY FROZEN (DO NOT TOUCH):**
 - `main.py` (FastAPI core - moved to root)
-- `signal.py` (Engine logic - moved to root)
+- `signal_engine.py` (Engine logic - renamed to avoid conflict)
 - `market.py` (Data fetching - moved to root)
 - `telegram.py` (Alert formatting - moved to root)
 - `requirements.txt` (Moved to root)

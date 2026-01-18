@@ -1,7 +1,7 @@
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
-from signal import get_latest_signal_safe
+from signal_engine import get_latest_signal_safe
 from telegram import send_telegram
 import os
 import requests

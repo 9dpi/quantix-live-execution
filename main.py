@@ -10,7 +10,18 @@ from datetime import datetime, timezone
 app = FastAPI()
 
 # Only ONE signal allowed per session
-CURRENT_SIGNAL = None
+def load_persisted_signal():
+    try:
+        if os.path.exists("execution_log.json"):
+            with open("execution_log.json", "r") as f:
+                data = json.load(f)
+                if isinstance(data, dict) and data.get("status") == "EXECUTED":
+                    return data
+    except Exception as e:
+        print(f"⚠️ Failed to load persistent log: {e}")
+    return None
+
+CURRENT_SIGNAL = load_persisted_signal()
 
 @app.middleware("http")
 async def observability_layer(request: Request, call_next):

@@ -32,15 +32,15 @@ def _format_execution_block(signal: dict) -> str:
     )
 
 def format_signal_message(signal: dict) -> str:
-    symbol = signal.get("asset") or signal.get("symbol")
+    symbol = signal.get("asset") or signal.get("symbol") or "N/A"
     timeframe = signal.get("timeframe", "M15")
-    direction = signal["direction"]
+    direction = signal.get("direction", "N/A")
     status = signal.get("status", "EXECUTED")
     validity = signal.get("validity", "ACTIVE")
     
-    entry = signal["entry"]
-    tp = signal["tp"]
-    sl = signal["sl"]
+    entry = signal.get("entry", "N/A")
+    tp = signal.get("tp", "N/A")
+    sl = signal.get("sl", "N/A")
 
     message = (
         "Signal Genius AI\n"

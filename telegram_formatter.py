@@ -35,55 +35,24 @@ def format_signal_message(signal: dict) -> str:
     symbol = signal.get("asset") or signal.get("symbol")
     timeframe = signal.get("timeframe", "M15")
     direction = signal["direction"]
-
-    status = signal.get("status", "SNAPSHOT")
-    validity = signal.get("validity", "")
-
-    status_badge = _format_status_badge(status)
-
+    status = signal.get("status", "EXECUTED")
+    validity = signal.get("validity", "ACTIVE")
+    
     entry = signal["entry"]
     tp = signal["tp"]
     sl = signal["sl"]
 
-    confidence = signal.get("confidence")
-    strategy = signal.get("strategy")
-    volatility = signal.get("volatility")
-
-    header = (
-        "🧠 Quantix Live Execution\n"
-        f"Status: {status_badge}\n"
-    )
-
-    if validity:
-        header += f"Validity: {validity}\n"
-
-    header += "\n"
-
-    market_context = _format_market_context(signal)
-
     message = (
-        header
-        + market_context
-        + f"📊 {symbol} | {timeframe}\n"
+        "Quantix Live Execution\n"
+        f"Status: {status}\n"
+        f"Validity: {validity}\n\n"
+        f"{symbol} | {timeframe}\n"
         f"{'🟢 BUY' if direction == 'BUY' else '🔴 SELL'}\n\n"
         f"🎯 Entry: {entry}\n"
         f"💰 TP: {tp}\n"
-        f"🛑 SL: {sl}\n"
+        f"🛑 SL: {sl}\n\n"
+        "⚠️ Educational purpose only"
     )
-
-    if confidence is not None:
-        message += f"\n⭐ Confidence: {confidence}%"
-
-    if strategy:
-        message += f"\n🧠 Strategy: {strategy}"
-
-    if volatility:
-        message += f"\n🌊 Volatility: {volatility}"
-
-    message += _format_execution_block(signal)
-
-    message += "\n\n⚠️ Educational purpose only"
-
     return message
 
 def send_telegram(chat_id, signal):

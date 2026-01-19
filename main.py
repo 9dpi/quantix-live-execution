@@ -71,6 +71,7 @@ def execute():
         "sl": sig["sl"],
         "confidence": sig["confidence"],
         "executed_at": sig["timestamp"],
+        "validity": "ACTIVE",
         "mode": "LIVE" if os.getenv("LIVE_MODE") == "true" else "SIMULATION"
     }
     

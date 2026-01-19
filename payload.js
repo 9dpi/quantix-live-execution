@@ -55,7 +55,7 @@ function updateFeaturedCard(data) {
     document.getElementById("card-sl").innerText = data.sl;
     document.getElementById("card-confidence").innerText = `${data.confidence}%`;
     document.getElementById("card-strategy").innerText = "Quantix Execution";
-    document.getElementById("card-validity").innerText = `LOCKED`;
+    document.getElementById("card-validity").innerText = `ACTIVE`;
     document.getElementById("card-volatility").innerText = "Real-time Verified";
 }
 

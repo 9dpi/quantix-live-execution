@@ -88,17 +88,26 @@ def save_log(signal):
 async def telegram_webhook(request: Request):
     try:
         data = await request.json()
+        print(f"📥 Telegram Webhook received: {json.dumps(data)}")
         message = data.get("message", {})
         chat_id = message.get("chat", {}).get("id")
         text = message.get("text", "")
 
         if text.startswith("/signal") and chat_id:
+            print(f"🔍 Signal requested by chat_id: {chat_id}")
             if CURRENT_SIGNAL:
-                send_telegram(chat_id, CURRENT_SIGNAL)
+                print(f"📤 Sending signal to {chat_id}")
+                res = send_telegram(chat_id, CURRENT_SIGNAL)
+                print(f"📦 Telegram send result: {res}")
             else:
+                print(f"⏳ No signal executed yet. Informing {chat_id}")
                 bot_token = os.getenv("TELEGRAM_BOT_TOKEN")
-                url = f"https://api.telegram.org/bot{bot_token}/sendMessage"
-                requests.post(url, json={"chat_id": chat_id, "text": "⏳ Waiting for Live Execution."})
-    except:
-        pass
+                if not bot_token:
+                    print("❌ TELEGRAM_BOT_TOKEN is missing!")
+                else:
+                    url = f"https://api.telegram.org/bot{bot_token}/sendMessage"
+                    res = requests.post(url, json={"chat_id": chat_id, "text": "⏳ Waiting for Live Execution."}, timeout=10)
+                    print(f"📦 Waiting message result: {res.status_code}")
+    except Exception as e:
+        print(f"🔥 Webhook error: {repr(e)}")
     return {"ok": True}

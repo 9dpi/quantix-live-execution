@@ -43,7 +43,7 @@ def format_signal_message(signal: dict) -> str:
     sl = signal["sl"]
 
     message = (
-        "Quantix Live Execution\n"
+        "Signal Genius AI\n"
         f"Status: {status}\n"
         f"Validity: {validity}\n\n"
         f"{symbol} | {timeframe}\n"

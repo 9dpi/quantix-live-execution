@@ -42,7 +42,11 @@ app.add_middleware(
 
 @app.get("/health")
 def health():
-    return {"status": "ok", "market_open": is_market_open()}
+    return {
+        "status": "ok", 
+        "market_open": is_market_open(),
+        "telegram_token_set": bool(os.getenv("TELEGRAM_BOT_TOKEN"))
+    }
 
 @app.get("/signal/latest")
 def latest():

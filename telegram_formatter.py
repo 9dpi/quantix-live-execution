@@ -88,7 +88,7 @@ def format_signal_message(signal: dict) -> str:
 
 def send_telegram(chat_id, signal):
     """
-    Sends the formatted signal message to Telegram.
+    Sends the formatted signal message to Telegram with interactive buttons.
     """
     bot_token = os.getenv("TELEGRAM_BOT_TOKEN")
     if not bot_token or not chat_id:
@@ -101,7 +101,14 @@ def send_telegram(chat_id, signal):
         payload = {
             "chat_id": chat_id,
             "text": message,
-            "parse_mode": "HTML"
+            "reply_markup": {
+                "inline_keyboard": [
+                    [
+                        {"text": "📈 View Dashboard", "url": "https://www.signalgeniusai.com/"},
+                        {"text": "🔄 Refresh", "url": "https://www.signalgeniusai.com/"}
+                    ]
+                ]
+            }
         }
         r = requests.post(url, json=payload, timeout=10)
         r.raise_for_status()

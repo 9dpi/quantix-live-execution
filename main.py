@@ -5,6 +5,7 @@ from signal_engine import get_latest_signal_safe, is_market_open
 from telegram_formatter import send_telegram
 import os
 import json
+import requests
 from datetime import datetime, timezone
 
 app = FastAPI()
@@ -91,7 +92,7 @@ async def telegram_webhook(request: Request):
         chat_id = message.get("chat", {}).get("id")
         text = message.get("text", "")
 
-        if text == "/signal" and chat_id:
+        if text.startswith("/signal") and chat_id:
             if CURRENT_SIGNAL:
                 send_telegram(chat_id, CURRENT_SIGNAL)
             else:

@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description"
+        content="Signal Genius AI - Transparent signal record system. Shows historical snapshots, not live recommendations.">
+    <title>Signal Genius AI - Signal Record</title>
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="./favicon.svg">
+
+    <!-- Access Gate -->
+    <script src="./gate.js"></script>
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="./style.css">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <!-- Main Content -->
+    <main class="container">
+        <div class="header-content">
+            <h1 class="brand-name">Signal Genius <span class="ai-badge">AI</span></h1>
+        </div>
+
+        <!-- STATE 1: Waiting (Default) -->
+        <div id="waiting-state" class="bento-card signal-card">
+            <div class="waiting-state">
+                <div class="waiting-icon">⏳</div>
+                <h2 class="waiting-title">System Status: Waiting by Design</h2>
+                <div class="waiting-description">
+                    <p style="margin-bottom: 1rem;">This system trades very rarely.</p>
+                    <p style="margin-bottom: 1rem;">A signal will only appear when:</p>
+                    <ul style="text-align: left; max-width: 400px; margin: 0 auto 1rem auto; line-height: 1.8;">
+                        <li>Market conditions are exceptionally clear</li>
+                        <li>The confidence is the highest for the day</li>
+                        <li>No trade has been executed today</li>
+                    </ul>
+                    <p style="margin-bottom: 1rem; font-weight: 600;">If nothing is shown, it means the system has
+                        decided not to trade.</p>
+                    <p style="font-style: italic; opacity: 0.8;">No signal is not a problem. It is a decision.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- STATE 2: Signal Record (Latest) -->
+        <div id="signal-record" class="bento-card signal-card hidden animate-in">
+            <div class="card-section header-section">
+                <div class="sub-header">📋 Signal Record (Latest)</div>
+                <div class="date-status">
+                    <span style="font-size: 0.85rem; color: var(--text-secondary);">Read-only historical snapshot</span>
+                    <span id="record-status" class="status-badge expired">EXPIRED</span>
+                </div>
+            </div>
+
+            <div class="divider"></div>
+
+            <div class="card-section main-info">
+                <div class="asset-tf">
+                    <span id="record-asset">EUR/USD</span>
+                    <span class="separator">|</span>
+                    <span id="record-tf">M15</span>
+                </div>
+                <div id="record-direction" class="direction-strength">
+                    <span id="dir-text">🟢 BUY</span>
+                </div>
+            </div>
+
+            <div class="divider"></div>
+
+            <div class="card-section levels-section">
+                <div class="level-item">
+                    <span class="icon">📍</span>
+                    <span>Reference Price:</span>
+                    <b id="record-entry">1.16044</b>
+                </div>
+                <div class="level-item">
+                    <span class="icon">📅</span>
+                    <span>Generated At:</span>
+                    <b id="record-timestamp">21 Jan 2026 · 06:09 UTC</b>
+                </div>
+                <div class="level-item">
+                    <span class="icon">⚠️</span>
+                    <span>Status:</span>
+                    <b id="record-validity" style="color: var(--accent-red);">EXPIRED — no longer active</b>
+                </div>
+            </div>
+
+            <div class="divider"></div>
+
+            <div class="card-section disclaimer-section"
+                style="background: rgba(255, 193, 7, 0.05); border-left: 3px solid #ffc107;">
+                <div style="text-align: left; padding: 1rem;">
+                    <h3
+                        style="font-size: 0.9rem; font-weight: 700; margin-bottom: 0.75rem; color: var(--text-primary);">
+                        ⚠️ Important Note</h3>
+                    <p style="font-size: 0.85rem; line-height: 1.6; margin-bottom: 0.5rem;">
+                        This signal is displayed <strong>for transparency only</strong>.
+                        It shows what the system generated at a specific point in time.
+                    </p>
+                    <p
+                        style="font-size: 0.85rem; line-height: 1.6; margin-bottom: 0.5rem; color: var(--accent-red); font-weight: 600;">
+                        The signal is no longer valid for execution.
+                    </p>
+                    <p style="font-size: 0.85rem; line-height: 1.6;">
+                        Any decision to use this information is entirely the viewer's own responsibility.
+                    </p>
+                </div>
+            </div>
+
+            <div class="divider"></div>
+
+            <div class="card-section" style="background: rgba(15, 23, 42, 0.02);">
+                <h3 style="font-size: 0.85rem; font-weight: 700; margin-bottom: 0.75rem; color: var(--text-primary);">📖
+                    How to read this</h3>
+                <ul style="text-align: left; font-size: 0.85rem; line-height: 1.8; color: var(--text-secondary);">
+                    <li>This is <strong>not</strong> a live trading instruction</li>
+                    <li>It is a historical record, not a recommendation</li>
+                    <li>Signals are generated <strong>before</strong> outcomes, never after</li>
+                </ul>
+            </div>
+
+            <div class="divider"></div>
+
+            <div class="card-section" style="padding: 1rem 1.5rem;">
+                <p style="font-size: 0.75rem; color: var(--text-secondary); line-height: 1.6; font-style: italic;">
+                    <strong>System Context:</strong> Only the most recent Signal Record is shown to avoid cherry-picking
+                    and hindsight bias.
+                </p>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-brand">Signal Genius AI · Transparent Signal Record System</div>
+            <div class="footer-disclaimer">
+                <strong>"When you see nothing, the system is waiting. When you see a Signal Record, you're looking at
+                    proof — not a suggestion."</strong>
+                <br><br>
+                Signal Genius AI displays historical signal records for transparency only.
+                <br>
+                This is not financial advice. Trading involves risk. Users are fully responsible for their trading
+                decisions.
+                <br>
+                <small style="opacity: 0.7;">Long periods with no signals are intentional. © 2026 Signal Genius AI. All
+                    rights reserved.</small>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script type="module" src="./signal_record.js"></script>
+</body>
+
+</html>

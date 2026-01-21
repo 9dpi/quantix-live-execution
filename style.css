@@ -120,6 +120,48 @@ h1.brand-name {
   border: 1px solid rgba(255, 77, 77, 0.2);
 }
 
+.info-note {
+  background: rgba(255, 193, 7, 0.05);
+  border-left: 3px solid #ffc107;
+  padding: 12px 16px;
+  margin: 10px 20px;
+}
+
+.info-note h3 {
+  font-size: 0.85rem;
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+
+.info-note p {
+  font-size: 0.8rem;
+  line-height: 1.5;
+}
+
+.how-to-read {
+  padding: 12px 20px;
+  background: rgba(15, 23, 42, 0.02);
+}
+
+.how-to-read h3 {
+  font-size: 0.85rem;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.how-to-read ul {
+  list-style: none;
+  font-size: 0.8rem;
+  line-height: 1.6;
+  color: var(--text-secondary);
+}
+
+.how-to-read li::before {
+  content: "•";
+  margin-right: 8px;
+  color: var(--primary-cyan);
+}
+
 /* Featured Card Layout */
 .signal-card {
   padding: 0 !important;
@@ -129,7 +171,7 @@ h1.brand-name {
 }
 
 .card-section {
-  padding: 20px 24px;
+  padding: 16px 20px;
 }
 
 .divider {
@@ -179,17 +221,17 @@ h1.brand-name {
 
 .main-info {
   text-align: center;
-  padding: 32px 24px;
+  padding: 20px 24px;
 }
 
 .asset-tf {
-  font-size: 1.8rem;
+  font-size: 1.4rem;
   font-weight: 800;
   display: flex;
   justify-content: center;
   align-items: center;
   gap: 12px;
-  margin-bottom: 12px;
+  margin-bottom: 8px;
   color: var(--text-primary);
 }
 
@@ -199,7 +241,7 @@ h1.brand-name {
 }
 
 .direction-strength {
-  font-size: 2.2rem;
+  font-size: 1.8rem;
   font-weight: 900;
   display: flex;
   justify-content: center;
@@ -226,21 +268,33 @@ h1.brand-name {
 
 .levels-section {
   display: grid;
-  grid-template-columns: 1fr;
-  gap: 12px;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 0;
   background: rgba(15, 23, 42, 0.02);
 }
 
 .level-item {
   display: flex;
   align-items: center;
-  gap: 15px;
-  font-size: 1.1rem;
-  padding: 12px 0;
+  gap: 10px;
+  font-size: 0.95rem;
+  padding: 12px 20px;
+  white-space: nowrap;
 }
 
 .level-item:not(:last-child) {
-  border-bottom: 1px solid var(--glass-border);
+  border-right: 1px solid var(--glass-border);
+}
+
+@media (max-width: 600px) {
+  .levels-section {
+    grid-template-columns: 1fr;
+  }
+
+  .level-item:not(:last-child) {
+    border-right: none;
+    border-bottom: 1px solid var(--glass-border);
+  }
 }
 
 .level-item .icon {
@@ -251,9 +305,9 @@ h1.brand-name {
 .level-item b {
   font-family: 'JetBrains Mono', 'Fira Code', monospace;
   margin-left: auto;
-  font-size: 1.4rem;
+  font-size: 1.1rem;
   color: var(--text-primary);
-  letter-spacing: 0.05em;
+  letter-spacing: 0.02em;
 }
 
 .analysis-section {

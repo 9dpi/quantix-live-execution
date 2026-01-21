@@ -49,9 +49,8 @@
         <!-- STATE 2: Signal Record (Latest) -->
         <div id="signal-record" class="bento-card signal-card hidden animate-in">
             <div class="card-section header-section">
-                <div class="sub-header">📋 Signal Record (Latest)</div>
                 <div class="date-status">
-                    <span style="font-size: 0.85rem; color: var(--text-secondary);">Read-only historical snapshot</span>
+                    <div class="sub-header">📋 Signal Record (Latest)</div>
                     <span id="record-status" class="status-badge expired">EXPIRED</span>
                 </div>
             </div>
@@ -71,64 +70,49 @@
 
             <div class="divider"></div>
 
-            <div class="card-section levels-section">
+            <div class="levels-section">
                 <div class="level-item">
                     <span class="icon">📍</span>
-                    <span>Reference Price:</span>
+                    <span>Entry:</span>
                     <b id="record-entry">1.16044</b>
                 </div>
                 <div class="level-item">
                     <span class="icon">📅</span>
-                    <span>Generated At:</span>
-                    <b id="record-timestamp">21 Jan 2026 · 06:09 UTC</b>
+                    <span>Time:</span>
+                    <b id="record-timestamp">21 Jan 06:09 UTC</b>
                 </div>
                 <div class="level-item">
                     <span class="icon">⚠️</span>
-                    <span>Status:</span>
-                    <b id="record-validity" style="color: var(--accent-red);">EXPIRED — no longer active</b>
+                    <span>Type:</span>
+                    <b id="record-validity" style="color: var(--accent-red);">RECORD ONLY</b>
                 </div>
             </div>
 
             <div class="divider"></div>
 
-            <div class="card-section disclaimer-section"
-                style="background: rgba(255, 193, 7, 0.05); border-left: 3px solid #ffc107;">
-                <div style="text-align: left; padding: 1rem;">
-                    <h3
-                        style="font-size: 0.9rem; font-weight: 700; margin-bottom: 0.75rem; color: var(--text-primary);">
-                        ⚠️ Important Note</h3>
-                    <p style="font-size: 0.85rem; line-height: 1.6; margin-bottom: 0.5rem;">
-                        This signal is displayed <strong>for transparency only</strong>.
-                        It shows what the system generated at a specific point in time.
-                    </p>
-                    <p
-                        style="font-size: 0.85rem; line-height: 1.6; margin-bottom: 0.5rem; color: var(--accent-red); font-weight: 600;">
-                        The signal is no longer valid for execution.
-                    </p>
-                    <p style="font-size: 0.85rem; line-height: 1.6;">
-                        Any decision to use this information is entirely the viewer's own responsibility.
-                    </p>
-                </div>
+            <div class="card-section info-note">
+                <h3>⚠️ Important Note</h3>
+                <p>
+                    This is a <strong>read-only historical snapshot</strong> for transparency.
+                    It is <strong>no longer valid</strong> for execution. Use at your own responsibility.
+                </p>
             </div>
 
             <div class="divider"></div>
 
-            <div class="card-section" style="background: rgba(15, 23, 42, 0.02);">
-                <h3 style="font-size: 0.85rem; font-weight: 700; margin-bottom: 0.75rem; color: var(--text-primary);">📖
-                    How to read this</h3>
-                <ul style="text-align: left; font-size: 0.85rem; line-height: 1.8; color: var(--text-secondary);">
-                    <li>This is <strong>not</strong> a live trading instruction</li>
-                    <li>It is a historical record, not a recommendation</li>
-                    <li>Signals are generated <strong>before</strong> outcomes, never after</li>
+            <div class="how-to-read">
+                <h3>📖 How to read this</h3>
+                <ul>
+                    <li>Not a live instruction or recommendation</li>
+                    <li>Historical record generated before outcomes</li>
                 </ul>
             </div>
 
             <div class="divider"></div>
 
-            <div class="card-section" style="padding: 1rem 1.5rem;">
-                <p style="font-size: 0.75rem; color: var(--text-secondary); line-height: 1.6; font-style: italic;">
-                    <strong>System Context:</strong> Only the most recent Signal Record is shown to avoid cherry-picking
-                    and hindsight bias.
+            <div class="card-section" style="padding: 12px 20px;">
+                <p style="font-size: 0.7rem; color: var(--text-secondary); line-height: 1.4; font-style: italic;">
+                    <strong>Context:</strong> Only the most recent record is shown to avoid hindsight bias.
                 </p>
             </div>
         </div>

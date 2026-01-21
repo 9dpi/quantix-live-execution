@@ -52,7 +52,6 @@ function formatTimestamp(isoString) {
     const date = new Date(isoString);
     const day = date.getUTCDate();
     const month = date.toLocaleString('en-US', { month: 'short', timeZone: 'UTC' });
-    const year = date.getUTCFullYear();
     const time = date.toLocaleTimeString('en-US', {
         hour: '2-digit',
         minute: '2-digit',
@@ -60,7 +59,7 @@ function formatTimestamp(isoString) {
         timeZone: 'UTC'
     });
 
-    return `${day} ${month} ${year} · ${time} UTC`;
+    return `${day} ${month} ${time} UTC`;
 }
 
 function displaySignalRecord(record) {

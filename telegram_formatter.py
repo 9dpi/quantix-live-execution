@@ -32,26 +32,53 @@ def _format_execution_block(signal: dict) -> str:
     )
 
 def format_signal_message(signal: dict) -> str:
-    symbol = signal.get("asset") or signal.get("symbol") or "N/A"
+    status = signal.get("status", "EXECUTED")
+    
+    # 1. SPECIAL STATUS: MARKET CLOSED
+    if status == "MARKET_CLOSED":
+        return (
+            "Signal Genius AI\n"
+            "Status: Market Closed 🌑\n\n"
+            "The Forex market is currently closed.\n"
+            "No signals generated on weekends.\n\n"
+            "System will auto-resume on Monday."
+        )
+
+    # 2. SPECIAL STATUS: WAITING
+    if status in ["AWAITING_EXECUTION", "WAITING"]:
+        return (
+            "Signal Genius AI\n"
+            "Status: Monitoring Market... ⏳\n\n"
+            "System is scanning for high-probability setups.\n"
+            "No trade decision executed yet.\n\n"
+            "Please wait for the next snapshot."
+        )
+
+    # 3. STANDARD SIGNAL FORMAT
+    symbol = signal.get("asset") or signal.get("symbol") or "EUR/USD"
     timeframe = signal.get("timeframe", "M15")
     direction = signal.get("direction", "N/A")
-    status = signal.get("status", "EXECUTED")
-    validity = signal.get("validity", "ACTIVE")
+    validity = signal.get("validity_status") or signal.get("validity") or "ACTIVE"
     
     entry = signal.get("entry", "N/A")
     tp = signal.get("tp", "N/A")
     sl = signal.get("sl", "N/A")
+    
+    # Emoji
+    dir_emoji = "🟢" if direction == "BUY" else "🔴" if direction == "SELL" else "⚪"
 
     message = (
         "Signal Genius AI\n"
         f"Status: {status}\n"
         f"Validity: {validity}\n\n"
         f"{symbol} | {timeframe}\n"
-        f"{'🟢 BUY' if direction == 'BUY' else '🔴 SELL'}\n\n"
+        f"{dir_emoji} {direction}\n\n"
         f"🎯 Entry: {entry}\n"
         f"💰 TP: {tp}\n"
         f"🛑 SL: {sl}\n\n"
-        "⚠️ Educational purpose only"
+        f"--\n"
+        f"⚠️ Educational purpose only\n"
+        f"--"
     )
     return message
 
@@ -73,8 +100,7 @@ def send_telegram(chat_id, signal):
             "reply_markup": {
                 "inline_keyboard": [
                     [
-                        {"text": "📈 View Dashboard", "url": "https://www.signalgeniusai.com/"},
-                        {"text": "🔄 Refresh", "url": "https://www.signalgeniusai.com/"}
+                        {"text": "📈 View Latest Signal", "url": "https://www.signalgeniusai.com/"}
                     ]
                 ]
             }

@@ -99,19 +99,32 @@ async def telegram_webhook(request: Request):
 
         if text.startswith("/signal") and chat_id:
             print(f"🔍 Signal requested by chat_id: {chat_id}")
-            if CURRENT_SIGNAL:
-                print(f"📤 Sending signal to {chat_id}")
-                res = send_telegram(chat_id, CURRENT_SIGNAL)
-                print(f"📦 Telegram send result: {res}")
-            else:
-                print(f"⏳ No signal executed yet. Informing {chat_id}")
+        if text.startswith("/signal") and chat_id:
+            print(f"� Signal requested by chat_id: {chat_id}")
+            
+            # FETCH FROM PRODUCTION API
+            try:
+                print("🌍 Fetching from Production API...")
+                api_url = "https://signalgeniusai-production.up.railway.app/signal/latest"
+                resp = requests.get(api_url, timeout=10)
+                resp.raise_for_status()
+                
+                signal_data = resp.json()
+                print(f"✅ API Data: {signal_data.get('status')}")
+                
+                # Send whatever data we got from API (send_telegram handles formatting)
+                send_telegram(chat_id, signal_data)
+                
+            except Exception as api_err:
+                print(f"❌ API Fetch Failed: {api_err}")
+                # Fallback message
                 bot_token = os.getenv("TELEGRAM_BOT_TOKEN")
-                if not bot_token:
-                    print("❌ TELEGRAM_BOT_TOKEN is missing!")
-                else:
+                if bot_token:
                     url = f"https://api.telegram.org/bot{bot_token}/sendMessage"
-                    res = requests.post(url, json={"chat_id": chat_id, "text": "⏳ Waiting for Live Execution."}, timeout=10)
-                    print(f"📦 Waiting message result: {res.status_code}")
+                    requests.post(url, json={
+                        "chat_id": chat_id, 
+                        "text": f"⚠️ Could not reach Signal Core.\nError: {str(api_err)}"
+                    })
     except Exception as e:
         print(f"🔥 Webhook error: {repr(e)}")
     return {"ok": True}

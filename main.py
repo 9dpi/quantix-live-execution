@@ -100,30 +100,29 @@ async def telegram_webhook(request: Request):
         if text.startswith("/signal") and chat_id:
             print(f"🔍 Signal requested by chat_id: {chat_id}")
         if text.startswith("/signal") and chat_id:
-            print(f"� Signal requested by chat_id: {chat_id}")
+            print(f"🔍 Signal requested by chat_id: {chat_id}")
             
-            # FETCH FROM PRODUCTION API
+            # DIRECT INTERNAL CALL (Avoid Deadlock/Timeout)
             try:
-                print("🌍 Fetching from Production API...")
-                api_url = "https://signalgeniusai-production.up.railway.app/signal/latest"
-                resp = requests.get(api_url, timeout=10)
-                resp.raise_for_status()
+                # 1. Check if we have an executed signal in memory first (Highest priority)
+                if CURRENT_SIGNAL:
+                    print("✅ Found Executed Signal in memory.")
+                    send_telegram(chat_id, CURRENT_SIGNAL)
+                else:
+                    # 2. If no executed signal, check Engine status (Market Closed / Waiting)
+                    print("🔄 Checking Engine Status...")
+                    engine_status = get_latest_signal_safe()
+                    print(f"✅ Engine Status: {engine_status.get('status')}")
+                    send_telegram(chat_id, engine_status)
                 
-                signal_data = resp.json()
-                print(f"✅ API Data: {signal_data.get('status')}")
-                
-                # Send whatever data we got from API (send_telegram handles formatting)
-                send_telegram(chat_id, signal_data)
-                
-            except Exception as api_err:
-                print(f"❌ API Fetch Failed: {api_err}")
-                # Fallback message
+            except Exception as err:
+                print(f"❌ Internal Signal Check Failed: {err}")
                 bot_token = os.getenv("TELEGRAM_BOT_TOKEN")
                 if bot_token:
                     url = f"https://api.telegram.org/bot{bot_token}/sendMessage"
                     requests.post(url, json={
                         "chat_id": chat_id, 
-                        "text": f"⚠️ Could not reach Signal Core.\nError: {str(api_err)}"
+                        "text": f"⚠️ System Error: {str(err)}"
                     })
     except Exception as e:
         print(f"🔥 Webhook error: {repr(e)}")

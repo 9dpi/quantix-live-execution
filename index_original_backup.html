@@ -1,0 +1,153 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description"
+    content="Signal Genius AI - Professional EUR/USD Forex Trading Signals powered by Advanced AI">
+  <meta name="keywords" content="forex signals, EUR/USD, trading signals, AI trading, forex analysis">
+  <meta name="author" content="Signal Genius AI">
+
+  <!-- Open Graph / Social Media -->
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Signal Genius AI - Professional Forex Signals">
+  <meta property="og:description"
+    content="High-confidence EUR/USD trading signals powered by advanced AI. Only signals with 95%+ confidence.">
+  <meta property="og:image" content="./logo.svg">
+
+  <title>Signal Genius AI - Professional Forex Signals</title>
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="./favicon.svg">
+
+  <!-- Access Gate -->
+  <script src="./gate.js"></script>
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="./style.css">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+</head>
+
+<body>
+  <!-- Main Content -->
+  <main class="container">
+    <div class="header-content">
+      <h1 class="brand-name">Signal Genius <span class="ai-badge">AI</span></h1>
+    </div>
+
+    <!-- Loading State -->
+    <div id="loading" class="bento-card signal-card">
+      <div class="waiting-state">
+        <div class="waiting-icon">⏳</div>
+        <h2 class="waiting-title">Loading Signal...</h2>
+        <p class="waiting-description">Please wait while we fetch the latest market analysis.</p>
+      </div>
+    </div>
+
+    <!-- Featured Signal Card -->
+    <div id="signal-card" class="bento-card signal-card hidden animate-in">
+      <div class="card-section header-section">
+        <div class="sub-header">ℹ️ You are viewing today's signal</div>
+        <div class="date-status">
+          <span id="card-date">📅 2026-01-18</span>
+          <span id="card-status" class="status-badge live">🟢 LIVE</span>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="card-section main-info">
+        <div class="asset-tf">
+          <span id="card-asset">🇪🇺 EUR/USD</span>
+          <span class="separator">|</span>
+          <span id="card-tf">M15</span>
+        </div>
+        <div id="card-direction" class="direction-strength">
+          <span id="dir-text">🟢 BUY</span>
+          <span id="strength-text">(LOW)</span>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="card-section levels-section">
+        <div class="level-item">
+          <span class="icon">🎯</span>
+          <span>Entry:</span>
+          <b id="card-entry">1.16044</b>
+        </div>
+        <div class="level-item">
+          <span class="icon">💰</span>
+          <span>TP:</span>
+          <b id="card-tp">1.16194</b>
+        </div>
+        <div class="level-item">
+          <span class="icon">🛑</span>
+          <span>SL:</span>
+          <b id="card-sl">1.15894</b>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="card-section analysis-section">
+        <div class="analysis-item">
+          <span>⭐ Confidence:</span>
+          <span id="card-confidence">55%</span>
+        </div>
+        <div class="analysis-item">
+          <span>🧠 Strategy:</span>
+          <span id="card-strategy">Trend Follow</span>
+        </div>
+        <div class="analysis-item">
+          <span>⏳ Validity:</span>
+          <span id="card-validity">81 / 90 min</span>
+        </div>
+        <div class="analysis-item">
+          <span>🌊 Volatility:</span>
+          <span id="card-volatility">0.12%</span>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="card-section disclaimer-section">
+        <div class="disclaimer-text">⚠️ Educational purpose only</div>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="card-section actions-section">
+        <button class="action-btn chart-btn">📈 View Chart</button>
+        <button class="action-btn refresh-btn" onclick="location.reload()">🔄 Refresh</button>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-content">
+      <div class="footer-brand">Signal Genius AI · AI-generated market reference</div>
+      <div class="footer-disclaimer">
+        Signal Genius AI provides AI-generated market references for educational purposes only.
+        <br>
+        This is not financial advice. Trading involves risk. Users are fully responsible for their trading decisions.
+        <br>
+        <small style="opacity: 0.7;">© 2026 Signal Genius AI. All rights reserved.</small>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Auto-refresh Indicator -->
+  <div class="refresh-indicator">
+    <div class="refresh-dot"></div>
+    <span id="refresh-indicator">Syncing...</span>
+  </div>
+
+  <!-- Scripts -->
+  <script type="module" src="./payload.js"></script>
+</body>
+
+</html>

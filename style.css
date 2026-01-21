@@ -610,55 +610,56 @@ h1.brand-name {
   }
 }
 
-/* Record Header Styles & Market Closed Logic */
-.record-header {
-  margin-bottom: 24px;
+/* Record Header Styles (New Layout) */
+.header-row-flex {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
   border-bottom: 1px solid var(--glass-border);
-  padding-bottom: 20px;
+  padding-bottom: 12px;
 }
 
 .main-title {
-  font-size: 1.25rem;
+  font-size: 1.1rem;
   font-weight: 700;
   color: var(--text-primary);
-  margin-bottom: 4px;
 }
 
 .sub-title {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+  background: rgba(15, 23, 42, 0.05);
+  padding: 4px 8px;
+  border-radius: 6px;
+}
+
+/* Meta Row Styles (New Layout) */
+.meta-row-flex {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   font-size: 0.9rem;
+  gap: 12px;
+}
+
+.meta-inline {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.meta-label-inline {
   color: var(--text-secondary);
   font-weight: 500;
 }
 
-/* Meta Grid Styles */
-.meta-grid {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 16px;
-  background: rgba(15, 23, 42, 0.02);
-  padding: 16px;
-  border-radius: 12px;
-}
-
-.meta-block {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.meta-label {
-  font-size: 0.8rem;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: var(--text-secondary);
-  font-weight: 600;
-}
-
-.meta-value {
-  font-size: 0.95rem;
-  font-weight: 600;
+.meta-value-inline {
   color: var(--text-primary);
+  font-weight: 600;
   font-family: 'JetBrains Mono', monospace;
+  font-size: 0.85rem;
 }
 
 .status-text {

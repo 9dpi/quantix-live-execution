@@ -49,7 +49,7 @@
         <!-- STATE 3: Market Closed -->
         <div id="market-closed" class="bento-card signal-card hidden animate-in closed-state">
             <div class="card-section header-section">
-                <div class="record-header">
+                <div class="header-row-flex">
                     <div class="main-title">🟦 STATE — MARKET CLOSED</div>
                     <div class="sub-title">Market Status: Closed</div>
                 </div>
@@ -75,19 +75,22 @@
         <!-- STATE 2: Signal Record (Latest) -->
         <div id="signal-record" class="bento-card signal-card hidden animate-in">
             <div class="card-section header-section">
-                <div class="record-header">
+                <!-- Row 1: Title & Tag -->
+                <div class="header-row-flex">
                     <div class="main-title">Signal Record (Latest Snapshot)</div>
                     <div class="sub-title">Read-only · Historical</div>
                 </div>
 
-                <div class="meta-grid">
-                    <div class="meta-block">
-                        <div class="meta-label">Generated At</div>
-                        <div id="record-generated-at" class="meta-value">21 Jan 2026 · 06:09 UTC</div>
+                <!-- Row 2: Generated At & Status -->
+                <div class="meta-row-flex">
+                    <div class="meta-inline">
+                        <span class="meta-label-inline">Generated At:</span>
+                        <span id="record-generated-at" class="meta-value-inline">21 Jan 2026 · 06:09 UTC</span>
                     </div>
-                    <div class="meta-block">
-                        <div class="meta-label">Status</div>
-                        <div id="record-main-status" class="meta-value status-text">EXPIRED — no longer active</div>
+                    <div class="meta-inline">
+                        <span class="meta-label-inline">Status:</span>
+                        <span id="record-main-status" class="meta-value-inline status-text">EXPIRED — no longer
+                            active</span>
                     </div>
                 </div>
             </div>

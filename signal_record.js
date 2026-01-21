@@ -77,7 +77,7 @@ function displaySignalRecord(record) {
     // Status is always EXPIRED for public Signal Record
     const statusEl = document.getElementById('record-main-status');
     statusEl.innerText = "EXPIRED — no longer active";
-    statusEl.className = "meta-value status-text expired";
+    statusEl.className = "meta-value-inline status-text expired";
 
     document.getElementById('record-entry').textContent = record.execution_price || record.signal_price || record.entry;
     document.getElementById('record-tp').textContent = record.tp;

@@ -17,58 +17,46 @@
 
 const EXECUTION_LOG_API = "https://raw.githubusercontent.com/9dpi/quantix-live-execution/main/auto_execution_log.jsonl";
 
+function isMarketOpen() {
+    const now = new Date();
+    const day = now.getUTCDay(); // 0 is Sunday, 6 is Saturday
+    const hour = now.getUTCHours();
+
+    // Closed Saturday (6) and Sunday (0)
+    if (day === 6 || day === 0) return false;
+
+    // Closed Friday after 22:00 UTC
+    if (day === 5 && hour >= 22) return false;
+
+    return true;
+}
+
+function displayMarketClosed() {
+    document.getElementById('waiting-state').classList.add('hidden');
+    document.getElementById('signal-record').classList.add('hidden');
+    document.getElementById('market-closed').classList.remove('hidden');
+}
+
 async function fetchLatestSignalRecord() {
     try {
-        // Fetch from GitHub (public read-only logs)
         const response = await fetch(EXECUTION_LOG_API);
-
-        if (!response.ok) {
-            console.log("No execution log available");
-            return null;
-        }
+        if (!response.ok) return null;
 
         const text = await response.text();
         const lines = text.trim().split('\n').filter(line => line.trim());
+        if (lines.length === 0) return null;
 
-        if (lines.length === 0) {
-            console.log("No signal records found");
-            return null;
-        }
-
-        // Get latest (last line)
-        const latestLine = lines[lines.length - 1];
-        const record = JSON.parse(latestLine);
-
-        console.log("Latest Signal Record:", record);
-        return record;
-
+        return JSON.parse(lines[lines.length - 1]);
     } catch (error) {
         console.error("Failed to fetch signal record:", error);
         return null;
     }
 }
 
-function formatTimestamp(isoString) {
-    const date = new Date(isoString);
-    const day = date.getUTCDate();
-    const month = date.toLocaleString('en-US', { month: 'short', timeZone: 'UTC' });
-    const time = date.toLocaleTimeString('en-US', {
-        hour: '2-digit',
-        minute: '2-digit',
-        hour12: false,
-        timeZone: 'UTC'
-    });
-
-    return `${day} ${month} ${time} UTC`;
-}
-
 function displaySignalRecord(record) {
-    // Hide waiting state
     document.getElementById('waiting-state').classList.add('hidden');
-
-    // Show signal record
-    const recordCard = document.getElementById('signal-record');
-    recordCard.classList.remove('hidden');
+    document.getElementById('market-closed').classList.add('hidden');
+    document.getElementById('signal-record').classList.remove('hidden');
 
     const isBuy = record.direction === 'BUY';
     document.getElementById('record-asset').textContent = 'EUR/USD';
@@ -77,8 +65,19 @@ function displaySignalRecord(record) {
     dirText.textContent = isBuy ? "🟢 BUY" : "🔴 SELL";
     dirText.className = isBuy ? "BUY" : "SELL";
 
+    // Format Timestamp: 21 Jan 2026 · 06:09 UTC
     const recordDate = new Date(record.signal_time);
-    document.getElementById('record-date').innerText = `📅 ${recordDate.toLocaleDateString('en-CA')}`;
+    const dateOptions = { day: 'numeric', month: 'short', year: 'numeric' };
+    const timeOptions = { hour: '2-digit', minute: '2-digit', timeZone: 'UTC' };
+    const dateStr = recordDate.toLocaleDateString('en-GB', dateOptions);
+    const timeStr = recordDate.toLocaleTimeString('en-GB', timeOptions);
+
+    document.getElementById('record-generated-at').innerText = `${dateStr} · ${timeStr} UTC`;
+
+    // Status is always EXPIRED for public Signal Record
+    const statusEl = document.getElementById('record-main-status');
+    statusEl.innerText = "EXPIRED — no longer active";
+    statusEl.className = "meta-value status-text expired";
 
     document.getElementById('record-entry').textContent = record.execution_price || record.signal_price || record.entry;
     document.getElementById('record-tp').textContent = record.tp;
@@ -87,37 +86,38 @@ function displaySignalRecord(record) {
     document.getElementById('record-strategy').textContent = record.strategy || "Quantix Execution";
     document.getElementById('record-volatility').textContent = "Verified";
 
-    // Status is always EXPIRED for public Signal Record
-    document.getElementById('record-status').textContent = 'EXPIRED';
-    document.getElementById('record-status').className = 'status-badge expired';
     document.getElementById('record-validity').textContent = 'EXPIRED';
     document.getElementById('record-validity').className = 'text-red';
 }
 
 function displayWaitingState() {
-    // Show waiting state
     document.getElementById('waiting-state').classList.remove('hidden');
-
-    // Hide signal record
     document.getElementById('signal-record').classList.add('hidden');
+    document.getElementById('market-closed').classList.add('hidden');
 }
 
 async function initializeSignalRecord() {
     console.log("Initializing Signal Record Display...");
 
+    // 1. Check Market Status
+    if (!isMarketOpen()) {
+        console.log("Market is closed. Showing closed state.");
+        displayMarketClosed();
+        return;
+    }
+
+    // 2. Fetch Logic
     const latestRecord = await fetchLatestSignalRecord();
 
     if (latestRecord) {
-        // Check if record is recent (within last 7 days)
         const recordDate = new Date(latestRecord.signal_time);
         const now = new Date();
         const daysDiff = (now - recordDate) / (1000 * 60 * 60 * 24);
 
         if (daysDiff <= 7) {
-            console.log("Displaying Signal Record (within 7 days)");
             displaySignalRecord(latestRecord);
         } else {
-            console.log("Signal Record too old, showing waiting state");
+            console.log("Signal Record too old (> 7 days), showing waiting state");
             displayWaitingState();
         }
     } else {
@@ -126,9 +126,4 @@ async function initializeSignalRecord() {
     }
 }
 
-// Initialize on page load
 document.addEventListener('DOMContentLoaded', initializeSignalRecord);
-
-// No auto-refresh for Signal Record
-// This is intentional - we don't want real-time updates
-// Signal Records are historical snapshots, not live data

@@ -46,13 +46,49 @@
             </div>
         </div>
 
+        <!-- STATE 3: Market Closed -->
+        <div id="market-closed" class="bento-card signal-card hidden animate-in closed-state">
+            <div class="card-section header-section">
+                <div class="record-header">
+                    <div class="main-title">🟦 STATE — MARKET CLOSED</div>
+                    <div class="sub-title">Market Status: Closed</div>
+                </div>
+
+                <div class="card-section main-info">
+                    <div class="closed-icon">🌑</div>
+                    <h2 class="closed-title">The Forex market is currently closed.</h2>
+                    <p class="closed-desc">
+                        Quantix operates only during live market hours.<br>
+                        No signals are generated when the market is closed.
+                    </p>
+                    <p class="closed-note">Signals will resume automatically when the market reopens.</p>
+                </div>
+
+                <div class="divider"></div>
+
+                <div class="card-section disclaimer-section">
+                    <div class="disclaimer-text">This behavior is intentional and part of the system design.</div>
+                </div>
+            </div>
+        </div>
+
         <!-- STATE 2: Signal Record (Latest) -->
         <div id="signal-record" class="bento-card signal-card hidden animate-in">
             <div class="card-section header-section">
-                <div class="sub-header">📋 Signal Record (Latest Snapshot)</div>
-                <div class="date-status">
-                    <span id="record-date">📅 2026-01-21</span>
-                    <span id="record-status" class="status-badge expired">EXPIRED</span>
+                <div class="record-header">
+                    <div class="main-title">Signal Record (Latest Snapshot)</div>
+                    <div class="sub-title">Read-only · Historical</div>
+                </div>
+
+                <div class="meta-grid">
+                    <div class="meta-block">
+                        <div class="meta-label">Generated At</div>
+                        <div id="record-generated-at" class="meta-value">21 Jan 2026 · 06:09 UTC</div>
+                    </div>
+                    <div class="meta-block">
+                        <div class="meta-label">Status</div>
+                        <div id="record-main-status" class="meta-value status-text">EXPIRED — no longer active</div>
+                    </div>
                 </div>
             </div>
 

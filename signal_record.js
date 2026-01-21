@@ -70,20 +70,28 @@ function displaySignalRecord(record) {
     const recordCard = document.getElementById('signal-record');
     recordCard.classList.remove('hidden');
 
-    // Populate data
-    document.getElementById('record-asset').textContent = record.direction === 'BUY' ? '🇪🇺 EUR/USD' : '🇪🇺 EUR/USD';
+    const isBuy = record.direction === 'BUY';
+    document.getElementById('record-asset').textContent = 'EUR/USD';
 
     const dirText = document.getElementById('dir-text');
-    dirText.textContent = record.direction === 'BUY' ? '🟢 BUY' : '🔴 SELL';
-    dirText.className = record.direction;
+    dirText.textContent = isBuy ? "🟢 BUY" : "🔴 SELL";
+    dirText.className = isBuy ? "BUY" : "SELL";
 
-    document.getElementById('record-entry').textContent = record.execution_price || record.signal_price;
-    document.getElementById('record-timestamp').textContent = formatTimestamp(record.signal_time);
+    const recordDate = new Date(record.signal_time);
+    document.getElementById('record-date').innerText = `📅 ${recordDate.toLocaleDateString('en-CA')}`;
 
-    // Status is always EXPIRED for public display
-    // (Signal Records are only shown after they're no longer active)
+    document.getElementById('record-entry').textContent = record.execution_price || record.signal_price || record.entry;
+    document.getElementById('record-tp').textContent = record.tp;
+    document.getElementById('record-sl').textContent = record.sl;
+    document.getElementById('record-confidence').textContent = `${record.confidence}%`;
+    document.getElementById('record-strategy').textContent = record.strategy || "Quantix Execution";
+    document.getElementById('record-volatility').textContent = "Verified";
+
+    // Status is always EXPIRED for public Signal Record
     document.getElementById('record-status').textContent = 'EXPIRED';
-    document.getElementById('record-validity').textContent = 'EXPIRED — no longer active';
+    document.getElementById('record-status').className = 'status-badge expired';
+    document.getElementById('record-validity').textContent = 'EXPIRED';
+    document.getElementById('record-validity').className = 'text-red';
 }
 
 function displayWaitingState() {

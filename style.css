@@ -221,17 +221,17 @@ h1.brand-name {
 
 .main-info {
   text-align: center;
-  padding: 20px 24px;
+  padding: 24px 24px;
 }
 
 .asset-tf {
-  font-size: 1.4rem;
+  font-size: 1.8rem;
   font-weight: 800;
   display: flex;
   justify-content: center;
   align-items: center;
   gap: 12px;
-  margin-bottom: 8px;
+  margin-bottom: 12px;
   color: var(--text-primary);
 }
 
@@ -266,48 +266,60 @@ h1.brand-name {
   font-weight: 600;
 }
 
-.levels-section {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+.levels-section-full {
+  display: flex;
+  flex-direction: column;
   gap: 0;
-  background: rgba(15, 23, 42, 0.02);
+  background: rgba(15, 23, 42, 0.01);
 }
 
-.level-item {
+.level-item-wide {
   display: flex;
   align-items: center;
-  gap: 10px;
-  font-size: 0.95rem;
-  padding: 12px 20px;
-  white-space: nowrap;
+  gap: 12px;
+  padding: 16px 24px;
+  border-bottom: 1px solid var(--glass-border);
 }
 
-.level-item:not(:last-child) {
-  border-right: 1px solid var(--glass-border);
+.level-item-wide:last-child {
+  border-bottom: none;
 }
 
-@media (max-width: 600px) {
-  .levels-section {
-    grid-template-columns: 1fr;
-  }
-
-  .level-item:not(:last-child) {
-    border-right: none;
-    border-bottom: 1px solid var(--glass-border);
-  }
-}
-
-.level-item .icon {
+.level-item-wide .icon {
   font-size: 1.2rem;
-  opacity: 0.8;
 }
 
-.level-item b {
-  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+.level-item-wide b {
   margin-left: auto;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 1.4rem;
+  letter-spacing: 0.05em;
+  color: var(--text-primary);
+}
+
+.analysis-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  padding: 20px 24px;
+}
+
+.analysis-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.analysis-item span {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.analysis-item b {
   font-size: 1.1rem;
   color: var(--text-primary);
-  letter-spacing: 0.02em;
 }
 
 .analysis-section {

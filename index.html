@@ -49,8 +49,9 @@
         <!-- STATE 2: Signal Record (Latest) -->
         <div id="signal-record" class="bento-card signal-card hidden animate-in">
             <div class="card-section header-section">
+                <div class="sub-header">📋 Signal Record (Latest Snapshot)</div>
                 <div class="date-status">
-                    <div class="sub-header">📋 Signal Record (Latest)</div>
+                    <span id="record-date">📅 2026-01-21</span>
                     <span id="record-status" class="status-badge expired">EXPIRED</span>
                 </div>
             </div>
@@ -65,54 +66,68 @@
                 </div>
                 <div id="record-direction" class="direction-strength">
                     <span id="dir-text">🟢 BUY</span>
+                    <span id="strength-text"
+                        style="font-size: 1rem; color: var(--text-secondary); opacity: 0.7;">HISTORICAL</span>
                 </div>
             </div>
 
             <div class="divider"></div>
 
-            <div class="levels-section">
-                <div class="level-item">
-                    <span class="icon">📍</span>
+            <div class="card-section levels-section-full">
+                <div class="level-item-wide">
+                    <span class="icon">🎯</span>
                     <span>Entry:</span>
-                    <b id="record-entry">1.16044</b>
+                    <b id="record-entry">1.17163</b>
                 </div>
-                <div class="level-item">
-                    <span class="icon">📅</span>
-                    <span>Time:</span>
-                    <b id="record-timestamp">21 Jan 06:09 UTC</b>
+                <div class="level-item-wide">
+                    <span class="icon">💰</span>
+                    <span>TP:</span>
+                    <b id="record-tp">1.17363</b>
                 </div>
-                <div class="level-item">
-                    <span class="icon">⚠️</span>
-                    <span>Type:</span>
-                    <b id="record-validity" style="color: var(--accent-red);">RECORD ONLY</b>
+                <div class="level-item-wide">
+                    <span class="icon">🛑</span>
+                    <span>SL:</span>
+                    <b id="record-sl">1.17013</b>
+                </div>
+            </div>
+
+            <div class="divider"></div>
+
+            <div class="card-section analysis-grid">
+                <div class="analysis-item">
+                    <span>⭐ Confidence:</span>
+                    <b id="record-confidence">65%</b>
+                </div>
+                <div class="analysis-item">
+                    <span>🧠 Strategy:</span>
+                    <b id="record-strategy">Quantix Execution</b>
+                </div>
+                <div class="analysis-item">
+                    <span>⏳ Status:</span>
+                    <b id="record-validity" class="text-red">EXPIRED</b>
+                </div>
+                <div class="analysis-item">
+                    <span>🌊 Volatility:</span>
+                    <b id="record-volatility">Verified</b>
                 </div>
             </div>
 
             <div class="divider"></div>
 
             <div class="card-section info-note">
-                <h3>⚠️ Important Note</h3>
+                <h3>⚠️ Transparency Notice</h3>
                 <p>
-                    This is a <strong>read-only historical snapshot</strong> for transparency.
-                    It is <strong>no longer valid</strong> for execution. Use at your own responsibility.
+                    This is a <strong>read-only historical record</strong>.
+                    It is provided for audit purposes only and is <strong>no longer valid</strong> for execution.
                 </p>
             </div>
 
             <div class="divider"></div>
 
-            <div class="how-to-read">
-                <h3>📖 How to read this</h3>
-                <ul>
-                    <li>Not a live instruction or recommendation</li>
-                    <li>Historical record generated before outcomes</li>
-                </ul>
-            </div>
-
-            <div class="divider"></div>
-
             <div class="card-section" style="padding: 12px 20px;">
-                <p style="font-size: 0.7rem; color: var(--text-secondary); line-height: 1.4; font-style: italic;">
-                    <strong>Context:</strong> Only the most recent record is shown to avoid hindsight bias.
+                <p
+                    style="font-size: 0.7rem; color: var(--text-secondary); line-height: 1.4; font-style: italic; text-align: center;">
+                    "When you see a Signal Record, you're looking at proof — not a suggestion."
                 </p>
             </div>
         </div>

@@ -635,31 +635,40 @@ h1.brand-name {
   border-radius: 6px;
 }
 
-/* Meta Row Styles (New Layout) */
+/* Meta Row Styles (Vertical Layout) */
 .meta-row-flex {
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-start;
+  /* Align top */
   font-size: 0.9rem;
   gap: 12px;
 }
 
-.meta-inline {
+.meta-block-vertical {
   display: flex;
-  align-items: center;
-  gap: 6px;
+  flex-direction: column;
+  gap: 4px;
 }
 
-.meta-label-inline {
+.meta-block-vertical.align-right {
+  align-items: flex-end;
+  text-align: right;
+}
+
+.meta-label-vertical {
   color: var(--text-secondary);
   font-weight: 500;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 }
 
-.meta-value-inline {
+.meta-value-vertical {
   color: var(--text-primary);
   font-weight: 600;
   font-family: 'JetBrains Mono', monospace;
-  font-size: 0.85rem;
+  font-size: 0.9rem;
 }
 
 .status-text {

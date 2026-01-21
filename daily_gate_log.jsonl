@@ -1,0 +1,2 @@
+{"timestamp": "2026-01-21T06:09:31.563758+00:00", "signal_id": "N/A", "decision": "SKIP", "reason": "No signal available", "date": "2026-01-21"}
+{"timestamp": "2026-01-21T06:09:54.865904+00:00", "signal_id": "live-003", "decision": "EXECUTE", "reason": "Signal valid, gate open, executing", "date": "2026-01-21"}

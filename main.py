@@ -67,7 +67,7 @@ def execute():
     # Phase 1: Pure Execution
     sig = get_latest_signal_safe()
     CURRENT_SIGNAL = {
-        "signal_id": "live-002",
+        "signal_id": "live-003",
         "status": "EXECUTED",
         "asset": sig["asset"],
         "direction": sig["direction"],

@@ -1,30 +1,48 @@
-# 🛡️ Quantix MPV Verified Snapshot - 2026-01-21
+# MPV VERIFIED SNAPSHOT — 2026-01-21
 
-## 📜 Internal Declaration
-> **"This snapshot represents the fully verified MPV state before any automation was introduced."**
+**Trạng thái:** ❄️ FROZEN / READ-ONLY
+**Hệ thống:** Quantix AI Core (MPV Anchor)
 
-## 🎯 One-line Positioning
-Quantix AI Core is a high-precision EUR/USD signal generation and live execution system verified through manual human-in-the-loop protocols.
+---
 
-## 🔒 Decisions Locked
-1. **Single Signal Execution**: Only one signal is processed and "frozen" per verification cycle to ensure absolute data integrity.
-2. **Standardized UI**: Using the "Bento White Theme" as the official baseline for client demonstrations.
-3. **Execution Mode**: `⚡ LIVE` using real-market data fetched from verified endpoints.
-4. **Verification Evidence**: All signals are backed by execution logs, web dashboard state, and Telegram bot output.
+## 1️⃣ SNAPSHOT FILE (ANCHOR)
+- **Timestamp:** 2026-01-21 15:00 UTC
+- **Workflow:** Market Session Rule Implementation + Telegram Bot Production Sync.
+- **UI State:** Compact 2-row header layout with vertical meta blocks.
+- **Evidence:** 
+    - Market Closed UI (Verified)
+    - Telegram /signal command (Verified via internal call)
 
-## 📊 Baseline Execution State (live-003)
-- **Signal ID**: `live-003`
-- **Asset**: `EUR/USD`
-- **Direction**: `🟢 BUY`
-- **Entry Price**: `1.17165`
-- **Take Profit**: `1.17365`
-- **Stop Loss**: `1.17015`
-- **Confidence**: `67%`
-- **Timestamp (UTC)**: `2026-01-21 05:58:10`
-- **Verification Status**: ✅ CERTIFIED LIVE MPV
+## 2️⃣ SOURCE CODE (TAGGED)
+- **Repository:** `https://github.com/9dpi/quantix-live-execution/`
+- **Commit Hash:** `d4cd524aeb0bcee19d8af6dc7787b1b0ce48771c`
+- **Restore Command:** `git checkout d4cd524aeb0bcee19d8af6dc7787b1b0ce48771c`
 
-## 📂 Snapshot Metadata
-- **Date**: 2026-01-21
-- **Version**: 1.0.4
-- **Branch**: `baseline/mpv-verified`
-- **Tag**: `mpv-verified`
+## 3️⃣ IMMUTABLE LOGS (JSONL)
+- **Execution Log:** `auto_execution_log.jsonl`
+- **Integrity Check:** Append-only logic verified. No manual modifications since last signal.
+- **Storage:** Publicly available on GitHub for audit.
+
+## 4️⃣ CONFIG STATE (ENV)
+- **Snapshot Config:** `.env.snapshot_20260121`
+- **Attributes:**
+    - `execution_mode = LIVE_RECORD_SYNC`
+    - `market_session_rule = UTC_MON_FRI`
+    - `telegram_proxy = PRODUCTION_INTERNAL`
+
+## 5️⃣ UI BUILD / URL STATE
+- **URL:** `https://www.signalgeniusai.com/` (Mirroring current snapshot)
+- **UI Version:** V0 (Bento Layout + Refined Record Header)
+- **Consistency:** 100% matched with `index.html` at commit `d4cd524`.
+
+---
+
+## 🔁 RESTORE CHECKLIST
+1. `git checkout d4cd524aeb0bcee19d8af6dc7787b1b0ce48771c`
+2. `cp .env.snapshot_20260121 .env`
+3. Verify `auto_execution_log.jsonl` is present.
+4. Deploy to Railway/Local.
+
+---
+
+**Restore guarantee:** Full system state can be reconstructed from this snapshot without regeneration.

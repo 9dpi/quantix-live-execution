@@ -4,15 +4,15 @@
   const isLive = ageMin <= validity;
   return {
     isLive,
-    text: isLive ? "LIVE_MODE" : "ARCHIVED",
+    text: isLive ? "LIVE" : "EXPIRED",
     class: isLive ? "live" : "expired",
-    icon: ""
+    icon: isLive ? "🟢" : "🔴"
   };
 }
 
 export function getStatusBadge(signal) {
   const status = getSignalStatus(signal);
-  return `<span class="status-badge ${status.class}">${status.text}</span>`;
+  return `<span class="badge ${status.class}">${status.text}</span>`;
 }
 
 export function renderHistoryCard(signal) {
@@ -23,16 +23,16 @@ export function renderHistoryCard(signal) {
       ${getStatusBadge(signal)}
     </div>
     <div class="card-row direction-row ${signal.direction.toLowerCase()}">
-      ${signal.direction} // CONF: ${signal.confidence || 0}%
+      ${signal.direction} | Conf: ${signal.confidence || 0}%
     </div>
     <div class="card-row">
-      ENTRY: <b>${signal.entry}</b>
+      Entry: <b>${signal.entry}</b>
     </div>
     <div class="card-row">
       TP: <span class="text-green">${signal.tp}</span> | SL: <span class="text-red">${signal.sl}</span>
     </div>
     <div class="card-row muted">
-      TTL: ${signal.validity || 90} MIN | TIME: ${new Date(signal.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+      ⏱ ${signal.validity || 90} min | ${new Date(signal.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
     </div>
   </div>`;
 }

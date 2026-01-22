@@ -1,13 +1,13 @@
-﻿{
-    "signal_id":  "live-003",
-    "status":  "EXECUTED",
-    "asset":  "EUR/USD",
-    "direction":  "BUY",
-    "entry":  1.17165,
-    "tp":  1.17365,
-    "sl":  1.17015,
-    "confidence":  67,
-    "executed_at":  "2026-01-21T05:58:10.807267+00:00",
-    "validity":  "ACTIVE",
-    "mode":  "LIVE"
+{
+  "signal_id": "live-004",
+  "status": "EXECUTED",
+  "asset": "EUR/USD",
+  "direction": "BUY",
+  "entry": 1.17163,
+  "tp": 1.17363,
+  "sl": 1.17013,
+  "confidence": 68,
+  "executed_at": "2026-01-22T06:54:01.063498+00:00",
+  "validity": "ACTIVE",
+  "mode": "SIMULATION"
 }

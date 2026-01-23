@@ -3,3 +3,5 @@
 {"timestamp": "2026-01-22T02:08:06.515387+00:00", "signal_id": "N/A", "decision": "SKIP", "reason": "No signal available", "date": "2026-01-22"}
 {"timestamp": "2026-01-22T06:54:28.179019+00:00", "signal_id": "N/A", "decision": "SKIP", "reason": "No signal available", "date": "2026-01-22"}
 {"timestamp": "2026-01-22T06:54:36.249111+00:00", "signal_id": "live-004", "decision": "EXECUTE", "reason": "Signal valid, gate open, executing", "date": "2026-01-22"}
+{"timestamp": "2026-01-23T06:04:48.333950+00:00", "signal_id": "live-004", "decision": "SKIP", "reason": "Signal invalid or expired", "date": "2026-01-23"}
+{"timestamp": "2026-01-23T06:15:12.448093+00:00", "signal_id": "live-20260123-001", "decision": "EXECUTE", "reason": "Signal valid, gate open, executing", "date": "2026-01-23"}

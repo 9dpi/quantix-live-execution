@@ -11,16 +11,24 @@ from datetime import datetime, timezone
 app = FastAPI()
 
 # Only ONE signal allowed per session
-def load_persisted_signal():
-    try:
-        if os.path.exists("execution_log.json"):
-            with open("execution_log.json", "r") as f:
-                data = json.load(f)
-                if isinstance(data, dict) and data.get("status") == "EXECUTED":
-                    return data
-    except Exception as e:
-        print(f"⚠️ Failed to load persistent log: {e}")
-    return None
+def get_active_signal():
+    """Returns the current signal if it's from today, otherwise clears it."""
+    global CURRENT_SIGNAL
+    
+    if CURRENT_SIGNAL:
+        exec_at = CURRENT_SIGNAL.get("executed_at")
+        if exec_at:
+            exec_date = datetime.fromisoformat(exec_at.replace('Z', '+00:00')).strftime("%Y-%m-%d")
+            today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+            if exec_date != today:
+                print(f"♻️ Resetting session signal from {exec_date}")
+                CURRENT_SIGNAL = None
+    
+    # If still None, try reloading from file (but load_persisted_signal also checks date)
+    if CURRENT_SIGNAL is None:
+        CURRENT_SIGNAL = load_persisted_signal()
+        
+    return CURRENT_SIGNAL
 
 CURRENT_SIGNAL = load_persisted_signal()
 
@@ -50,9 +58,10 @@ def health():
 
 @app.get("/signal/latest")
 def latest():
-    if CURRENT_SIGNAL is None:
+    sig = get_active_signal()
+    if sig is None:
         return JSONResponse(status_code=404, content={"status": "AWAITING_EXECUTION"})
-    return CURRENT_SIGNAL
+    return sig
 
 @app.post("/signal/execute")
 def execute():
@@ -61,13 +70,14 @@ def execute():
     if not is_market_open():
         return JSONResponse(status_code=403, content={"status": "MARKET_CLOSED"})
 
-    if CURRENT_SIGNAL:
+    if get_active_signal():
         return JSONResponse(status_code=409, content={"status": "ALREADY_EXECUTED"})
 
     # Phase 1: Pure Execution
     sig = get_latest_signal_safe()
+    new_signal_id = f"live-{datetime.now(timezone.utc).strftime('%Y%m%d')}-001"
     CURRENT_SIGNAL = {
-        "signal_id": "live-003",
+        "signal_id": new_signal_id,
         "status": "EXECUTED",
         "asset": sig["asset"],
         "direction": sig["direction"],

@@ -11,6 +11,25 @@ from datetime import datetime, timezone
 app = FastAPI()
 
 # Only ONE signal allowed per session
+def load_persisted_signal():
+    try:
+        if os.path.exists("execution_log.json"):
+            with open("execution_log.json", "r") as f:
+                data = json.load(f)
+                if isinstance(data, dict) and data.get("status") == "EXECUTED":
+                    # DAILY RESET: Only load if it was executed today (UTC)
+                    exec_at = data.get("executed_at")
+                    if exec_at:
+                        exec_date = datetime.fromisoformat(exec_at.replace('Z', '+00:00')).strftime("%Y-%m-%d")
+                        today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+                        if exec_date == today:
+                            return data
+                        else:
+                            print(f"♻️ Clearing old signal from {exec_date} (Today: {today})")
+    except Exception as e:
+        print(f"⚠️ Failed to load persistent log: {e}")
+    return None
+
 def get_active_signal():
     """Returns the current signal if it's from today, otherwise clears it."""
     global CURRENT_SIGNAL

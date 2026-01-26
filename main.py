@@ -75,6 +75,28 @@ def health():
         "telegram_token_set": bool(os.getenv("TELEGRAM_BOT_TOKEN"))
     }
 
+@app.get("/data-feed/health")
+def data_feed_health():
+    """
+    Data feed health status endpoint
+    Shows if external market data is available
+    """
+    try:
+        if os.path.exists("data_feed_health.json"):
+            with open("data_feed_health.json", "r") as f:
+                health_data = json.load(f)
+                return health_data
+        else:
+            return {
+                "status": "unknown",
+                "reason": "No health check performed yet"
+            }
+    except Exception as e:
+        return {
+            "status": "error",
+            "reason": str(e)
+        }
+
 @app.get("/signal/latest")
 def latest():
     sig = get_active_signal()

@@ -3,6 +3,13 @@ import random
 from datetime import datetime, timezone
 from external_client import get_price
 
+# Import data feed monitor for health tracking
+try:
+    from data_feed_monitor import DataFeedMonitor
+    MONITOR_AVAILABLE = True
+except ImportError:
+    MONITOR_AVAILABLE = False
+
 LIVE_MODE = os.getenv("LIVE_MODE", "false").lower() == "true"
 
 def is_market_open():
@@ -21,6 +28,13 @@ def is_market_open():
     return True
 
 def generate_signal():
+    # Update data feed health status
+    if MONITOR_AVAILABLE:
+        try:
+            DataFeedMonitor.run_health_check()
+        except Exception as e:
+            print(f"⚠️ Health check failed: {e}")
+    
     price = get_price()
     confidence = random.randint(55, 95)
     strength = "(HIGH)" if confidence > 75 else "(MID)" if confidence > 60 else "(LOW)"

@@ -89,10 +89,19 @@ def scheduler_loop():
     Polls every POLL_INTERVAL_SECONDS
     Gate enforcement happens inside auto_executor
     """
+    # Guardrail: Check data feed configuration
+    if not os.getenv("TWELVE_DATA_API_KEY"):
+        raise RuntimeError(
+            "❌ DATA FEED NOT CONFIGURED\n"
+            "TWELVE_DATA_API_KEY environment variable is required.\n"
+            "Scheduler aborted to prevent silent failures."
+        )
+    
     print("=" * 60)
     print("AUTO v0 Scheduler Started")
     print(f"Poll Interval: {POLL_INTERVAL_SECONDS}s")
     print(f"Kill Switch: AUTO_V0_ENABLED={AUTO_V0_ENABLED}")
+    print(f"Data Feed: Twelve Data API configured ✓")
     print("=" * 60)
     
     cycle_count = 0

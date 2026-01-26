@@ -31,37 +31,6 @@ function isMarketOpen() {
     return true;
 }
 
-async function checkDataFeedHealth() {
-    console.log("Checking [T1] data feed health...");
-    const container = document.getElementById('data-feed-status');
-    const valueEl = document.getElementById('data-feed-value');
-
-    try {
-        const response = await fetch(`${AI_CORE_API_URL}/health`, {
-            method: 'GET',
-            cache: 'no-cache'
-        });
-
-        if (response.ok) {
-            const data = await response.json();
-            if (data.status === 'ok') {
-                container.className = 'data-feed-container active';
-                valueEl.innerHTML = 'ACTIVE (Live Market Data) <span style="opacity:0.7; margin-left:8px; font-weight:400;">&gt; Latest signal from: Quantix AI Core</span>';
-            } else {
-                container.className = 'data-feed-container error';
-                valueEl.innerText = 'OFFLINE (Engine Busy)';
-            }
-        } else {
-            container.className = 'data-feed-container error';
-            valueEl.innerText = 'OFFLINE (Internal Server Error)';
-        }
-    } catch (err) {
-        console.error("Data feed health failed:", err);
-        container.className = 'data-feed-container error';
-        valueEl.innerText = 'OFFLINE (Connection Error)';
-    }
-}
-
 function displayMarketClosed() {
     document.getElementById('waiting-state').classList.add('hidden');
     document.getElementById('signal-record').classList.add('hidden');
@@ -90,14 +59,14 @@ function displaySignalRecord(record) {
     document.getElementById('signal-record').classList.remove('hidden');
 
     const isBuy = record.direction === 'BUY';
-    document.getElementById('record-asset').textContent = 'EUR/USD';
+    document.getElementById('record-asset').textContent = record.asset || 'EUR/USD';
 
     const dirText = document.getElementById('dir-text');
     dirText.textContent = isBuy ? "🟢 BUY" : "🔴 SELL";
     dirText.className = isBuy ? "BUY" : "SELL";
 
-    // Format Timestamp: 21 Jan 2026 · 06:09 UTC
-    const recordDate = new Date(record.signal_time);
+    // Format Timestamp (100% Sync with T1 executed_at)
+    const recordDate = new Date(record.executed_at || record.signal_time);
     const dateOptions = { day: 'numeric', month: 'short', year: 'numeric' };
     const timeOptions = { hour: '2-digit', minute: '2-digit', timeZone: 'UTC' };
     const dateStr = recordDate.toLocaleDateString('en-GB', dateOptions);
@@ -110,11 +79,11 @@ function displaySignalRecord(record) {
     statusEl.innerText = "EXPIRED — no longer active";
     statusEl.className = "meta-value-vertical status-text expired";
 
-    document.getElementById('record-entry').textContent = record.execution_price || record.signal_price || record.entry;
+    document.getElementById('record-entry').textContent = record.entry || record.execution_price || record.signal_price;
     document.getElementById('record-tp').textContent = record.tp;
     document.getElementById('record-sl').textContent = record.sl;
     document.getElementById('record-confidence').textContent = `${record.confidence}%`;
-    document.getElementById('record-strategy').textContent = record.strategy || "Quantix Execution";
+    document.getElementById('record-strategy').textContent = record.strategy || "Quantix AI Core [T1]";
     document.getElementById('record-volatility').textContent = "Verified";
 
     document.getElementById('record-validity').textContent = 'EXPIRED';
@@ -130,9 +99,6 @@ function displayWaitingState() {
 async function initializeSignalRecord() {
     console.log("Initializing Signal Record Display...");
 
-    // 0. Check Data Feed Health (Parallel to other checks)
-    checkDataFeedHealth();
-
     // 1. Check Market Status
     if (!isMarketOpen()) {
         console.log("Market is closed. Showing closed state.");
@@ -144,7 +110,7 @@ async function initializeSignalRecord() {
     const latestRecord = await fetchLatestSignalRecord();
 
     if (latestRecord) {
-        const recordDate = new Date(latestRecord.signal_time);
+        const recordDate = new Date(latestRecord.executed_at || latestRecord.signal_time);
         const now = new Date();
         const daysDiff = (now - recordDate) / (1000 * 60 * 60 * 24);
 

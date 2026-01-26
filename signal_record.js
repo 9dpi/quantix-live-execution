@@ -16,19 +16,51 @@
  */
 
 const EXECUTION_LOG_API = "https://raw.githubusercontent.com/9dpi/quantix-live-execution/main/auto_execution_log.jsonl";
+const PRODUCTION_API_URL = "https://signalgeniusai-production.up.railway.app";
 
 function isMarketOpen() {
     const now = new Date();
     const day = now.getUTCDay(); // 0 is Sunday, 6 is Saturday
     const hour = now.getUTCHours();
 
-    // Closed Saturday (6) and Sunday (0)
-    if (day === 6 || day === 0) return false;
-
-    // Closed Friday after 22:00 UTC
-    if (day === 5 && hour >= 22) return false;
+    // Forex market hours: Open Sunday 22:00 UTC to Friday 22:00 UTC
+    if (day === 6) return false; // Saturday: Always closed
+    if (day === 5 && hour >= 22) return false; // Friday after 22:00: Closed
+    if (day === 0 && hour < 22) return false; // Sunday before 22:00: Closed
 
     return true;
+}
+
+async function checkDataFeedHealth() {
+    console.log("Checking data feed health...");
+    const container = document.getElementById('data-feed-status');
+    const valueEl = document.getElementById('data-feed-value');
+
+    try {
+        const response = await fetch(`${PRODUCTION_API_URL}/data-feed/health`, {
+            method: 'GET',
+            mode: 'cors',
+            cache: 'no-cache'
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+            if (data.status === 'ok') {
+                container.className = 'data-feed-container active';
+                valueEl.innerText = 'ACTIVE (Live Market Data)';
+            } else {
+                container.className = 'data-feed-container error';
+                valueEl.innerText = 'ERROR (No Market Feed)';
+            }
+        } else {
+            container.className = 'data-feed-container error';
+            valueEl.innerText = 'OFFLINE (API Down)';
+        }
+    } catch (err) {
+        console.error("Data feed health failed:", err);
+        container.className = 'data-feed-container error';
+        valueEl.innerText = 'OFFLINE (Connection Error)';
+    }
 }
 
 function displayMarketClosed() {
@@ -98,6 +130,9 @@ function displayWaitingState() {
 
 async function initializeSignalRecord() {
     console.log("Initializing Signal Record Display...");
+
+    // 0. Check Data Feed Health (Parallel to other checks)
+    checkDataFeedHealth();
 
     // 1. Check Market Status
     if (!isMarketOpen()) {

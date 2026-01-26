@@ -74,6 +74,56 @@ h1.brand-name {
   box-shadow: 0 4px 12px rgba(8, 145, 178, 0.1);
 }
 
+/* Data Feed Status Styles */
+.data-feed-container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 12px;
+  background: rgba(15, 23, 42, 0.04);
+  padding: 6px 14px;
+  border-radius: 99px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  border: 1px solid var(--glass-border);
+}
+
+.data-feed-dot {
+  width: 8px;
+  height: 8px;
+  background: #94a3b8; /* gray by default */
+  border-radius: 50%;
+}
+
+.data-feed-container.active .data-feed-dot {
+  background: #10b981;
+  box-shadow: 0 0 8px #10b981;
+  animation: data-pulse 2s infinite;
+}
+
+.data-feed-container.error .data-feed-dot {
+  background: #ef4444;
+  box-shadow: 0 0 8px #ef4444;
+}
+
+.data-feed-value {
+  color: var(--text-secondary);
+}
+
+.data-feed-container.active .data-feed-value {
+  color: #059669;
+}
+
+.data-feed-container.error .data-feed-value {
+  color: #dc2626;
+}
+
+@keyframes data-pulse {
+  0% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.2); opacity: 0.7; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
 /* Card & Bento Styles */
 .bento-card {
   background: var(--bg-card);

@@ -11,6 +11,7 @@ except ImportError:
     MONITOR_AVAILABLE = False
 
 LIVE_MODE = os.getenv("LIVE_MODE", "false").lower() == "true"
+AI_CORE_API = "https://quantixaicore-production.up.railway.app/api/v1/signals/active"
 
 def is_market_open():
     """Forex market hours: Open Sunday 22:00 UTC to Friday 22:00 UTC"""
@@ -27,36 +28,40 @@ def is_market_open():
     
     return True
 
-def generate_signal():
-    # Update data feed health status
+def consume_ai_core_signal():
+    """CONSUMPTION ONLY [T3]: Fetches signal from Immutable Record [T1]"""
     if MONITOR_AVAILABLE:
         try:
             DataFeedMonitor.run_health_check()
         except Exception as e:
             print(f"⚠️ Health check failed: {e}")
-    
-    price = get_price()
-    confidence = random.randint(55, 95)
-    strength = "(HIGH)" if confidence > 75 else "(MID)" if confidence > 60 else "(LOW)"
 
-    strategy_name = "Quantix LIVE" if LIVE_MODE else "Quantix Simulation"
-    volatility_mode = "Real-time" if LIVE_MODE else "Stabilized"
-
-    return {
-        "asset": "EUR/USD",
-        "direction": "BUY",
-        "strength": strength,
-        "entry": round(price, 5),
-        "tp": round(price + 0.0020, 5),
-        "sl": round(price - 0.0015, 5),
-        "confidence": confidence,
-        "strategy": strategy_name,
-        "validity": 90,
-        "validity_passed": 0,
-        "volatility": f"0.12% ({volatility_mode})",
-        "timestamp": datetime.now(timezone.utc).isoformat()
-    }
+    try:
+        response = requests.get(AI_CORE_API, timeout=10)
+        if response.ok:
+            signals = response.json()
+            if signals:
+                # Get the most recent active signal
+                latest = signals[0]
+                return {
+                    "asset": latest["asset"],
+                    "direction": latest["direction"],
+                    "strength": "(HIGH)" if latest["ai_confidence"] > 0.8 else "(MID)",
+                    "entry": float(latest["entry_low"]),
+                    "tp": float(latest["tp"]),
+                    "sl": float(latest["sl"]),
+                    "confidence": int(latest["ai_confidence"] * 100),
+                    "strategy": "Quantix Core [T1] Consumer",
+                    "validity": 90,
+                    "validity_passed": 0,
+                    "volatility": "Verified via Core",
+                    "timestamp": latest["generated_at"]
+                }
+        return None
+    except Exception as e:
+        print(f"❌ Failed to consume AI Core signal: {e}")
+        return None
 
 def get_latest_signal_safe():
-    # LIVE PROOF: No baseline auto-regeneration or stabilizer
-    return generate_signal()
+    """Execution Layer Entry [T3]"""
+    return consume_ai_core_signal()

@@ -10,11 +10,13 @@ import json
 from datetime import datetime, timezone
 from auto_executor import run_auto_v0
 
+# Polling config (Adjusted to stay within 800 req/day API limit)
+POLL_INTERVAL_SECONDS = 120  # 30 req/hr = 720 req/24h (Safe)
+
 # Guardrail 1: Kill Switch
 AUTO_V0_ENABLED = os.getenv("AUTO_V0_ENABLED", "true").lower() == "true"
 
 # Configuration
-POLL_INTERVAL_SECONDS = 60  # Poll every 60 seconds
 DAILY_SUMMARY_FILE = "daily_summary_log.jsonl"
 
 

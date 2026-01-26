@@ -46,7 +46,7 @@ async function checkDataFeedHealth() {
             const data = await response.json();
             if (data.status === 'ok') {
                 container.className = 'data-feed-container active';
-                valueEl.innerText = 'ACTIVE (Live Market Data)';
+                valueEl.innerHTML = 'ACTIVE (Live Market Data) <span style="opacity:0.7; margin-left:8px; font-weight:400;">&gt; Latest signal from: Quantix AI Core</span>';
             } else {
                 container.className = 'data-feed-container error';
                 valueEl.innerText = 'OFFLINE (Engine Busy)';

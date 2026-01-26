@@ -2,11 +2,13 @@ from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from signal_engine import get_latest_signal_safe, is_market_open
-from telegram_formatter import send_telegram
+from telegram_formatter import send_telegram, format_signal_message
 import os
 import json
 import requests
 from datetime import datetime, timezone
+
+EXECUTION_LOG_API = "https://raw.githubusercontent.com/9dpi/quantix-live-execution/main/auto_execution_log.jsonl"
 
 app = FastAPI()
 
@@ -153,18 +155,34 @@ async def telegram_webhook(request: Request):
         if text.startswith("/signal") and chat_id:
             print(f"🔍 Signal requested by chat_id: {chat_id}")
             
-            # DIRECT INTERNAL CALL (Avoid Deadlock/Timeout)
             try:
-                # 1. Check if we have an executed signal in memory first (Highest priority)
+                # 1. 1st Choice: Live signal in memory
                 if CURRENT_SIGNAL:
-                    print("✅ Found Executed Signal in memory.")
+                    print("✅ Found Live Signal in memory.")
                     send_telegram(chat_id, CURRENT_SIGNAL)
                 else:
-                    # 2. If no executed signal, check Engine status (Market Closed / Waiting)
-                    print("🔄 Checking Engine Status...")
-                    engine_status = get_latest_signal_safe()
-                    print(f"✅ Engine Status: {engine_status.get('status')}")
-                    send_telegram(chat_id, engine_status)
+                    # 2. 2nd Choice: Check GitHub Logs (What the Web shows)
+                    print("🔄 Checking GitHub Logs for 1:1 mapping...")
+                    try:
+                        log_response = requests.get(EXECUTION_LOG_API, timeout=5)
+                        if log_response.ok:
+                            lines = log_response.text.strip().split('\n')
+                            if lines:
+                                latest_log = json.loads(lines[-1])
+                                # Add status for formatter
+                                latest_log["status"] = "SIGNAL RECORD (Web Sync)"
+                                send_telegram(chat_id, latest_log)
+                                return {"ok": True}
+                    except Exception as log_err:
+                        print(f"⚠️ GitHub Log fetch failed: {log_err}")
+
+                    # 3. 3rd Choice: Engine status (Waiting)
+                    print("🔄 Engine is currently waiting...")
+                    waiting_status = {
+                        "status": "AWAITING_EXECUTION",
+                        "timestamp": datetime.now(timezone.utc).isoformat()
+                    }
+                    send_telegram(chat_id, waiting_status)
                 
             except Exception as err:
                 print(f"❌ Internal Signal Check Failed: {err}")

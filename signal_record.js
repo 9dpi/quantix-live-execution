@@ -16,7 +16,7 @@
  */
 
 const EXECUTION_LOG_API = "https://raw.githubusercontent.com/9dpi/quantix-live-execution/main/auto_execution_log.jsonl";
-const PRODUCTION_API_URL = "https://signalgeniusai-production.up.railway.app";
+const AI_CORE_API_URL = "https://quantixaicore-production.up.railway.app/api/v1";
 
 function isMarketOpen() {
     const now = new Date();
@@ -32,14 +32,13 @@ function isMarketOpen() {
 }
 
 async function checkDataFeedHealth() {
-    console.log("Checking data feed health...");
+    console.log("Checking [T1] data feed health...");
     const container = document.getElementById('data-feed-status');
     const valueEl = document.getElementById('data-feed-value');
 
     try {
-        const response = await fetch(`${PRODUCTION_API_URL}/data-feed/health`, {
+        const response = await fetch(`${AI_CORE_API_URL}/health`, {
             method: 'GET',
-            mode: 'cors',
             cache: 'no-cache'
         });
 
@@ -50,11 +49,11 @@ async function checkDataFeedHealth() {
                 valueEl.innerText = 'ACTIVE (Live Market Data)';
             } else {
                 container.className = 'data-feed-container error';
-                valueEl.innerText = 'ERROR (No Market Feed)';
+                valueEl.innerText = 'OFFLINE (Engine Busy)';
             }
         } else {
             container.className = 'data-feed-container error';
-            valueEl.innerText = 'OFFLINE (API Down)';
+            valueEl.innerText = 'OFFLINE (Internal Server Error)';
         }
     } catch (err) {
         console.error("Data feed health failed:", err);

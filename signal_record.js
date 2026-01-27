@@ -1,22 +1,6 @@
-/**
- * Signal Record Display Logic
- * 
- * WORKFLOW:
- * 1. Default: Show "Waiting State" (no signal)
- * 2. Fetch latest execution from local logs (NOT from live API)
- * 3. If found: Show as "Signal Record" (read-only, historical)
- * 4. Never show ACTIVE signals publicly
- * 
- * GOLDEN RULES:
- * ❌ Never show signal still ACTIVE to public
- * ✅ Only show signal when it becomes Signal Record
- * ⏱️ Timestamp always clearer than price
- * 🚫 No CTA, no "trade now", no "follow"
- * 🧠 UI only explains meaning, not how to trade
- */
+import { getSignalStatus } from "./signals.js";
 
 const EXECUTION_LOG_API = "https://raw.githubusercontent.com/9dpi/quantix-live-execution/main/auto_execution_log.jsonl";
-const AI_CORE_API_URL = "https://quantixaicore-production.up.railway.app/api/v1";
 
 function isMarketOpen() {
     const now = new Date();
@@ -39,7 +23,8 @@ function displayMarketClosed() {
 
 async function fetchLatestSignalRecord() {
     try {
-        const response = await fetch(EXECUTION_LOG_API);
+        const cacheBuster = `?t=${Date.now()}`;
+        const response = await fetch(EXECUTION_LOG_API + cacheBuster);
         if (!response.ok) return null;
 
         const text = await response.text();
@@ -74,10 +59,26 @@ function displaySignalRecord(record) {
 
     document.getElementById('record-generated-at').innerText = `${dateStr} · ${timeStr} UTC`;
 
-    // Status is always EXPIRED for public Signal Record
+    // Smart Status based on age
+    const statusInfo = getSignalStatus({
+        timestamp: record.executed_at || record.signal_time,
+        validity: 90
+    });
+
     const statusEl = document.getElementById('record-main-status');
-    statusEl.innerText = "EXPIRED — no longer active";
-    statusEl.className = "meta-value-vertical status-text expired";
+    const validityEl = document.getElementById('record-validity');
+
+    if (statusInfo.isLive) {
+        statusEl.innerText = "ACTIVE — currently verifying";
+        statusEl.className = "meta-value-vertical status-text live";
+        validityEl.innerText = 'ACTIVE';
+        validityEl.className = 'text-green';
+    } else {
+        statusEl.innerText = "EXPIRED — no longer active";
+        statusEl.className = "meta-value-vertical status-text expired";
+        validityEl.innerText = 'EXPIRED';
+        validityEl.className = 'text-red';
+    }
 
     document.getElementById('record-entry').textContent = record.entry || record.execution_price || record.signal_price;
     document.getElementById('record-tp').textContent = record.tp;
@@ -85,9 +86,6 @@ function displaySignalRecord(record) {
     document.getElementById('record-confidence').textContent = `${record.confidence}%`;
     document.getElementById('record-strategy').textContent = record.strategy || "Quantix AI Core [T1]";
     document.getElementById('record-volatility').textContent = "Verified";
-
-    document.getElementById('record-validity').textContent = 'EXPIRED';
-    document.getElementById('record-validity').className = 'text-red';
 }
 
 function displayWaitingState() {

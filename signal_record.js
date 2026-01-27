@@ -1,6 +1,7 @@
 import { getSignalStatus } from "./signals.js";
 
 const LIVE_API_URL = "https://signalgeniusai-production.up.railway.app/signal/latest";
+const FALLBACK_LOG_API = "https://raw.githubusercontent.com/9dpi/quantix-live-execution/main/auto_execution_log.jsonl";
 
 function isMarketOpen() {
     const now = new Date();
@@ -16,7 +17,6 @@ function isMarketOpen() {
 }
 
 function displayMarketClosed() {
-    document.getElementById('waiting-state').classList.add('hidden');
     document.getElementById('signal-record').classList.add('hidden');
     document.getElementById('market-closed').classList.remove('hidden');
 }
@@ -39,7 +39,6 @@ async function fetchLatestSignalRecord() {
 }
 
 function displaySignalRecord(record) {
-    document.getElementById('waiting-state').classList.add('hidden');
     document.getElementById('market-closed').classList.add('hidden');
     document.getElementById('signal-record').classList.remove('hidden');
 
@@ -88,11 +87,7 @@ function displaySignalRecord(record) {
     document.getElementById('record-volatility').textContent = "Verified";
 }
 
-function displayWaitingState() {
-    document.getElementById('waiting-state').classList.remove('hidden');
-    document.getElementById('signal-record').classList.add('hidden');
-    document.getElementById('market-closed').classList.add('hidden');
-}
+
 
 async function initializeSignalRecord() {
     console.log("Initializing Signal Record Display...");
@@ -104,23 +99,34 @@ async function initializeSignalRecord() {
         return;
     }
 
-    // 2. Fetch Logic
-    const latestRecord = await fetchLatestSignalRecord();
+    // 2. Try Live API First
+    let latestRecord = await fetchLatestSignalRecord();
 
-    if (latestRecord) {
-        const recordDate = new Date(latestRecord.executed_at || latestRecord.signal_time);
-        const now = new Date();
-        const daysDiff = (now - recordDate) / (1000 * 60 * 60 * 24);
-
-        if (daysDiff <= 7) {
-            displaySignalRecord(latestRecord);
-        } else {
-            console.log("Signal Record too old (> 7 days), showing waiting state");
-            displayWaitingState();
+    // 3. Fallback to GitHub Logs if Live API has no active signal
+    if (!latestRecord) {
+        console.log("No live signal, fetching last update from logs...");
+        try {
+            const cacheBuster = `?t=${Date.now()}`;
+            const response = await fetch(FALLBACK_LOG_API + cacheBuster);
+            if (response.ok) {
+                const text = await response.text();
+                const lines = text.trim().split('\n').filter(line => line.trim());
+                if (lines.length > 0) {
+                    latestRecord = JSON.parse(lines[lines.length - 1]);
+                    latestRecord.strategy = latestRecord.strategy || "Quantix Core [Record]";
+                }
+            }
+        } catch (e) {
+            console.error("Log fallback failed:", e);
         }
+    }
+
+    // 4. Display the signal card (Never show waiting state anymore)
+    if (latestRecord) {
+        displaySignalRecord(latestRecord);
     } else {
-        console.log("No Signal Record available, showing waiting state");
-        displayWaitingState();
+        console.log("Truly no data found.");
+        // We could show an error, but staying on blank card or loading is better than the mascot
     }
 }
 

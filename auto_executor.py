@@ -102,10 +102,9 @@ class SignalConsumer:
         if not signal:
             return False
         
-        # Check if signal has validity field
-        validity = signal.get('validity')
-        if validity != 'ACTIVE':
-            print(f"⚠️ Signal validity: {validity}")
+        # Signal must have a valid structure
+        if not signal.get('entry') or not signal.get('direction'):
+            print("⚠️ Signal missing core data (entry/direction)")
             return False
         
         # Check timestamp (signals should be fresh)

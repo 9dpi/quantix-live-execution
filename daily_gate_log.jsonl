@@ -25,3 +25,5 @@
 {"timestamp": "2026-01-26T04:17:43.101017+00:00", "signal_id": "N/A", "decision": "SKIP", "reason": "No signal available", "date": "2026-01-26"}
 {"timestamp": "2026-01-26T04:18:43.993368+00:00", "signal_id": "live-20260126-001", "decision": "EXECUTE", "reason": "Signal valid, gate open, executing", "date": "2026-01-26"}
 {"timestamp": "2026-01-27T07:11:36.860062+00:00", "signal_id": "N/A", "decision": "SKIP", "reason": "No signal available", "date": "2026-01-27"}
+{"timestamp": "2026-01-27T09:45:09.298734+00:00", "signal_id": "88e91be4-ae0b-4069-aff2-9f9a7f0d6786", "decision": "SKIP", "reason": "Signal invalid or expired", "date": "2026-01-27"}
+{"timestamp": "2026-01-27T09:45:26.623509+00:00", "signal_id": "88e91be4-ae0b-4069-aff2-9f9a7f0d6786", "decision": "EXECUTE", "reason": "Signal valid, gate open, executing", "date": "2026-01-27"}

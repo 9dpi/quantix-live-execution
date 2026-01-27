@@ -11,7 +11,7 @@ except ImportError:
     MONITOR_AVAILABLE = False
 
 LIVE_MODE = os.getenv("LIVE_MODE", "false").lower() == "true"
-AI_CORE_API = "https://quantixaicore-production.up.railway.app/api/v1/signals/active"
+AI_CORE_API = "https://quantixaicore-production.up.railway.app/api/v1/active"
 
 def is_market_open():
     """Forex market hours: Open Sunday 22:00 UTC to Friday 22:00 UTC"""

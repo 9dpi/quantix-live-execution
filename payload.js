@@ -1,6 +1,6 @@
 import { getSignalStatus } from "./signals.js";
 
-const LATEST_API = `/signal/latest`;
+const LATEST_API = "https://signalgeniusai-production.up.railway.app/signal/latest";
 let refreshInterval = 60;
 let countdown = refreshInterval;
 

@@ -1,6 +1,6 @@
 import { getSignalStatus } from "./signals.js";
 
-const LIVE_API_URL = "/signal/latest";
+const LIVE_API_URL = "https://signalgeniusai-production.up.railway.app/signal/latest";
 
 function isMarketOpen() {
     const now = new Date();

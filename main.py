@@ -183,28 +183,32 @@ async def telegram_webhook(request: Request):
                     print("✅ Found Live Signal in memory.")
                     send_telegram(chat_id, CURRENT_SIGNAL)
                 else:
-                    # 2. 2nd Choice: Check GitHub Logs (What the Web shows)
-                    print("🔄 Checking GitHub Logs for 1:1 mapping...")
-                    try:
-                        log_response = requests.get(EXECUTION_LOG_API, timeout=5)
-                        if log_response.ok:
-                            lines = log_response.text.strip().split('\n')
-                            if lines:
-                                latest_log = json.loads(lines[-1])
-                                # Add status for formatter
-                                latest_log["status"] = "SIGNAL RECORD (Web Sync)"
-                                send_telegram(chat_id, latest_log)
-                                return {"ok": True}
-                    except Exception as log_err:
-                        print(f"⚠️ GitHub Log fetch failed: {log_err}")
+                    # 2. 2nd Choice: Check Supabase (Hybrid Mode)
+                    fresh_sig = get_latest_signal_safe()
+                    if fresh_sig:
+                        print("✅ Found Live Signal in Supabase.")
+                        send_telegram(chat_id, fresh_sig)
+                    else:
+                        # 3. 3rd Choice: Check GitHub Logs (Fallback)
+                        print("🔄 Checking GitHub Logs...")
+                        try:
+                            log_response = requests.get(EXECUTION_LOG_API, timeout=5)
+                            if log_response.ok:
+                                lines = log_response.text.strip().split('\n')
+                                if lines:
+                                    latest_log = json.loads(lines[-1])
+                                    latest_log["status"] = "SIGNAL RECORD (Sync)"
+                                    send_telegram(chat_id, latest_log)
+                                    return {"ok": True}
+                        except Exception as log_err:
+                            print(f"⚠️ GitHub Log fetch failed: {log_err}")
 
-                    # 3. 3rd Choice: Engine status (Waiting)
-                    print("🔄 Engine is currently waiting...")
-                    waiting_status = {
-                        "status": "AWAITING_EXECUTION",
-                        "timestamp": datetime.now(timezone.utc).isoformat()
-                    }
-                    send_telegram(chat_id, waiting_status)
+                        # 4. 4th Choice: Waiting
+                        waiting_status = {
+                            "status": "AWAITING_EXECUTION",
+                            "timestamp": datetime.now(timezone.utc).isoformat()
+                        }
+                        send_telegram(chat_id, waiting_status)
                 
             except Exception as err:
                 print(f"❌ Internal Signal Check Failed: {err}")

@@ -34,7 +34,7 @@ def consume_ai_core_signal():
     sb_url = os.getenv("SUPABASE_URL")
     sb_key = os.getenv("SUPABASE_SERVICE_ROLE_KEY") or os.getenv("SUPABASE_KEY")
     
-    print(f"🔍 Checking for signals... (Supabase URL: {sb_url[:15]}...)")
+    print(f"🔍 Checking for signals... (URL: {sb_url}, Key Prefix: {str(sb_key)[:10]}...)")
 
     if sb_url and sb_key:
         try:

@@ -1,6 +1,6 @@
 import { getSignalStatus } from "./signals.js";
 
-const EXECUTION_LOG_API = "https://raw.githubusercontent.com/9dpi/quantix-live-execution/main/auto_execution_log.jsonl";
+const LIVE_API_URL = "/signal/latest";
 
 function isMarketOpen() {
     const now = new Date();
@@ -23,17 +23,17 @@ function displayMarketClosed() {
 
 async function fetchLatestSignalRecord() {
     try {
-        const cacheBuster = `?t=${Date.now()}`;
-        const response = await fetch(EXECUTION_LOG_API + cacheBuster);
-        if (!response.ok) return null;
+        const response = await fetch(LIVE_API_URL);
 
-        const text = await response.text();
-        const lines = text.trim().split('\n').filter(line => line.trim());
-        if (lines.length === 0) return null;
+        if (response.status === 404) {
+            console.log("API: Awaiting Execution");
+            return null;
+        }
 
-        return JSON.parse(lines[lines.length - 1]);
+        if (!response.ok) throw new Error("API Error");
+        return await response.json();
     } catch (error) {
-        console.error("Failed to fetch signal record:", error);
+        console.error("Failed to fetch live signal:", error);
         return null;
     }
 }

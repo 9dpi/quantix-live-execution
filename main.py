@@ -74,7 +74,9 @@ def health():
     return {
         "status": "ok", 
         "market_open": is_market_open(),
-        "telegram_token_set": bool(os.getenv("TELEGRAM_BOT_TOKEN"))
+        "telegram_token_set": bool(os.getenv("TELEGRAM_BOT_TOKEN")),
+        "supabase_url_set": bool(os.getenv("SUPABASE_URL")),
+        "supabase_key_set": bool(os.getenv("SUPABASE_SERVICE_ROLE_KEY") or os.getenv("SUPABASE_KEY"))
     }
 
 @app.get("/data-feed/health")

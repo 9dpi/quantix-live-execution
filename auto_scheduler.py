@@ -93,11 +93,9 @@ def scheduler_loop():
     """
     # Guardrail: Check data feed configuration
     if not os.getenv("TWELVE_DATA_API_KEY"):
-        raise RuntimeError(
-            "❌ DATA FEED NOT CONFIGURED\n"
-            "TWELVE_DATA_API_KEY environment variable is required.\n"
-            "Scheduler aborted to prevent silent failures."
-        )
+        print("⚠️  DATA FEED NOT LOCAL: Continuing in Pure Consumption mode.")
+    else:
+        print("✅ DATA FEED CONFIGURED: Twelve Data API key present.")
     
     print("=" * 60)
     print("AUTO v0 Scheduler Started")

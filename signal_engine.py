@@ -4,10 +4,10 @@ import requests
 import sys
 from datetime import datetime, timezone
 
-def print_flush(msg):
-    print(msg)
-    sys.stdout.flush()
-from external_client import get_price
+from datetime import datetime, timezone
+
+# Legacy API (Fallback)
+AI_CORE_API = "https://quantixaicore-production.up.railway.app/api/v1/active"
 
 # Import data feed monitor for health tracking
 try:
@@ -56,6 +56,7 @@ def consume_ai_core_signal():
                     latest = data[0]
                     # print(f"✅ Extracted signal from Supabase: {latest.get('id')}")
                     return {
+                        "signal_id": latest.get("id"),
                         "asset": latest.get("asset", "EUR/USD"),
                         "direction": latest.get("direction", "NEUTRAL"),
                         "strength": "(HIGH)" if float(latest.get("ai_confidence", 0)) > 0.8 else "(MID)",
@@ -81,6 +82,7 @@ def consume_ai_core_signal():
                 if signals:
                     latest = signals[0]
                     return {
+                        "signal_id": latest.get("id", "legacy-001"),
                         "asset": latest["asset"],
                         "direction": latest["direction"],
                         "strength": "(HIGH)" if latest["ai_confidence"] > 0.8 else "(MID)",

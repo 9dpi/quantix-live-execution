@@ -118,6 +118,9 @@ def execute():
 
     # Phase 1: Pure Execution
     sig = get_latest_signal_safe()
+    if not sig:
+        return JSONResponse(status_code=404, content={"status": "NO_ACTIVE_SIGNAL", "message": "No active signals found in AI Core [T1]"})
+
     new_signal_id = f"live-{datetime.now(timezone.utc).strftime('%Y%m%d')}-001"
     CURRENT_SIGNAL = {
         "signal_id": new_signal_id,

@@ -1,5 +1,6 @@
 import os
 import random
+import requests
 from datetime import datetime, timezone
 from external_client import get_price
 

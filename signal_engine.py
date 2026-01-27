@@ -39,8 +39,6 @@ def consume_ai_core_signal():
     sb_url = os.getenv("SUPABASE_URL")
     sb_key = os.getenv("SUPABASE_SERVICE_ROLE_KEY") or os.getenv("SUPABASE_KEY")
     
-    print_flush(f"🔍 Checking for signals... (URL: {sb_url}, Key Prefix: {str(sb_key)[:10]}...)")
-
     if sb_url and sb_key:
         try:
             # 1. NEW: Try Supabase Direct (Primary)
@@ -50,14 +48,13 @@ def consume_ai_core_signal():
                 "Authorization": f"Bearer {sb_key}",
                 "Content-Type": "application/json"
             }
-            print_flush(f"📡 Querying Supabase: {url}")
             resp = requests.get(url, headers=headers, timeout=5)
             
             if resp.ok:
                 data = resp.json()
                 if data:
                     latest = data[0]
-                    print_flush(f"✅ SUCCESS: Found signal {latest.get('id')} in Supabase")
+                    # print(f"✅ Extracted signal from Supabase: {latest.get('id')}")
                     return {
                         "asset": latest.get("asset", "EUR/USD"),
                         "direction": latest.get("direction", "NEUTRAL"),
@@ -72,17 +69,11 @@ def consume_ai_core_signal():
                         "volatility": "Verified",
                         "timestamp": latest.get("generated_at")
                     }
-                else:
-                    print_flush("ℹ️ Supabase query returned NO active signals.")
-            else:
-                print_flush(f"❌ Supabase API Error: {resp.status_code} - {resp.text}")
-                
         except Exception as sb_err:
-            print_flush(f"🔥 Supabase exception: {sb_err}")
+            print(f"⚠️ Supabase fetch failed: {sb_err}")
 
     # Fallback to legacy only if Supabase is NOT configured
     if not (sb_url and sb_key):
-        print_flush(f"🔄 Supabase not configured. Trying legacy API: {AI_CORE_API}")
         try:
             response = requests.get(AI_CORE_API, timeout=5)
             if response.ok:
@@ -104,7 +95,7 @@ def consume_ai_core_signal():
                         "timestamp": latest["generated_at"]
                     }
         except Exception as e:
-            print_flush(f"❌ Legacy API failed: {e}")
+            pass
             
     return None
 

@@ -109,23 +109,19 @@ def data_feed_health():
 @app.get("/signal/latest")
 def latest():
     # 1. First priority: Signal already executed and locked in this session
-    print_flush("DEBUG: Checking active signal...")
     sig = get_active_signal()
     if sig:
-        print_flush("DEBUG: Active signal found in memory.")
         return sig
     
     # 2. Second priority: Check for valid ACTIVE signal in Database (Pre-execution)
-    print_flush("DEBUG: No active signal in memory. Fetching fresh from Supabase...")
+    # This ensures "Real Data" is shown as soon as the Miner pushes it.
     try:
         fresh_sig = get_latest_signal_safe()
         if fresh_sig:
-            print_flush(f"DEBUG: Fresh signal fetched: {fresh_sig.get('asset')}")
+            print(f"✅ Serving live signal for {fresh_sig.get('asset')}")
             return fresh_sig
-        else:
-            print_flush("DEBUG: No fresh signal returned from engine.")
     except Exception as e:
-        print_flush(f"⚠️ Failed to fetch fresh signal: {e}")
+        print(f"⚠️ Failed to fetch fresh signal: {e}")
 
     return JSONResponse(status_code=404, content={"status": "AWAITING_EXECUTION"})
 

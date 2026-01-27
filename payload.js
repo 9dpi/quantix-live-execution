@@ -1,7 +1,6 @@
 import { getSignalStatus } from "./signals.js";
 
-const API_BASE = "https://signalgeniusai-production.up.railway.app";
-const LATEST_API = `${API_BASE}/signal/latest`;
+const LATEST_API = `/signal/latest`;
 let refreshInterval = 60;
 let countdown = refreshInterval;
 
@@ -54,7 +53,7 @@ function updateFeaturedCard(data) {
     document.getElementById("card-tp").innerText = data.tp;
     document.getElementById("card-sl").innerText = data.sl;
     document.getElementById("card-confidence").innerText = `${data.confidence}%`;
-    document.getElementById("card-strategy").innerText = "Quantix Execution";
+    document.getElementById("card-strategy").innerText = data.strategy || "Quantix Execution";
     document.getElementById("card-validity").innerText = `ACTIVE`;
     document.getElementById("card-volatility").innerText = "Real-time Verified";
 }

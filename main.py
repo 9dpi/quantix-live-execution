@@ -101,10 +101,24 @@ def data_feed_health():
 
 @app.get("/signal/latest")
 def latest():
+    # 1. First priority: Signal already executed and locked in this session
     sig = get_active_signal()
-    if sig is None:
-        return JSONResponse(status_code=404, content={"status": "AWAITING_EXECUTION"})
-    return sig
+    if sig:
+        return sig
+    
+    # 2. Second priority: Check for valid ACTIVE signal in Database (Pre-execution)
+    # This ensures "Real Data" is shown as soon as the Miner pushes it.
+    try:
+        fresh_sig = get_latest_signal_safe()
+        if fresh_sig:
+            # We found a real signal from the Miner
+            # We return it to the frontend so the user sees "ACTIVE"
+            # The frontend 'validity' logic will handle if it's expired
+            return fresh_sig
+    except Exception as e:
+        print(f"⚠️ Failed to fetch fresh signal: {e}")
+
+    return JSONResponse(status_code=404, content={"status": "AWAITING_EXECUTION"})
 
 @app.post("/signal/execute")
 def execute():

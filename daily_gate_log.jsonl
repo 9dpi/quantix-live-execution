@@ -27,3 +27,31 @@
 {"timestamp": "2026-01-27T07:11:36.860062+00:00", "signal_id": "N/A", "decision": "SKIP", "reason": "No signal available", "date": "2026-01-27"}
 {"timestamp": "2026-01-27T09:45:09.298734+00:00", "signal_id": "88e91be4-ae0b-4069-aff2-9f9a7f0d6786", "decision": "SKIP", "reason": "Signal invalid or expired", "date": "2026-01-27"}
 {"timestamp": "2026-01-27T09:45:26.623509+00:00", "signal_id": "88e91be4-ae0b-4069-aff2-9f9a7f0d6786", "decision": "EXECUTE", "reason": "Signal valid, gate open, executing", "date": "2026-01-27"}
+{"timestamp": "2026-01-28T00:01:35.953946+00:00", "signal_id": "88e91be4-ae0b-4069-aff2-9f9a7f0d6786", "decision": "SKIP", "reason": "Signal invalid or expired", "date": "2026-01-28"}
+{"timestamp": "2026-01-28T00:03:37.441520+00:00", "signal_id": "88e91be4-ae0b-4069-aff2-9f9a7f0d6786", "decision": "SKIP", "reason": "Signal invalid or expired", "date": "2026-01-28"}
+{"timestamp": "2026-01-28T00:05:38.578248+00:00", "signal_id": "88e91be4-ae0b-4069-aff2-9f9a7f0d6786", "decision": "SKIP", "reason": "Signal invalid or expired", "date": "2026-01-28"}
+{"timestamp": "2026-01-28T00:07:40.024773+00:00", "signal_id": "88e91be4-ae0b-4069-aff2-9f9a7f0d6786", "decision": "SKIP", "reason": "Signal invalid or expired", "date": "2026-01-28"}
+{"timestamp": "2026-01-28T00:09:41.489408+00:00", "signal_id": "88e91be4-ae0b-4069-aff2-9f9a7f0d6786", "decision": "SKIP", "reason": "Signal invalid or expired", "date": "2026-01-28"}
+{"timestamp": "2026-01-28T00:11:42.954245+00:00", "signal_id": "88e91be4-ae0b-4069-aff2-9f9a7f0d6786", "decision": "SKIP", "reason": "Signal invalid or expired", "date": "2026-01-28"}
+{"timestamp": "2026-01-28T00:13:44.436420+00:00", "signal_id": "88e91be4-ae0b-4069-aff2-9f9a7f0d6786", "decision": "SKIP", "reason": "Signal invalid or expired", "date": "2026-01-28"}
+{"timestamp": "2026-01-28T00:15:46.082146+00:00", "signal_id": "88e91be4-ae0b-4069-aff2-9f9a7f0d6786", "decision": "SKIP", "reason": "Signal invalid or expired", "date": "2026-01-28"}
+{"timestamp": "2026-01-28T00:17:47.186066+00:00", "signal_id": "88e91be4-ae0b-4069-aff2-9f9a7f0d6786", "decision": "SKIP", "reason": "Signal invalid or expired", "date": "2026-01-28"}
+{"timestamp": "2026-01-28T00:19:48.629595+00:00", "signal_id": "88e91be4-ae0b-4069-aff2-9f9a7f0d6786", "decision": "SKIP", "reason": "Signal invalid or expired", "date": "2026-01-28"}
+{"timestamp": "2026-01-28T00:21:49.751995+00:00", "signal_id": "88e91be4-ae0b-4069-aff2-9f9a7f0d6786", "decision": "SKIP", "reason": "Signal invalid or expired", "date": "2026-01-28"}
+{"timestamp": "2026-01-28T00:23:51.254670+00:00", "signal_id": "88e91be4-ae0b-4069-aff2-9f9a7f0d6786", "decision": "SKIP", "reason": "Signal invalid or expired", "date": "2026-01-28"}
+{"timestamp": "2026-01-28T00:25:51.028947+00:00", "signal_id": "88e91be4-ae0b-4069-aff2-9f9a7f0d6786", "decision": "SKIP", "reason": "Signal invalid or expired", "date": "2026-01-28"}
+{"timestamp": "2026-01-28T00:27:52.961073+00:00", "signal_id": "88e91be4-ae0b-4069-aff2-9f9a7f0d6786", "decision": "SKIP", "reason": "Signal invalid or expired", "date": "2026-01-28"}
+{"timestamp": "2026-01-28T00:29:54.873224+00:00", "signal_id": "88e91be4-ae0b-4069-aff2-9f9a7f0d6786", "decision": "SKIP", "reason": "Signal invalid or expired", "date": "2026-01-28"}
+{"timestamp": "2026-01-28T01:16:27.190796+00:00", "signal_id": "88e91be4-ae0b-4069-aff2-9f9a7f0d6786", "decision": "SKIP", "reason": "Signal invalid or expired", "date": "2026-01-28"}
+{"timestamp": "2026-01-28T01:18:29.019474+00:00", "signal_id": "88e91be4-ae0b-4069-aff2-9f9a7f0d6786", "decision": "SKIP", "reason": "Signal invalid or expired", "date": "2026-01-28"}
+{"timestamp": "2026-01-28T01:20:30.727146+00:00", "signal_id": "88e91be4-ae0b-4069-aff2-9f9a7f0d6786", "decision": "SKIP", "reason": "Signal invalid or expired", "date": "2026-01-28"}
+{"timestamp": "2026-01-28T01:22:32.116772+00:00", "signal_id": "88e91be4-ae0b-4069-aff2-9f9a7f0d6786", "decision": "SKIP", "reason": "Signal invalid or expired", "date": "2026-01-28"}
+{"timestamp": "2026-01-28T01:23:32.000077+00:00", "signal_id": "88e91be4-ae0b-4069-aff2-9f9a7f0d6786", "decision": "SKIP", "reason": "Signal invalid or expired", "date": "2026-01-28"}
+{"timestamp": "2026-01-28T01:25:33.758417+00:00", "signal_id": "88e91be4-ae0b-4069-aff2-9f9a7f0d6786", "decision": "SKIP", "reason": "Signal invalid or expired", "date": "2026-01-28"}
+{"timestamp": "2026-01-28T01:27:35.195195+00:00", "signal_id": "88e91be4-ae0b-4069-aff2-9f9a7f0d6786", "decision": "SKIP", "reason": "Signal invalid or expired", "date": "2026-01-28"}
+{"timestamp": "2026-01-28T01:29:36.248583+00:00", "signal_id": "N/A", "decision": "SKIP", "reason": "No signal available", "date": "2026-01-28"}
+{"timestamp": "2026-01-28T01:30:05.630557+00:00", "signal_id": "N/A", "decision": "SKIP", "reason": "No signal available", "date": "2026-01-28"}
+{"timestamp": "2026-01-28T01:32:07.118489+00:00", "signal_id": "dd50e541-c501-4168-9d62-cce00ba0864f", "decision": "EXECUTE", "reason": "Signal valid, gate open, executing", "date": "2026-01-28"}
+{"timestamp": "2026-01-29T01:01:18.382854+00:00", "signal_id": "8c8059c4-46a0-442e-ab0e-c89ba282754a", "decision": "SKIP", "reason": "Signal invalid or expired", "date": "2026-01-29"}
+{"timestamp": "2026-01-29T01:03:20.335604+00:00", "signal_id": "8c8059c4-46a0-442e-ab0e-c89ba282754a", "decision": "SKIP", "reason": "Signal invalid or expired", "date": "2026-01-29"}
+{"timestamp": "2026-01-29T03:42:25.030984+00:00", "signal_id": "f790c999-21d7-4906-8c72-810a32ff9f02", "decision": "EXECUTE", "reason": "Signal valid, gate open, executing", "date": "2026-01-29"}

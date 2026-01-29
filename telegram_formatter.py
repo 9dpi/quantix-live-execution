@@ -37,7 +37,7 @@ def format_signal_message(signal: dict) -> str:
     # 1. SPECIAL STATUS: MARKET CLOSED
     if status == "MARKET_CLOSED":
         return (
-            "Signal Genius AI\n"
+            "SIGNAL GENIUS AI\n"
             "Status: Market Closed 🌑\n\n"
             "The Forex market is currently closed.\n"
             "No signals generated on weekends.\n\n"
@@ -47,7 +47,7 @@ def format_signal_message(signal: dict) -> str:
     # 2. SPECIAL STATUS: WAITING
     if status in ["AWAITING_EXECUTION", "WAITING"]:
         return (
-            "Signal Genius AI\n"
+            "SIGNAL GENIUS AI\n"
             "Status: Monitoring Market... ⏳\n\n"
             "System is scanning for high-probability setups.\n"
             "No trade decision executed yet.\n\n"
@@ -68,7 +68,7 @@ def format_signal_message(signal: dict) -> str:
     dir_emoji = "🟢" if direction == "BUY" else "🔴" if direction == "SELL" else "⚪"
 
     message = (
-        "Signal Genius AI\n"
+        "SIGNAL GENIUS AI\n"
         f"Status: {status}\n"
         f"Validity: {validity}\n\n"
         f"{symbol} | {timeframe}\n"

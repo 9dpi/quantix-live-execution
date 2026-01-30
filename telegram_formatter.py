@@ -32,12 +32,14 @@ def _format_execution_block(signal: dict) -> str:
     )
 
 def format_signal_message(signal: dict) -> str:
-    status = signal.get("status", "EXECUTED")
+    status = signal.get("status", "ACTIVE")
+    if isinstance(status, str):
+        status = status.upper()
     
     # 1. SPECIAL STATUS: MARKET CLOSED
     if status == "MARKET_CLOSED":
         return (
-            "SIGNAL GENIUS AI\n"
+            "⚡️ SIGNAL GENIUS AI\n\n"
             "Status: Market Closed 🌑\n\n"
             "The Forex market is currently closed.\n"
             "No signals generated on weekends.\n\n"
@@ -47,40 +49,83 @@ def format_signal_message(signal: dict) -> str:
     # 2. SPECIAL STATUS: WAITING
     if status in ["AWAITING_EXECUTION", "WAITING"]:
         return (
-            "SIGNAL GENIUS AI\n"
+            "⚡️ SIGNAL GENIUS AI\n\n"
             "Status: Monitoring Market... ⏳\n\n"
             "System is scanning for high-probability setups.\n"
             "No trade decision executed yet.\n\n"
             "Please wait for the next snapshot."
         )
 
-    # 3. STANDARD SIGNAL FORMAT
-    symbol = signal.get("asset") or signal.get("symbol") or "EUR/USD"
+    # Standard Fields Extraction
+    asset = signal.get("asset") or signal.get("symbol") or "EURUSD"
+    asset = asset.replace("/", "")
     timeframe = signal.get("timeframe", "M15")
-    direction = signal.get("direction", "N/A")
-    validity = signal.get("validity_status") or signal.get("validity") or "ACTIVE"
-    
-    entry = signal.get("entry", "N/A")
-    tp = signal.get("tp", "N/A")
-    sl = signal.get("sl", "N/A")
-    
-    # Emoji
+    direction = str(signal.get("direction", "N/A")).upper()
     dir_emoji = "🟢" if direction == "BUY" else "🔴" if direction == "SELL" else "⚪"
+    
+    confidence = signal.get("confidence") or signal.get("ai_confidence") or 0
+    if isinstance(confidence, float) and confidence <= 1.0:
+        confidence = int(confidence * 100)
+    
+    strength = signal.get("strength") or 0
+    if isinstance(strength, (int, float)) and strength <= 1.0:
+        strength_pct = f"{int(strength * 100)}%"
+    else:
+        strength_pct = str(strength)
 
-    message = (
-        "SIGNAL GENIUS AI\n"
-        f"Status: {status}\n"
-        f"Validity: {validity}\n\n"
-        f"{symbol} | {timeframe}\n"
-        f"{dir_emoji} {direction}\n\n"
+    entry = signal.get("entry") or signal.get("entry_low") or "N/A"
+    tp = signal.get("tp") or "N/A"
+    sl = signal.get("sl") or "N/A"
+
+    # TEMPLATE 3 – SIGNAL ULTRA (95%+ FAST ALERT)
+    if confidence >= 95 and status != "EXPIRED":
+        return (
+            f"🚨 *ULTRA SIGNAL (95%+)*\n\n"
+            f"{asset} | {timeframe}\n"
+            f"{dir_emoji} {direction}\n\n"
+            f"Status: 🟢 ACTIVE\n"
+            f"Entry window: OPEN\n\n"
+            f"Confidence: {confidence}%\n"
+            f"Strength: {strength_pct}\n\n"
+            f"🎯 Entry: {entry}\n"
+            f"💰 TP: {tp}\n"
+            f"🛑 SL: {sl}\n"
+        )
+
+    # TEMPLATE 2 – SIGNAL ĐÃ HẾT ENTRY (EXPIRED – RECORD)
+    if status in ["EXPIRED", "CLOSED"]:
+        result = signal.get("result", "N/A")
+        if result == "N/A": result = "Closed"
+        return (
+            f"⚡️ *SIGNAL GENIUS AI*\n\n"
+            f"Asset: {asset}\n"
+            f"Timeframe: {timeframe}\n"
+            f"Direction: {dir_emoji} {direction}\n\n"
+            f"Status: ⛔ EXPIRED (for record only)\n\n"
+            f"Entry: {entry}\n"
+            f"TP: {tp}\n"
+            f"SL: {sl}\n\n"
+            f"Result: {result}"
+        )
+
+    # TEMPLATE 1 – SIGNAL CÒN HIỆU LỰC (ACTIVE)
+    validity_min = signal.get("validity", 90)
+    passed = signal.get("validity_passed", 0)
+    remaining = max(1, validity_min - passed)
+    
+    return (
+        f"⚡️ *SIGNAL GENIUS AI*\n\n"
+        f"Asset: {asset}\n"
+        f"Timeframe: {timeframe}\n"
+        f"Direction: {dir_emoji} {direction}\n\n"
+        f"Status: 🟢 ACTIVE\n"
+        f"Valid for: ~{remaining} minutes\n\n"
+        f"Confidence: {confidence}%\n"
+        f"Force/Strength: {strength_pct}\n\n"
         f"🎯 Entry: {entry}\n"
         f"💰 TP: {tp}\n"
-        f"🛑 SL: {sl}\n\n"
-        f"--\n"
-        f"⚠️ Educational purpose only\n"
-        f"--"
+        f"🛑 SL: {sl}\n"
     )
-    return message
 
 def send_telegram(chat_id, signal):
     """
@@ -97,6 +142,7 @@ def send_telegram(chat_id, signal):
         payload = {
             "chat_id": chat_id,
             "text": message,
+            "parse_mode": "Markdown",
             "reply_markup": {
                 "inline_keyboard": [
                     [

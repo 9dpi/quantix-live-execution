@@ -49,14 +49,20 @@ function displaySignalRecord(record) {
     dirText.textContent = isBuy ? "🟢 BUY" : "🔴 SELL";
     dirText.className = isBuy ? "BUY" : "SELL";
 
-    // Format Timestamp (100% Sync with T1 executed_at)
-    const recordDate = new Date(record.executed_at || record.signal_time);
-    const dateOptions = { day: 'numeric', month: 'short', year: 'numeric' };
-    const timeOptions = { hour: '2-digit', minute: '2-digit', timeZone: 'UTC' };
-    const dateStr = recordDate.toLocaleDateString('en-GB', dateOptions);
-    const timeStr = recordDate.toLocaleTimeString('en-GB', timeOptions);
+    // Safe Date Parsing
+    const ts = record.executed_at || record.signal_time || record.timestamp;
+    const dateObj = (ts && !isNaN(new Date(ts))) ? new Date(ts) : null;
 
-    document.getElementById('record-generated-at').innerText = `${dateStr} · ${timeStr} UTC`;
+    if (dateObj) {
+        // Format: 2026-01-29 14:05:00 UTC (User preference for clarity)
+        const dateOptions = { year: 'numeric', month: '2-digit', day: '2-digit' };
+        const timeOptions = { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false, timeZone: 'UTC' };
+        const dStr = dateObj.toLocaleDateString('en-CA', dateOptions); // en-CA gives YYYY-MM-DD
+        const tStr = dateObj.toLocaleTimeString('en-GB', timeOptions);
+        document.getElementById('record-generated-at').innerText = `${dStr} ${tStr} UTC`;
+    } else {
+        document.getElementById('record-generated-at').innerText = "— (Historical Record)";
+    }
 
     // Smart Status based on age
     const statusInfo = getSignalStatus({
@@ -64,19 +70,16 @@ function displaySignalRecord(record) {
         validity: 90
     });
 
-    const statusEl = document.getElementById('record-main-status');
-    const validityEl = document.getElementById('record-validity');
+    const statusEl = document.getElementById('record-status-detailed');
 
-    if (statusInfo.isLive) {
-        statusEl.innerText = "ACTIVE — currently verifying";
-        statusEl.className = "meta-value-vertical status-text live";
-        validityEl.innerText = 'ACTIVE';
-        validityEl.className = 'text-green';
-    } else {
-        statusEl.innerText = "EXPIRED — no longer active";
-        statusEl.className = "meta-value-vertical status-text expired";
-        validityEl.innerText = 'EXPIRED';
-        validityEl.className = 'text-red';
+    if (statusEl) {
+        if (statusInfo.isLive) {
+            statusEl.innerText = "ACTIVE — Monitoring Market";
+            statusEl.className = 'text-green';
+        } else {
+            statusEl.innerText = "EXPIRED (Entry not hit before expiry)";
+            statusEl.className = 'text-red';
+        }
     }
 
     document.getElementById('record-entry').textContent = record.entry || record.execution_price || record.signal_price;

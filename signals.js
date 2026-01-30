@@ -1,5 +1,6 @@
 ﻿export function getSignalStatus(signal) {
-  const ageMin = (Date.now() - new Date(signal.timestamp)) / 60000;
+  const ts = signal.timestamp || signal.executed_at || signal.signal_time;
+  const ageMin = (ts && !isNaN(new Date(ts))) ? (Date.now() - new Date(ts)) / 60000 : 9999;
   const validity = signal.validity || 90;
   const isLive = ageMin <= validity;
   return {

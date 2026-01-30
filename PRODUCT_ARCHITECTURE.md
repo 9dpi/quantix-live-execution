@@ -131,6 +131,49 @@ Result: TP hit / SL hit / Closed
 
 ---
 
+## 🎯 Trading Rules (AUTO v0)
+
+### Fixed Risk/Reward Rule
+**Effective**: 2026-01-30  
+**Version**: AUTO v0
+
+| Parameter | Value | Notes |
+|-----------|-------|-------|
+| **Take Profit (TP)** | 10 pips | Fixed for all signals |
+| **Stop Loss (SL)** | 10 pips | Fixed for all signals |
+| **Risk/Reward Ratio** | 1:1 | Fixed ratio |
+
+#### Application Scope
+- ✅ Applies to **100% of all signals**
+- ✅ **DOES NOT** change based on:
+  - Market condition (trending/ranging)
+  - Confidence level (75%, 95%+)
+  - Volatility (ATR, Bollinger Bands)
+  - Timeframe (M1, M5, M15, H1)
+
+#### Examples
+```
+BUY Signal:
+Entry: 1.19500
+TP:    1.19600 (+10 pips)
+SL:    1.19400 (-10 pips)
+
+SELL Signal:
+Entry: 1.19500
+TP:    1.19400 (-10 pips)
+SL:    1.19600 (+10 pips)
+```
+
+#### Rationale
+- **Simplicity**: Easy to understand and implement
+- **Consistency**: Uniform risk profile across all signals
+- **Backtesting**: Standardized parameters for performance evaluation
+- **Risk Management**: Clear, predictable risk per trade
+
+**Documentation**: See `FIXED_RR_RULE_v0.md` for full specification
+
+---
+
 ## 📦 Repository Structure
 
 ```
@@ -174,6 +217,7 @@ Signal_Genius_AI/             (Web Dashboard)
 ---
 
 **Last Updated**: 2026-01-30  
-**Architecture Version**: 2.1 (Hybrid + 3 Templates)  
+**Architecture Version**: 2.2 (Hybrid + 3 Templates + Fixed RR)  
 **Status**: ✅ Production Ready
+
 

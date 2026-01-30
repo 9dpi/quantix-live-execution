@@ -163,3 +163,7 @@
 {"timestamp": "2026-01-30T04:17:21.474600+00:00", "signal_id": "036c6773-ce82-43e6-8a1f-d0eae582f6ec", "decision": "SKIP", "reason": "Signal invalid or expired", "date": "2026-01-30"}
 {"timestamp": "2026-01-30T04:19:23.158293+00:00", "signal_id": "036c6773-ce82-43e6-8a1f-d0eae582f6ec", "decision": "SKIP", "reason": "Signal invalid or expired", "date": "2026-01-30"}
 {"timestamp": "2026-01-30T04:21:24.458354+00:00", "signal_id": "036c6773-ce82-43e6-8a1f-d0eae582f6ec", "decision": "SKIP", "reason": "Signal invalid or expired", "date": "2026-01-30"}
+{"timestamp": "2026-01-30T04:23:26.386966+00:00", "signal_id": "036c6773-ce82-43e6-8a1f-d0eae582f6ec", "decision": "SKIP", "reason": "Signal invalid or expired", "date": "2026-01-30"}
+{"timestamp": "2026-01-30T04:25:28.226237+00:00", "signal_id": "036c6773-ce82-43e6-8a1f-d0eae582f6ec", "decision": "SKIP", "reason": "Signal invalid or expired", "date": "2026-01-30"}
+{"timestamp": "2026-01-30T04:27:29.662335+00:00", "signal_id": "036c6773-ce82-43e6-8a1f-d0eae582f6ec", "decision": "SKIP", "reason": "Signal invalid or expired", "date": "2026-01-30"}
+{"timestamp": "2026-01-30T04:29:31.442970+00:00", "signal_id": "036c6773-ce82-43e6-8a1f-d0eae582f6ec", "decision": "SKIP", "reason": "Signal invalid or expired", "date": "2026-01-30"}

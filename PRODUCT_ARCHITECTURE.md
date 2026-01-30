@@ -1,35 +1,179 @@
-# Quantix Hybrid Architecture (Home Miner Mode)
+# Quantix Signal Genius AI - System Architecture (2026-01-30)
 
-Due to Twelve Data's blocking of Cloud Center IPs (Railway/AWS), the Data Ingestion and Analysis layers have been moved to the Local Environment (Residential IP), while the Storage and Presentation layers remain Cloud-native.
+## 🏗️ Hybrid Architecture Overview
 
-[T0] Live Market Data
-(continuous feed via Twelve Data API)
-      ↓
-[T0 + Δ] Quantix AI Core (HOME MINER) 🏠
-   * Running Locally on Operator Machine *
-   - Repo: https://github.com/9dpi/quantix-ai-core
-   - Market analysis runs every **15 seconds**
-   - Bypasses Cloud IP blocking (Residential IP)
-   - Function:
-      • Ingests Live Data
-      • Analyzes Structure
-      • PUSHES 'Locked' Signals to Supabase Cloud
-   - Frequency: Max **1 signal per day**
-      ↓
-      (Secure Write / HTTPS)
-      ↓
-[T1] Backend - The Vault (CLOUD) ☁️
-   Immutable Record (Supabase)
-   - Append-only Log
-   - Single Source of Truth for Web & Bot
-      ↓
------------------------------------------------------------
-      ↓                                   ↓
-[T2] Web MPV (Signal Genius)         [T2] Telegram Bot
-   (Railway Hosted)                    (GitHub Actions)
-   - Reads T1 (Supabase)               - Reads T1 (Supabase)
-   - Displays Active Signal            - Notifies Users
-      ↓
-[T3] Execution Layer
-   - Reads T1 (Supabase)
-   - Executes trade (Demo/Live)
+Due to Twelve Data's blocking of Cloud IPs, we operate a **Hybrid Architecture**:
+- **Data Ingestion & Analysis**: Local (Home Miner) 🏠
+- **Storage & Distribution**: Cloud (Supabase + Railway) ☁️
+
+---
+
+## 📊 Complete Signal Flow
+
+```
+[T0] Live Market Data (TwelveData API)
+     ↓ (every 120 seconds)
+     
+[T0+Δ] QUANTIX AI CORE - Home Miner 🏠
+├─ Location: Local Machine (Residential IP)
+├─ Repo: github.com/9dpi/quantix-ai-core
+├─ Function: ContinuousAnalyzer
+│  ├─ Fetch EURUSD M15 data
+│  ├─ Structure Analysis (StructureEngineV1)
+│  ├─ Confidence Calculation (0.0 - 1.0)
+│  └─ Strength Calculation (0.0 - 1.0)
+├─ Decision Logic:
+│  ├─ Confidence >= 95% → ULTRA Signal (Auto-push Telegram)
+│  ├─ Confidence >= 75% → ACTIVE Signal (Lock to DB)
+│  └─ Confidence < 75%  → CANDIDATE (Temporary)
+└─ Output: Signal Object
+     ↓ (HTTPS POST)
+     
+[T1] SUPABASE CLOUD DATABASE ☁️
+├─ Table: fx_signals
+├─ Status Types:
+│  ├─ ACTIVE: Valid signal ready for execution
+│  ├─ CANDIDATE: Low confidence (auto-purged after 1h)
+│  └─ EXPIRED: Past validity window
+├─ Key Fields:
+│  ├─ asset, direction, timeframe
+│  ├─ entry_low, tp, sl
+│  ├─ ai_confidence (0.0-1.0)
+│  ├─ strength (0.0-1.0)
+│  └─ generated_at, status
+└─ Immutable Append-Only Log
+     ↓
+     ├──────────────────────┬──────────────────────┐
+     ↓                      ↓                      ↓
+     
+[T2] TELEGRAM BOT         [T2] WEB DASHBOARD    [T2] LIVE EXECUTION
+├─ Proactive Push         ├─ Railway Hosted     ├─ Signal Consumer
+│  (AI Core Direct)       ├─ signalgeniusai.com ├─ Reads Supabase
+├─ Webhook Handler        ├─ Reads Supabase     └─ Executes Trades
+│  (/signal command)      └─ Real-time Display       (Demo/Live)
+└─ 3 Templates:
+   ├─ ⚡️ ACTIVE (Standard)
+   ├─ 🚨 ULTRA (95%+)
+   └─ ⛔ EXPIRED (Record)
+```
+
+---
+
+## 📱 Telegram Message Templates
+
+### Template 1: ACTIVE Signal (Standard)
+```
+⚡️ SIGNAL GENIUS AI
+
+Asset: EURUSD
+Timeframe: M15
+Direction: 🔴 SELL
+
+Status: 🟢 ACTIVE
+Valid for: ~78 minutes
+
+Confidence: 87%
+Force/Strength: 63%
+
+🎯 Entry: 1.19498
+💰 TP: 1.19298
+🛑 SL: 1.19648
+```
+
+### Template 2: ULTRA Signal (95%+)
+```
+🚨 ULTRA SIGNAL (95%+)
+
+EURUSD | M15
+🔴 SELL
+
+Status: 🟢 ACTIVE
+Entry window: OPEN
+
+Confidence: 97%
+Strength: 91%
+
+🎯 Entry: 1.19498
+💰 TP: 1.19298
+🛑 SL: 1.19648
+```
+
+### Template 3: EXPIRED Signal (Record)
+```
+⚡️ SIGNAL GENIUS AI
+
+Asset: EURUSD
+Timeframe: M15
+Direction: 🔴 SELL
+
+Status: ⛔ EXPIRED (for record only)
+
+Entry: 1.19498
+TP: 1.19298
+SL: 1.19648
+
+Result: TP hit / SL hit / Closed
+```
+
+---
+
+## 🔐 Security & Reliability
+
+### Deduplication Mechanisms
+1. **Daily Cap**: Max 1 ACTIVE signal per day (enforced by `has_traded_today()`)
+2. **Cooldown**: 60-minute gap between Telegram pushes
+3. **Signal Fingerprint**: Prevents duplicate messages (asset + direction + entry)
+
+### Fail-Safe Features
+- **Local Heartbeat Log**: `heartbeat_audit.jsonl` (survives restarts)
+- **Cloud Telemetry**: `fx_analysis_log` table (persistent monitoring)
+- **Graceful Degradation**: System continues if DB temporarily unavailable
+
+---
+
+## 📦 Repository Structure
+
+```
+Quantix_AI_Core/              (Home Miner - Local)
+├─ backend/
+│  ├─ quantix_core/
+│  │  ├─ engine/
+│  │  │  └─ continuous_analyzer.py  ← Main Heartbeat
+│  │  ├─ ingestion/
+│  │  │  └─ twelve_data_client.py
+│  │  └─ api/
+│  │     └─ main.py  ← Railway API (Optional)
+│  └─ requirements.txt
+└─ Dockerfile
+
+quantix-live-execution/       (Execution Layer)
+├─ signal_engine.py           ← Supabase Consumer
+├─ telegram_formatter.py      ← 3 Templates
+└─ main.py                    ← FastAPI Server
+
+Signal_Genius_AI/             (Web Dashboard)
+├─ backend/
+│  ├─ main.py                 ← Webhook Handler
+│  └─ telegram_formatter.py   ← 3 Templates
+└─ frontend/
+   └─ index.html              ← GitHub Pages
+```
+
+---
+
+## 🚀 Deployment Status
+
+| Component | Location | Status | URL |
+|-----------|----------|--------|-----|
+| AI Core (Miner) | Local Machine | 🟢 Running | localhost:8000 |
+| AI Core (API) | Railway | 🟢 Online | quantixaicore-production.up.railway.app |
+| Web Dashboard | Railway | 🟢 Online | signalgeniusai-production.up.railway.app |
+| Frontend | GitHub Pages | 🟢 Live | www.signalgeniusai.com |
+| Database | Supabase | 🟢 Connected | Cloud Postgres |
+
+---
+
+**Last Updated**: 2026-01-30  
+**Architecture Version**: 2.1 (Hybrid + 3 Templates)  
+**Status**: ✅ Production Ready
+

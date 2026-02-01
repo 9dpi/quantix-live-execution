@@ -1307,61 +1307,107 @@ td {
     justify-content: center;
   }
 }
-/* Enhanced Mobile Modal & Bug Fixes */
 @media (max-width: 768px) {
   .modal-content {
     width: 98% !important;
-    max-height: 95vh;
-    border-radius: 12px;
+    max-height: 98vh !important;
+    height: auto !important;
+    border-radius: 16px;
     display: flex;
     flex-direction: column;
-    margin: 10px auto;
+    margin: 5px auto;
+    overflow: hidden;
+  }
+
+  .modal-header {
+    padding: 14px 20px !important;
+    position: relative;
+    background: var(--bg-card) !important;
+    border-bottom: 1px solid var(--glass-border) !important;
+  }
+
+  .modal-header h3 {
+    font-size: 0.95rem !important;
+    max-width: 80%;
+  }
+
+  .close-btn {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 36px;
+    height: 36px;
+    background: rgba(15, 23, 42, 0.05) !important;
+    border-radius: 50% !important;
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem !important;
+    color: var(--text-primary) !important;
+    border: 1px solid var(--glass-border) !important;
+    padding: 0 !important;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
   }
 
   .modal-body {
     flex-direction: column !important;
-    overflow-y: auto;
+    overflow-y: auto !important;
     min-height: unset !important;
     flex: 1;
     display: flex;
+    background: var(--bg-card);
   }
 
   .chart-container {
-    height: 230px !important;
-    min-height: 230px !important;
+    height: 450px !important;
+    min-height: 400px !important;
     background: #131722;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    overflow: hidden;
+    width: 100%;
+    margin-bottom: 0;
   }
 
   #tv-iframe {
     width: 100%;
     height: 100%;
     border: none;
+    display: block;
   }
 
   .signal-details-sidebar {
     width: 100% !important;
-    padding: 12px !important;
+    padding: 16px !important;
     border-left: none !important;
-    border-top: 1px solid var(--glass-border);
+    border-top: 2px solid var(--glass-border) !important;
     display: grid !important;
     grid-template-columns: repeat(2, 1fr);
-    gap: 10px;
-    background: #fff;
+    gap: 12px;
+    background: #fff !important;
+    z-index: 10;
   }
 
   .signal-details-sidebar .detail-item {
     margin-bottom: 0;
-    padding: 8px;
-    background: rgba(15, 23, 42, 0.02);
-    border-radius: 8px;
+    padding: 12px;
+    background: rgba(15, 23, 42, 0.03);
+    border-radius: 12px;
     border: 1px solid rgba(15, 23, 42, 0.05);
     display: flex;
     flex-direction: column;
     gap: 4px;
+    box-shadow: inset 0 1px 2px rgba(0,0,0,0.02);
+  }
+
+  .signal-details-sidebar .detail-item label {
+    font-size: 0.65rem;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    font-weight: 800;
+  }
+
+  .signal-details-sidebar .detail-item span {
+    font-size: 0.95rem;
+    font-weight: 700;
   }
 
   .signal-details-sidebar .divider {
@@ -1370,22 +1416,18 @@ td {
 
   .signal-details-sidebar .modal-note {
     grid-column: span 2;
-    margin: 4px 0;
-    font-size: 0.65rem;
+    margin: 8px 0;
+    font-size: 0.7rem;
+    color: var(--text-secondary);
+    opacity: 0.8;
   }
 
   .signal-details-sidebar .btn-primary {
     grid-column: span 2;
-    padding: 12px !important;
-    font-size: 0.85rem !important;
-    margin-top: 4px;
-  }
-
-  .modal-header {
-    padding: 10px 16px !important;
-  }
-
-  .modal-header h3 {
-    font-size: 0.85rem !important;
+    padding: 16px !important;
+    font-size: 0.95rem !important;
+    margin-top: 8px;
+    border-radius: 12px !important;
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2) !important;
   }
 }

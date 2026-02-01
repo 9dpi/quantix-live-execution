@@ -3,6 +3,8 @@ const SB_URL = "https://wttsaprezgvircanthbk.supabase.co/rest/v1/fx_signals";
 const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind0dHNhcHJlemd2aXJjYW50aGJrIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc2ODM2ODA3MCwiZXhwIjoyMDgzOTQ0MDcwfQ.QGewz8bDfBC6vJce6g4-sHA164bL1y0u71d6HH7PYVk";
 
 let activeTab = 'active';
+let historyOffset = 0;
+const PAGE_SIZE = 50;
 
 // --- UTILS ---
 
@@ -98,7 +100,7 @@ window.switchTab = (tab) => {
     document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
     document.getElementById(`${tab}-tab`).classList.add('active');
 
-    if (tab === 'history') loadHistory();
+    if (tab === 'history') loadHistory(false);
 };
 
 // --- ACTIVE TAB LOGIC ---
@@ -142,8 +144,11 @@ async function fetchLatestSignal() {
 }
 
 function displayActiveSignal(record) {
+    const recordEl = document.getElementById('signal-record');
+    if (!recordEl) return;
+
     document.getElementById('market-closed').classList.add('hidden');
-    document.getElementById('signal-record').classList.remove('hidden');
+    recordEl.classList.remove('hidden');
 
     const ts = record.executed_at || record.timestamp || record.generated_at;
     const dateObj = (ts && !isNaN(new Date(ts))) ? new Date(ts) : null;
@@ -205,24 +210,46 @@ function displayActiveSignal(record) {
 
 // --- HISTORY TAB LOGIC ---
 
-async function loadHistory() {
+async function loadHistory(append = false) {
     const tbody = document.getElementById('history-body');
-    tbody.innerHTML = '<tr><td colspan="8" style="text-align:center">⏳ Fetching History...</td></tr>';
+    const loadMoreBtn = document.getElementById('load-more-btn');
+
+    if (!append) {
+        historyOffset = 0;
+        tbody.innerHTML = '<tr><td colspan="8" style="text-align:center">⏳ Fetching History...</td></tr>';
+        if (loadMoreBtn) loadMoreBtn.style.display = 'none';
+    } else {
+        if (loadMoreBtn) {
+            loadMoreBtn.innerText = "⏳ Loading...";
+            loadMoreBtn.disabled = true;
+        }
+    }
 
     try {
         const asset = document.getElementById('filter-asset').value;
         const outcome = document.getElementById('filter-outcome').value;
         const sort = document.getElementById('filter-sort').value;
+        const dateRange = document.getElementById('filter-date').value;
 
-        let url = `${SB_URL}?select=*&limit=100`;
+        let url = `${SB_URL}?select=*&limit=${PAGE_SIZE}&offset=${historyOffset}`;
         const sortOrder = sort === 'asc' ? 'asc' : 'desc';
         url += `&order=generated_at.${sortOrder}`;
 
+        // Date Range Filter
+        if (dateRange !== "0") {
+            const days = parseInt(dateRange);
+            const d = new Date();
+            d.setDate(d.getDate() - days);
+            url += `&generated_at=gte.${d.toISOString()}`;
+        }
+
+        // Asset filter
         if (asset !== 'ALL') {
             const dbAsset = asset.replace('/', '');
             url += `&asset=eq.${dbAsset}`;
         }
 
+        // Outcome filter
         if (outcome !== 'ALL') {
             const stateMap = {
                 'PROFIT': 'TP_HIT',
@@ -250,10 +277,14 @@ async function loadHistory() {
         if (!res.ok) throw new Error(`Supabase Error: ${res.status}`);
 
         let signals = await res.json();
-        tbody.innerHTML = "";
+
+        if (!append) tbody.innerHTML = "";
 
         if (!signals || signals.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="8" style="text-align:center">No records found.</td></tr>';
+            if (!append) {
+                tbody.innerHTML = '<tr><td colspan="8" style="text-align:center">No records found.</td></tr>';
+            }
+            if (loadMoreBtn) loadMoreBtn.style.display = 'none';
             return;
         }
 
@@ -283,7 +314,7 @@ async function loadHistory() {
                 <td data-label="Outcome"><span class="outcome-badge outcome-${mapping.class}">${mapping.label}</span></td>
             `;
 
-            // Add Modal Trigger to the icon link
+            // Add Modal Trigger
             row.querySelector('.tv-preview-link').onclick = (e) => {
                 e.preventDefault();
                 openTVPreview(sig.asset, tf, entry, sl, tp, sig.generated_at);
@@ -292,9 +323,22 @@ async function loadHistory() {
             tbody.appendChild(row);
         });
 
+        // Show/Hide Load More
+        if (loadMoreBtn) {
+            loadMoreBtn.innerText = "Load More Signals";
+            loadMoreBtn.disabled = false;
+            if (signals.length === PAGE_SIZE) {
+                loadMoreBtn.style.display = 'block';
+            } else {
+                loadMoreBtn.style.display = 'none';
+            }
+        }
+
     } catch (e) {
         console.error("History fetch error:", e);
-        tbody.innerHTML = `<tr><td colspan="8" style="text-align:center; color:var(--accent-red)">⚠️ Error loading history</td></tr>`;
+        if (!append) {
+            tbody.innerHTML = `<tr><td colspan="8" style="text-align:center; color:var(--accent-red)">⚠️ Error loading history</td></tr>`;
+        }
     }
 }
 
@@ -312,10 +356,20 @@ document.addEventListener('DOMContentLoaded', () => {
     const fa = document.getElementById('filter-asset');
     const fo = document.getElementById('filter-outcome');
     const fs = document.getElementById('filter-sort');
+    const fd = document.getElementById('filter-date');
+    const loadMoreBtn = document.getElementById('load-more-btn');
 
-    if (fa) fa.addEventListener('change', loadHistory);
-    if (fo) fo.addEventListener('change', loadHistory);
-    if (fs) fs.addEventListener('change', loadHistory);
+    if (fa) fa.addEventListener('change', () => loadHistory(false));
+    if (fo) fo.addEventListener('change', () => loadHistory(false));
+    if (fs) fs.addEventListener('change', () => loadHistory(false));
+    if (fd) fd.addEventListener('change', () => loadHistory(false));
+
+    if (loadMoreBtn) {
+        loadMoreBtn.addEventListener('click', () => {
+            historyOffset += PAGE_SIZE;
+            loadHistory(true);
+        });
+    }
 
     setInterval(() => {
         if (activeTab === 'active') fetchLatestSignal();

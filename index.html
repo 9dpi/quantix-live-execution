@@ -177,6 +177,15 @@
                         <option value="asc">Oldest First</option>
                     </select>
                 </div>
+                <div class="filter-group">
+                    <label>Date Range</label>
+                    <select id="filter-date">
+                        <option value="1">Last 24 Hours</option>
+                        <option value="7" selected>Last 7 Days</option>
+                        <option value="30">Last 30 Days</option>
+                        <option value="0">All Time</option>
+                    </select>
+                </div>
             </div>
 
             <!-- Table -->
@@ -198,6 +207,13 @@
                         <!-- History injected here -->
                     </tbody>
                 </table>
+            </div>
+
+            <!-- Pagination -->
+            <div id="pagination-wrapper" style="text-align:center; padding: 0 0 40px 0;">
+                <button id="load-more-btn" class="action-btn" style="max-width:200px; margin:auto; display:none;">
+                    Load More Signals
+                </button>
             </div>
 
             <!-- Legal Footer for History Tab -->

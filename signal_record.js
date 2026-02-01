@@ -198,11 +198,11 @@ function displayActiveSignal(record) {
     let label = "Checking...";
     let color = "var(--text-secondary)";
 
-    if (state === 'WAITING_FOR_ENTRY') { label = "⏳ PENDING (Waiting Entry)"; color = "var(--primary-blue)"; }
+    if (state === 'WAITING_FOR_ENTRY') { label = "⏳ ACTIVE (Waiting Entry)"; color = "var(--primary-blue)"; }
     else if (state === 'ENTRY_HIT') { label = "🚀 ACTIVE (Monitoring)"; color = "var(--accent-green)"; }
-    else if (state === 'TP_HIT') { label = "🎯 SUCCESS (Target Hit)"; color = "var(--accent-green)"; }
-    else if (state === 'SL_HIT') { label = "🛑 STOPPED (Exit Hit)"; color = "var(--accent-red)"; }
-    else if (state === 'CANCELLED') { label = "⚪ NO TRADE (Expired)"; }
+    else if (state === 'TP_HIT') { label = "🎯 TP HIT (Target)"; color = "var(--accent-green)"; }
+    else if (state === 'SL_HIT') { label = "🛑 SL HIT (Stop)"; color = "var(--accent-red)"; }
+    else if (state === 'CANCELLED') { label = "⚪ NO EXECUTION"; }
 
     statusEl.innerText = label;
     statusEl.style.color = color;
@@ -335,10 +335,10 @@ async function loadHistory(append = false) {
 }
 
 function mapState(state) {
-    if (state === 'TP_HIT') return { label: 'Successful', class: 'tp' };
-    if (state === 'SL_HIT') return { label: 'Not Successful', class: 'sl' };
-    if (state === 'CANCELLED') return { label: 'No Trade', class: 'expired' };
-    return { label: 'Pending', class: 'pending' };
+    if (state === 'TP_HIT') return { label: 'TP Hit', class: 'tp' };
+    if (state === 'SL_HIT') return { label: 'SL Hit', class: 'sl' };
+    if (state === 'CANCELLED') return { label: 'No Execution', class: 'expired' };
+    return { label: 'Active', class: 'pending' };
 }
 
 // Initial Run

@@ -1431,3 +1431,128 @@ td {
     box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2) !important;
   }
 }
+@media (max-width: 768px) {
+  .modal-content {
+    width: 98% !important;
+    max-height: 96vh !important;
+    height: auto !important;
+    border-radius: 20px;
+    display: flex;
+    flex-direction: column;
+    margin: 10px auto;
+    overflow: hidden;
+    background: #fff !important;
+    border: none !important;
+  }
+
+  /* Header */
+  .modal-header {
+    padding: 14px 20px !important;
+    background: #fff !important;
+    border-bottom: 1px solid rgba(15, 23, 42, 0.08) !important;
+    position: relative;
+    z-index: 20;
+  }
+  
+  .modal-header h3 {
+    font-size: 0.9rem !important;
+    color: var(--text-primary) !important;
+  }
+
+  .close-btn {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 34px;
+    height: 34px;
+    background: rgba(15, 23, 42, 0.05) !important;
+    border-radius: 50% !important;
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.4rem !important;
+    color: var(--text-primary) !important;
+    border: 1px solid rgba(15, 23, 42, 0.1) !important;
+    padding: 0 !important;
+    z-index: 30;
+  }
+
+  /* Body */
+  .modal-body {
+    flex-direction: column !important;
+    display: flex !important;
+    min-height: unset !important;
+    background: #fff !important;
+    overflow-y: auto !important;
+  }
+
+  /* Chart Container - FIXING THE GAP */
+  .chart-container {
+    height: 320px !important; /* Sweet spot to avoid internal TradingView gap */
+    min-height: 320px !important;
+    background: #131722; /* TradingView Dark Background */
+    width: 100%;
+    overflow: hidden;
+  }
+
+  #tv-iframe {
+    width: 100%;
+    height: 100%;
+    display: block;
+    border: none;
+  }
+
+  /* Sidebar Grid */
+  .signal-details-sidebar {
+    width: 100% !important;
+    padding: 16px !important;
+    border-left: none !important;
+    border-top: 1px solid rgba(15, 23, 42, 0.08) !important;
+    display: grid !important;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    background: #fff !important;
+  }
+
+  .signal-details-sidebar .detail-item {
+    background: rgba(15, 23, 42, 0.03);
+    padding: 10px;
+    border-radius: 12px;
+    border: 1px solid rgba(15, 23, 42, 0.05);
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .signal-details-sidebar .detail-item label {
+    font-size: 0.6rem;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    font-weight: 800;
+  }
+
+  .signal-details-sidebar .detail-item span {
+    font-size: 0.9rem;
+    font-weight: 700;
+  }
+
+  .signal-details-sidebar .divider {
+    display: none;
+  }
+
+  .signal-details-sidebar .modal-note {
+    grid-column: span 2;
+    font-size: 0.65rem;
+    margin: 4px 0;
+    text-align: center;
+  }
+
+  .signal-details-sidebar .btn-primary {
+    grid-column: span 2;
+    padding: 15px !important;
+    font-size: 0.9rem !important;
+    border-radius: 12px !important;
+    margin-top: 5px;
+  }
+}

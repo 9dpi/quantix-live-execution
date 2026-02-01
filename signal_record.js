@@ -214,6 +214,10 @@ async function loadHistory(append = false) {
     const tbody = document.getElementById('history-body');
     const loadMoreBtn = document.getElementById('load-more-btn');
 
+    // Get outcome from active tab
+    const activeOutcomeTab = document.querySelector('.outcome-tab.active');
+    const outcome = activeOutcomeTab ? activeOutcomeTab.getAttribute('data-value') : 'ALL';
+
     if (!append) {
         historyOffset = 0;
         tbody.innerHTML = '<tr><td colspan="8" style="text-align:center">⏳ Fetching History...</td></tr>';
@@ -226,14 +230,10 @@ async function loadHistory(append = false) {
     }
 
     try {
-        const asset = document.getElementById('filter-asset').value;
-        const outcome = document.getElementById('filter-outcome').value;
-        const sort = document.getElementById('filter-sort').value;
         const dateRange = document.getElementById('filter-date').value;
 
         let url = `${SB_URL}?select=*&limit=${PAGE_SIZE}&offset=${historyOffset}`;
-        const sortOrder = sort === 'asc' ? 'asc' : 'desc';
-        url += `&order=generated_at.${sortOrder}`;
+        url += `&order=generated_at.desc`; // Default newest first
 
         // Date Range Filter
         if (dateRange !== "0") {
@@ -241,12 +241,6 @@ async function loadHistory(append = false) {
             const d = new Date();
             d.setDate(d.getDate() - days);
             url += `&generated_at=gte.${d.toISOString()}`;
-        }
-
-        // Asset filter
-        if (asset !== 'ALL') {
-            const dbAsset = asset.replace('/', '');
-            url += `&asset=eq.${dbAsset}`;
         }
 
         // Outcome filter
@@ -314,7 +308,6 @@ async function loadHistory(append = false) {
                 <td data-label="Outcome"><span class="outcome-badge outcome-${mapping.class}">${mapping.label}</span></td>
             `;
 
-            // Add Modal Trigger
             row.querySelector('.tv-preview-link').onclick = (e) => {
                 e.preventDefault();
                 openTVPreview(sig.asset, tf, entry, sl, tp, sig.generated_at);
@@ -323,7 +316,6 @@ async function loadHistory(append = false) {
             tbody.appendChild(row);
         });
 
-        // Show/Hide Load More
         if (loadMoreBtn) {
             loadMoreBtn.innerText = "Load More Signals";
             loadMoreBtn.disabled = false;
@@ -353,15 +345,10 @@ function mapState(state) {
 document.addEventListener('DOMContentLoaded', () => {
     fetchLatestSignal();
 
-    const fa = document.getElementById('filter-asset');
-    const fo = document.getElementById('filter-outcome');
-    const fs = document.getElementById('filter-sort');
     const fd = document.getElementById('filter-date');
     const loadMoreBtn = document.getElementById('load-more-btn');
+    const outcomeTabs = document.querySelectorAll('.outcome-tab');
 
-    if (fa) fa.addEventListener('change', () => loadHistory(false));
-    if (fo) fo.addEventListener('change', () => loadHistory(false));
-    if (fs) fs.addEventListener('change', () => loadHistory(false));
     if (fd) fd.addEventListener('change', () => loadHistory(false));
 
     if (loadMoreBtn) {
@@ -370,6 +357,15 @@ document.addEventListener('DOMContentLoaded', () => {
             loadHistory(true);
         });
     }
+
+    // Outcome Tabs logic
+    outcomeTabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+            outcomeTabs.forEach(t => t.classList.remove('active'));
+            tab.classList.add('active');
+            loadHistory(false);
+        });
+    });
 
     setInterval(() => {
         if (activeTab === 'active') fetchLatestSignal();

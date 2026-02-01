@@ -151,39 +151,22 @@
                 <span>"Transparency is the only way to trust." — Historical Audit Trail</span>
             </div>
 
-            <!-- Filters -->
-            <div class="filters-wrapper">
-                <div class="filter-group">
-                    <label>Symbol</label>
-                    <select id="filter-asset">
-                        <option value="ALL">All Pairs</option>
-                        <option value="EUR/USD" selected>EUR/USD</option>
-                    </select>
+            <!-- Filters (Streamlined) -->
+            <div class="filters-wrapper-pro">
+                <div class="outcome-tabs" id="filter-outcome-tabs">
+                    <button class="outcome-tab" data-value="ALL">All</button>
+                    <button class="outcome-tab active" data-value="PROFIT">Win</button>
+                    <button class="outcome-tab" data-value="LOSS">Loss</button>
+                    <button class="outcome-tab" data-value="CANCELLED">No Trade</button>
+                    <button class="outcome-tab" data-value="PENDING">Pending</button>
                 </div>
-                <div class="filter-group">
-                    <label>Outcome</label>
-                    <select id="filter-outcome">
-                        <option value="ALL">All Outcomes</option>
-                        <option value="PROFIT" selected>Successful</option>
-                        <option value="LOSS">Not Successful</option>
-                        <option value="CANCELLED">No Trade</option>
-                        <option value="PENDING">Pending</option>
-                    </select>
-                </div>
-                <div class="filter-group">
-                    <label>Sorting</label>
-                    <select id="filter-sort">
-                        <option value="desc">Newest First</option>
-                        <option value="asc">Oldest First</option>
-                    </select>
-                </div>
-                <div class="filter-group">
-                    <label>Date Range</label>
+
+                <div class="filter-group-mini">
                     <select id="filter-date">
-                        <option value="1">Last 24 Hours</option>
-                        <option value="7" selected>Last 7 Days</option>
-                        <option value="30">Last 30 Days</option>
-                        <option value="0">All Time</option>
+                        <option value="1">24h</option>
+                        <option value="7" selected>7d</option>
+                        <option value="30">30d</option>
+                        <option value="0">All</option>
                     </select>
                 </div>
             </div>

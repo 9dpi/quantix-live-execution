@@ -198,11 +198,11 @@ function displayActiveSignal(record) {
     let label = "Checking...";
     let color = "var(--text-secondary)";
 
-    if (state === 'WAITING_FOR_ENTRY') { label = "⏳ ACTIVE (Waiting Entry)"; color = "var(--primary-blue)"; }
-    else if (state === 'ENTRY_HIT') { label = "🚀 ACTIVE (Monitoring)"; color = "var(--accent-green)"; }
-    else if (state === 'TP_HIT') { label = "🎯 TP HIT (Target)"; color = "var(--accent-green)"; }
-    else if (state === 'SL_HIT') { label = "🛑 SL HIT (Stop)"; color = "var(--accent-red)"; }
-    else if (state === 'CANCELLED') { label = "⚪ NO EXECUTION"; }
+    if (state === 'WAITING_FOR_ENTRY') { label = "⏳ PENDING (Waiting Entry)"; color = "var(--primary-blue)"; }
+    else if (state === 'ENTRY_HIT') { label = "🚀 LIVE (Monitoring)"; color = "var(--accent-green)"; }
+    else if (state === 'TP_HIT') { label = "✅ SUCCESSFUL"; color = "var(--accent-green)"; }
+    else if (state === 'SL_HIT') { label = "❌ NOT SUCCESSFUL"; color = "var(--accent-red)"; }
+    else if (state === 'CANCELLED') { label = "⚪ NO TRADE"; }
 
     statusEl.innerText = label;
     statusEl.style.color = color;
@@ -234,6 +234,7 @@ async function loadHistory(append = false) {
 
         let url = `${SB_URL}?select=*&limit=${PAGE_SIZE}&offset=${historyOffset}`;
         url += `&order=generated_at.desc`; // Default newest first
+        url += `&telegram_message_id=not.is.null`; // SINGLE SOURCE OF TRUTH: Only telegram-released signals
 
         // Date Range Filter
         if (dateRange !== "0") {
@@ -339,10 +340,10 @@ async function loadHistory(append = false) {
 }
 
 function mapState(state) {
-    if (state === 'TP_HIT') return { label: 'TP Hit', class: 'tp' };
-    if (state === 'SL_HIT') return { label: 'SL Hit', class: 'sl' };
-    if (state === 'CANCELLED') return { label: 'No Execution', class: 'expired' };
-    return { label: 'Active', class: 'pending' };
+    if (state === 'TP_HIT') return { label: 'Successful', class: 'tp' };
+    if (state === 'SL_HIT') return { label: 'Not Successful', class: 'sl' };
+    if (state === 'CANCELLED') return { label: 'No Trade', class: 'expired' };
+    return { label: 'Pending', class: 'pending' };
 }
 
 // Initial Run

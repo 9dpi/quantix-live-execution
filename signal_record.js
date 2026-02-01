@@ -1,5 +1,5 @@
 const LIVE_API_URL = "https://signalgeniusai-production.up.railway.app/signal/latest";
-const HISTORY_API_URL = "https://signalgeniusai-production.up.railway.app/api/signals";
+const HISTORY_API_URL = "https://signalgeniusai-production.up.railway.app/api/v1/signals";
 
 let activeTab = 'active';
 

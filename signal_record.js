@@ -277,7 +277,13 @@ async function loadHistory(append = false) {
 
         if (!signals || signals.length === 0) {
             if (!append) {
-                tbody.innerHTML = '<tr><td colspan="8" style="text-align:center">No records found.</td></tr>';
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="8" style="text-align:center; padding: 2rem; color: var(--text-secondary);">
+                            <div style="font-weight: 600; font-size: 1.1rem; margin-bottom: 0.5rem; color: var(--text-primary);">No released signals in this period.</div>
+                            <div style="font-size: 0.9rem;">Signals appear here only after being published on Telegram.</div>
+                        </td>
+                    </tr>`;
             }
             if (loadMoreBtn) loadMoreBtn.style.display = 'none';
             return;

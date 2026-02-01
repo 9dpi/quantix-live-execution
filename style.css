@@ -1300,4 +1300,10 @@ td {
     padding: 10px;
     font-size: 0.85rem;
   }
+  #history-table td[data-label='Verify']::before {
+    display: none;
+  }
+  #history-table td[data-label='Verify'] {
+    justify-content: center;
+  }
 }

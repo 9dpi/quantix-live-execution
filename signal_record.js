@@ -299,16 +299,20 @@ async function loadHistory(append = false) {
             const row = document.createElement('tr');
             row.innerHTML = `
                 <td data-label="Date/Time" class="mono" style="font-size: 0.8rem">${dStr} ${tStr}</td>
-                <td data-label="Symbol"><a href="#" class="tv-preview-link" style="text-decoration:none; color:inherit;"><b>${sig.asset}</b> 📈</a></td>
                 <td data-label="Side"><span class="direction-tag tag-${(sig.direction || 'BUY').toLowerCase()}">${sig.direction || 'BUY'}</span></td>
                 <td data-label="Entry" class="mono">${parseFloat(entry).toFixed(5)}</td>
                 <td data-label="SL" class="mono">${parseFloat(sl).toFixed(5)}</td>
                 <td data-label="TP" class="mono">${parseFloat(tp).toFixed(5)}</td>
                 <td data-label="R:R" class="mono">1 : ${rr}</td>
                 <td data-label="Outcome"><span class="outcome-badge outcome-${mapping.class}">${mapping.label}</span></td>
+                <td data-label="Verify">
+                    <button class="verify-btn" title="Verify entry, SL and TP on TradingView chart">
+                        Verify
+                    </button>
+                </td>
             `;
 
-            row.querySelector('.tv-preview-link').onclick = (e) => {
+            row.querySelector('.verify-btn').onclick = (e) => {
                 e.preventDefault();
                 openTVPreview(sig.asset, tf, entry, sl, tp, sig.generated_at);
             };

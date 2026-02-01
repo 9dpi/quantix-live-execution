@@ -91,7 +91,8 @@ h1.brand-name {
 .data-feed-dot {
   width: 8px;
   height: 8px;
-  background: #94a3b8; /* gray by default */
+  background: #94a3b8;
+  /* gray by default */
   border-radius: 50%;
 }
 
@@ -119,9 +120,20 @@ h1.brand-name {
 }
 
 @keyframes data-pulse {
-  0% { transform: scale(1); opacity: 1; }
-  50% { transform: scale(1.2); opacity: 0.7; }
-  100% { transform: scale(1); opacity: 1; }
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+
+  50% {
+    transform: scale(1.2);
+    opacity: 0.7;
+  }
+
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
 }
 
 /* Card & Bento Styles */
@@ -784,4 +796,177 @@ h1.brand-name {
   100% {
     transform: translateY(0px);
   }
+}
+
+/* Tab Navigation */
+.tab-nav {
+  display: flex;
+  gap: 12px;
+  margin-bottom: var(--spacing-lg);
+  justify-content: center;
+  padding: 4px;
+  background: rgba(15, 23, 42, 0.04);
+  border-radius: 14px;
+  max-width: fit-content;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.tab-btn {
+  padding: 10px 24px;
+  border-radius: 10px;
+  border: none;
+  background: transparent;
+  color: var(--text-secondary);
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 0.95rem;
+}
+
+.tab-btn.active {
+  background: var(--bg-card);
+  color: var(--primary-cyan);
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.08);
+}
+
+/* Tab Content Area */
+.tab-content {
+  display: none;
+}
+
+.tab-content.active {
+  display: block;
+}
+
+/* Filters Section */
+.filters-wrapper {
+  margin-bottom: var(--spacing-lg);
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: var(--spacing-md);
+  padding: 20px;
+  background: rgba(255, 255, 255, 0.5);
+  border-radius: 16px;
+  border: 1px solid var(--glass-border);
+}
+
+.filter-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.filter-group label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+  letter-spacing: 0.05em;
+}
+
+.filter-group select {
+  padding: 10px 14px;
+  border-radius: 10px;
+  border: 1px solid var(--glass-border);
+  background: var(--bg-card);
+  color: var(--text-primary);
+  font-weight: 600;
+  outline: none;
+  cursor: pointer;
+}
+
+/* Table Styles */
+.table-wrapper {
+  overflow-x: auto;
+  border-radius: 16px;
+  border: 1px solid var(--glass-border);
+  background: var(--bg-card);
+  box-shadow: 0 4px 20px rgba(15, 23, 42, 0.04);
+  margin-bottom: var(--spacing-xl);
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 0.9rem;
+}
+
+th {
+  padding: 16px 20px;
+  font-weight: 700;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  letter-spacing: 0.05em;
+  background: rgba(15, 23, 42, 0.02);
+  border-bottom: 2px solid var(--glass-border);
+}
+
+td {
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--glass-border);
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
+.mono {
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 600;
+}
+
+/* Outcome Badges */
+.outcome-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  border-radius: 99px;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.outcome-tp {
+  background: rgba(5, 150, 105, 0.1);
+  color: var(--accent-green);
+}
+
+.outcome-sl {
+  background: rgba(211, 47, 47, 0.1);
+  color: var(--accent-red);
+}
+
+.outcome-expired {
+  background: rgba(71, 85, 105, 0.1);
+  color: var(--text-secondary);
+}
+
+.outcome-pending {
+  background: rgba(37, 99, 235, 0.1);
+  color: var(--primary-blue);
+}
+
+.direction-tag {
+  font-weight: 800;
+  font-size: 0.8rem;
+}
+
+.tag-buy {
+  color: var(--accent-green);
+}
+
+.tag-sell {
+  color: var(--accent-red);
+}
+
+.historical-note-fancy {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  opacity: 0.8;
+  justify-content: center;
 }

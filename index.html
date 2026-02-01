@@ -28,123 +28,163 @@
 
 
 
-        <!-- STATE 3: Market Closed -->
-        <div id="market-closed" class="bento-card signal-card hidden animate-in closed-state">
-            <div class="card-section header-section">
-                <div class="header-row-flex">
-                    <div class="main-title">🟦 STATE — MARKET CLOSED</div>
-                    <div class="sub-title">Market Status: Closed</div>
-                </div>
+        <!-- Tab Navigation -->
+        <nav class="tab-nav">
+            <button class="tab-btn active" onclick="switchTab('active')">🎯 Active Signal</button>
+            <button class="tab-btn" onclick="switchTab('history')">📜 History</button>
+        </nav>
 
+        <!-- Content Sections -->
+        <div id="active-tab" class="tab-content active">
+            <!-- STATE 3: Market Closed -->
+            <div id="market-closed" class="bento-card signal-card hidden animate-in closed-state">
+                <div class="card-section header-section">
+                    <div class="header-row-flex">
+                        <div class="main-title">🟦 STATE — MARKET CLOSED</div>
+                        <div class="sub-title">Market Status: Closed</div>
+                    </div>
+                </div>
                 <div class="card-section main-info">
                     <div class="closed-icon">🌑</div>
                     <h2 class="closed-title">The Forex market is currently closed.</h2>
-                    <p class="closed-desc">
-                        Quantix operates only during live market hours.<br>
-                        No signals are generated when the market is closed.
-                    </p>
-                    <p class="closed-note">Signals will resume automatically when the market reopens.</p>
+                    <p class="closed-desc">Quantix operates only during live market hours.<br>No signals are generated
+                        when the market is closed.</p>
+                </div>
+            </div>
+
+            <!-- STATE 2: Signal Record (Latest) -->
+            <div id="signal-record" class="bento-card signal-card hidden animate-in">
+                <div class="card-section header-section">
+                    <div class="header-row-flex">
+                        <div class="main-title">Active Signal snapshot</div>
+                        <div class="sub-title">Read-only · Real-time</div>
+                    </div>
+                    <div class="meta-row-flex">
+                        <div class="meta-block-vertical">
+                            <span class="meta-label-vertical">Generated At:</span>
+                            <span id="record-generated-at" class="meta-value-vertical">—</span>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="divider"></div>
 
-                <div class="card-section disclaimer-section">
-                    <div class="disclaimer-text">This behavior is intentional and part of the system design.</div>
+                <div class="card-section main-info">
+                    <div class="asset-tf">
+                        <span id="record-asset">EUR/USD</span>
+                        <span class="separator">|</span>
+                        <span id="record-tf">M15</span>
+                    </div>
+                    <div id="record-direction" class="direction-strength">
+                        <span id="dir-text">🟢 BUY</span>
+                        <span id="strength-text"
+                            style="font-size: 1rem; color: var(--text-secondary);">(Calculating)</span>
+                    </div>
+                </div>
+
+                <div class="divider"></div>
+
+                <div class="card-section levels-section-full">
+                    <div class="level-item-wide">
+                        <span class="icon">🎯</span>
+                        <span>Entry:</span>
+                        <b id="record-entry">—</b>
+                    </div>
+                    <div class="level-item-wide">
+                        <span class="icon">💰</span>
+                        <span>TP:</span>
+                        <b id="record-tp">—</b>
+                    </div>
+                    <div class="level-item-wide">
+                        <span class="icon">🛑</span>
+                        <span>SL:</span>
+                        <b id="record-sl">—</b>
+                    </div>
+                </div>
+
+                <div class="divider"></div>
+
+                <div class="card-section analysis-grid">
+                    <div class="analysis-item">
+                        <span>⭐ Confidence:</span>
+                        <b id="record-confidence">—</b>
+                    </div>
+                    <div class="analysis-item">
+                        <span>🧠 Strategy:</span>
+                        <b id="record-strategy">Quantix AI</b>
+                    </div>
+                    <div class="analysis-item">
+                        <span>⏳ Status:</span>
+                        <b id="record-status-detailed">Waiting...</b>
+                    </div>
+                    <div class="analysis-item">
+                        <span>🌊 Range:</span>
+                        <b id="record-volatility">Verified</b>
+                    </div>
+                </div>
+
+                <div class="divider"></div>
+
+                <div class="card-section" style="padding: 12px 20px;">
+                    <p style="font-size: 0.7rem; color: var(--text-secondary); font-style: italic; text-align: center;">
+                        "Proof of AI execution, refreshed automatically."
+                    </p>
                 </div>
             </div>
         </div>
 
-        <!-- STATE 2: Signal Record (Latest) -->
-        <div id="signal-record" class="bento-card signal-card hidden animate-in">
-            <div class="card-section header-section">
-                <!-- Row 1: Title & Tag -->
-                <div class="header-row-flex">
-                    <div class="main-title">Signal Record (Latest Snapshot)</div>
-                    <div class="sub-title">Read-only · Historical</div>
-                </div>
+        <!-- History Content Area -->
+        <div id="history-tab" class="tab-content">
+            <div class="historical-note-fancy">
+                <span>"Transparency is the only way to trust." — Historical Audit Trail</span>
+            </div>
 
-                <!-- Row 2: Generated At -->
-                <div class="meta-row-flex">
-                    <div class="meta-block-vertical">
-                        <span class="meta-label-vertical">Generated At:</span>
-                        <span id="record-generated-at" class="meta-value-vertical">—</span>
-                    </div>
+            <!-- Filters -->
+            <div class="filters-wrapper">
+                <div class="filter-group">
+                    <label>Symbol</label>
+                    <select id="filter-asset">
+                        <option value="ALL">All Pairs</option>
+                        <option value="EUR/USD" selected>EUR/USD</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>Outcome</label>
+                    <select id="filter-outcome">
+                        <option value="ALL">All Outcomes</option>
+                        <option value="PROFIT">Successful</option>
+                        <option value="LOSS">Not Successful</option>
+                        <option value="CANCELLED">No Trade</option>
+                        <option value="PENDING">Pending</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>Sorting</label>
+                    <select id="filter-sort">
+                        <option value="desc">Newest First</option>
+                        <option value="asc">Oldest First</option>
+                    </select>
                 </div>
             </div>
 
-            <div class="divider"></div>
-
-            <div class="card-section main-info">
-                <div class="asset-tf">
-                    <span id="record-asset">EUR/USD</span>
-                    <span class="separator">|</span>
-                    <span id="record-tf">M15</span>
-                </div>
-                <div id="record-direction" class="direction-strength">
-                    <span id="dir-text">🟢 BUY</span>
-                    <span id="strength-text"
-                        style="font-size: 1rem; color: var(--text-secondary); opacity: 0.7;">HISTORICAL</span>
-                </div>
-            </div>
-
-            <div class="divider"></div>
-
-            <div class="card-section levels-section-full">
-                <div class="level-item-wide">
-                    <span class="icon">🎯</span>
-                    <span>Entry:</span>
-                    <b id="record-entry">1.17163</b>
-                </div>
-                <div class="level-item-wide">
-                    <span class="icon">💰</span>
-                    <span>TP:</span>
-                    <b id="record-tp">1.17363</b>
-                </div>
-                <div class="level-item-wide">
-                    <span class="icon">🛑</span>
-                    <span>SL:</span>
-                    <b id="record-sl">1.17013</b>
-                </div>
-            </div>
-
-            <div class="divider"></div>
-
-            <div class="card-section analysis-grid">
-                <div class="analysis-item">
-                    <span>⭐ Confidence:</span>
-                    <b id="record-confidence">65%</b>
-                </div>
-                <div class="analysis-item">
-                    <span>🧠 Strategy:</span>
-                    <b id="record-strategy">Quantix Execution</b>
-                </div>
-                <div class="analysis-item">
-                    <span>⏳ Lifecycle Status:</span>
-                    <b id="record-status-detailed">Checking...</b>
-                </div>
-                <div class="analysis-item">
-                    <span>🌊 Volatility:</span>
-                    <b id="record-volatility">Verified</b>
-                </div>
-            </div>
-
-            <div class="divider"></div>
-
-            <div class="card-section info-note">
-                <h3>⚠️ Transparency Notice</h3>
-                <p>
-                    This is a <strong>read-only historical record</strong>.
-                    It is provided for audit purposes only and is <strong>no longer valid</strong> for execution.
-                </p>
-            </div>
-
-            <div class="divider"></div>
-
-            <div class="card-section" style="padding: 12px 20px;">
-                <p
-                    style="font-size: 0.7rem; color: var(--text-secondary); line-height: 1.4; font-style: italic; text-align: center;">
-                    "When you see a Signal Record, you're looking at proof — not a suggestion."
-                </p>
+            <!-- Table -->
+            <div class="table-wrapper">
+                <table id="history-table">
+                    <thead>
+                        <tr>
+                            <th>Date (UTC)</th>
+                            <th>Symbol</th>
+                            <th>Dir</th>
+                            <th>Entry</th>
+                            <th>SL</th>
+                            <th>TP</th>
+                            <th>Outcome</th>
+                        </tr>
+                    </thead>
+                    <tbody id="history-body">
+                        <!-- History injected here -->
+                    </tbody>
+                </table>
             </div>
         </div>
 

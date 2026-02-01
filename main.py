@@ -106,6 +106,30 @@ def data_feed_health():
             "reason": str(e)
         }
 
+@app.get("/signal")
+def list_signals(
+    asset: Optional[str] = None,
+    state: Optional[str] = None,
+    limit: int = 50,
+    offset: int = 0
+):
+    """Bridge to Quantix AI Core for History"""
+    try:
+        # Forward the request to the real AI Core
+        # Note: In a real production bridge, you might want to cache this
+        AI_CORE_BASE = "https://quantixaicore-production.up.railway.app/api/v1/signals"
+        params = {"limit": limit, "offset": offset}
+        if asset: params["asset"] = asset
+        if state: params["state"] = state
+        
+        resp = requests.get(AI_CORE_BASE, params=params, timeout=5)
+        if resp.ok:
+            return resp.json()
+        return []
+    except Exception as e:
+        print(f"❌ History bridge error: {e}")
+        return []
+
 @app.get("/signal/latest")
 def latest():
     # 1. First priority: Signal already executed and locked in this session

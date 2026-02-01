@@ -1,5 +1,6 @@
 const LIVE_API_URL = "https://signalgeniusai-production.up.railway.app/signal/latest";
-const HISTORY_API_URL = "https://signalgeniusai-production.up.railway.app/api/v1/signals";
+const SB_URL = "https://wttsaprezgvircanthbk.supabase.co/rest/v1/fx_signals";
+const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind0dHNhcHJlemd2aXJjYW50aGJrIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc2ODM2ODA3MCwiZXhwIjoyMDgzOTQ0MDcwfQ.QGewz8bDfBC6vJce6g4-sHA164bL1y0u71d6HH7PYVk";
 
 let activeTab = 'active';
 
@@ -123,40 +124,51 @@ async function loadHistory() {
         const outcome = document.getElementById('filter-outcome').value;
         const sort = document.getElementById('filter-sort').value;
 
-        let url = `${HISTORY_API_URL}?limit=100`;
+        // Construct Supabase PostgREST URL
+        let url = `${SB_URL}?select=*&limit=100`;
+
+        // Sorting
+        const sortOrder = sort === 'asc' ? 'asc' : 'desc';
+        url += `&order=generated_at.${sortOrder}`;
 
         // Asset filter
         if (asset !== 'ALL') {
-            url += `&asset=${encodeURIComponent(asset)}`;
+            // Remove / if present to match DB format e.g. "EURUSD"
+            const dbAsset = asset.replace('/', '');
+            url += `&asset=eq.${dbAsset}`;
         }
 
-        // Outcome filter - Map UI labels to backend states
+        // Outcome filter
         if (outcome !== 'ALL') {
             const stateMap = {
                 'PROFIT': 'TP_HIT',
                 'LOSS': 'SL_HIT',
                 'CANCELLED': 'CANCELLED',
-                'PENDING': 'WAITING_FOR_ENTRY'  // Backend will handle ENTRY_HIT too
+                'PENDING': 'WAITING_FOR_ENTRY'
             };
             const mappedState = stateMap[outcome];
             if (mappedState) {
-                url += `&state=${mappedState}`;
+                if (outcome === 'PENDING') {
+                    url += `&state=in.(WAITING_FOR_ENTRY,ENTRY_HIT)`;
+                } else {
+                    url += `&state=eq.${mappedState}`;
+                }
             }
         }
 
-        console.log('Fetching history from:', url);
-        const res = await fetch(url);
+        console.log('Fetching history from Supabase:', url);
+        const res = await fetch(url, {
+            headers: {
+                "apikey": SB_KEY,
+                "Authorization": `Bearer ${SB_KEY}`
+            }
+        });
 
         if (!res.ok) {
-            throw new Error(`API Error: ${res.status} ${res.statusText}`);
+            throw new Error(`Supabase Error: ${res.status} ${res.statusText}`);
         }
 
         let signals = await res.json();
-
-        // Client-side sorting
-        if (sort === 'asc') {
-            signals.reverse();
-        }
 
         tbody.innerHTML = "";
 
@@ -168,7 +180,6 @@ async function loadHistory() {
         signals.forEach(sig => {
             const dt = new Date(sig.generated_at);
 
-            // Validate date
             if (isNaN(dt.getTime())) {
                 console.warn('Invalid date for signal:', sig);
                 return;

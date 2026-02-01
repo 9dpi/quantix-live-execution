@@ -42,6 +42,48 @@ async function copySignalToClipboard(sig) {
     }
 }
 
+// --- TRADINGVIEW MODAL LOGIC ---
+
+window.openTVPreview = (symbol, timeframe, entry, sl, tp, generated_at) => {
+    const modal = document.getElementById('tv-modal');
+    const iframe = document.getElementById('tv-iframe');
+
+    // Format Display
+    document.getElementById('modal-title').innerText = `${symbol} · ${timeframe} · TradingView Preview`;
+    document.getElementById('modal-entry').innerText = parseFloat(entry).toFixed(5);
+    document.getElementById('modal-sl').innerText = parseFloat(sl).toFixed(5);
+    document.getElementById('modal-tp').innerText = parseFloat(tp).toFixed(5);
+
+    const dt = new Date(generated_at);
+    document.getElementById('modal-utc').innerText = dt.toISOString().replace('T', ' ').slice(0, 16);
+
+    document.getElementById('modal-external-link').href = getTradingViewLink(symbol, timeframe);
+
+    // Set Iframe URL (Using Widget Embed for best performance)
+    const cleanSymbol = symbol.replace('/', '');
+    const tvSymbol = cleanSymbol.includes(':') ? cleanSymbol : `FX:${cleanSymbol}`;
+    const tf = timeframe ? timeframe.replace('M', '') : '15';
+
+    iframe.src = `https://s.tradingview.com/widgetembed/?symbol=${tvSymbol}&interval=${tf}&theme=dark`;
+
+    modal.classList.add('active');
+    document.body.style.overflow = 'hidden'; // Prevent scroll
+};
+
+window.closeTVModal = () => {
+    const modal = document.getElementById('tv-modal');
+    const iframe = document.getElementById('tv-iframe');
+    iframe.src = ""; // Stop iframe loading
+    modal.classList.remove('active');
+    document.body.style.overflow = 'auto';
+};
+
+// Close modal on background click
+document.addEventListener('click', (e) => {
+    const modal = document.getElementById('tv-modal');
+    if (e.target === modal) closeTVModal();
+});
+
 // Tab Switching Logic
 window.switchTab = (tab) => {
     activeTab = tab;
@@ -76,7 +118,6 @@ async function fetchLatestSignal() {
     const recordEl = document.getElementById('signal-record');
     const closedEl = document.getElementById('market-closed');
 
-    // Early local check
     if (!isMarketOpen()) {
         if (closedEl) closedEl.classList.remove('hidden');
         if (recordEl) recordEl.classList.add('hidden');
@@ -104,7 +145,6 @@ function displayActiveSignal(record) {
     document.getElementById('market-closed').classList.add('hidden');
     document.getElementById('signal-record').classList.remove('hidden');
 
-    // Header
     const ts = record.executed_at || record.timestamp || record.generated_at;
     const dateObj = (ts && !isNaN(new Date(ts))) ? new Date(ts) : null;
     if (dateObj) {
@@ -113,16 +153,17 @@ function displayActiveSignal(record) {
         document.getElementById('record-generated-at').innerText = `${dStr} ${tStr} UTC`;
     }
 
-    // Asset & Direction
     const asset = record.asset || 'EUR/USD';
+    const timeframe = record.timeframe || 'M15';
     document.getElementById('record-asset').textContent = asset;
+    document.getElementById('record-tf').textContent = timeframe;
+
     const dirText = document.getElementById('dir-text');
     const direction = record.direction || "BUY";
     const isBuy = direction === 'BUY';
     dirText.textContent = isBuy ? "🟢 BUY" : "🔴 SELL";
     dirText.className = isBuy ? "BUY" : "SELL";
 
-    // Levels
     const f = (val) => val ? parseFloat(val).toFixed(5) : "---";
     const entry = record.entry || record.entry_low || record.entry_price || 0;
     const tp = record.tp || 0;
@@ -132,17 +173,20 @@ function displayActiveSignal(record) {
     document.getElementById('record-tp').textContent = f(tp);
     document.getElementById('record-sl').textContent = f(sl);
 
-    // Analysis (AI Confidence - Option B fallback)
     const conf = record.confidence || record.ai_confidence || 0;
     document.getElementById('record-confidence').textContent = conf > 0 ? `${conf}%` : "Alpha v1";
     document.getElementById('record-strategy').textContent = record.strategy || "Quantix Alpha v1";
     document.getElementById('strength-text').textContent = conf > 0 ? `(${conf}%)` : "(Alpha)";
 
-    // TradingView & Copy
-    document.getElementById('tv-link-active').href = getTradingViewLink(asset, record.timeframe);
+    // Update Action Buttons
+    const tvBtn = document.getElementById('tv-link-active');
+    tvBtn.onclick = (e) => {
+        e.preventDefault();
+        openTVPreview(asset, timeframe, entry, sl, tp, ts);
+    };
+
     document.getElementById('copy-signal-btn').onclick = () => copySignalToClipboard(record);
 
-    // Status Mapping
     const statusEl = document.getElementById('record-status-detailed');
     const state = record.state || 'WAITING_FOR_ENTRY';
 
@@ -170,20 +214,15 @@ async function loadHistory() {
         const outcome = document.getElementById('filter-outcome').value;
         const sort = document.getElementById('filter-sort').value;
 
-        // Construct Supabase PostgREST URL
         let url = `${SB_URL}?select=*&limit=100`;
-
-        // Sorting
         const sortOrder = sort === 'asc' ? 'asc' : 'desc';
         url += `&order=generated_at.${sortOrder}`;
 
-        // Asset filter
         if (asset !== 'ALL') {
             const dbAsset = asset.replace('/', '');
             url += `&asset=eq.${dbAsset}`;
         }
 
-        // Outcome filter
         if (outcome !== 'ALL') {
             const stateMap = {
                 'PROFIT': 'TP_HIT',
@@ -229,13 +268,13 @@ async function loadHistory() {
             const sl = sig.sl || 0;
             const tp = sig.tp || 0;
             const rr = calculateRR(entry, sl, tp, sig.direction);
-            const tvLink = getTradingViewLink(sig.asset, sig.timeframe);
+            const tf = sig.timeframe || 'M15';
 
             const mapping = mapState(sig.state);
             const row = document.createElement('tr');
             row.innerHTML = `
                 <td class="mono" style="font-size: 0.8rem">${dStr} ${tStr}</td>
-                <td><a href="${tvLink}" target="_blank" style="text-decoration:none; color:inherit;" title="Verify on TradingView"><b>${sig.asset}</b> 📈</a></td>
+                <td><a href="#" class="tv-preview-link" style="text-decoration:none; color:inherit;"><b>${sig.asset}</b> 📈</a></td>
                 <td><span class="direction-tag tag-${(sig.direction || 'BUY').toLowerCase()}">${sig.direction || 'BUY'}</span></td>
                 <td class="mono">${parseFloat(entry).toFixed(5)}</td>
                 <td class="mono">${parseFloat(sl).toFixed(5)}</td>
@@ -243,6 +282,13 @@ async function loadHistory() {
                 <td class="mono">1 : ${rr}</td>
                 <td><span class="outcome-badge outcome-${mapping.class}">${mapping.label}</span></td>
             `;
+
+            // Add Modal Trigger to the icon link
+            row.querySelector('.tv-preview-link').onclick = (e) => {
+                e.preventDefault();
+                openTVPreview(sig.asset, tf, entry, sl, tp, sig.generated_at);
+            };
+
             tbody.appendChild(row);
         });
 
@@ -263,7 +309,6 @@ function mapState(state) {
 document.addEventListener('DOMContentLoaded', () => {
     fetchLatestSignal();
 
-    // Filter listeners
     const fa = document.getElementById('filter-asset');
     const fo = document.getElementById('filter-outcome');
     const fs = document.getElementById('filter-sort');
@@ -272,7 +317,6 @@ document.addEventListener('DOMContentLoaded', () => {
     if (fo) fo.addEventListener('change', loadHistory);
     if (fs) fs.addEventListener('change', loadHistory);
 
-    // Auto-refresh (60s)
     setInterval(() => {
         if (activeTab === 'active') fetchLatestSignal();
     }, 60000);

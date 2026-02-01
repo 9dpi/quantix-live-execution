@@ -273,14 +273,14 @@ async function loadHistory() {
             const mapping = mapState(sig.state);
             const row = document.createElement('tr');
             row.innerHTML = `
-                <td class="mono" style="font-size: 0.8rem">${dStr} ${tStr}</td>
-                <td><a href="#" class="tv-preview-link" style="text-decoration:none; color:inherit;"><b>${sig.asset}</b> 📈</a></td>
-                <td><span class="direction-tag tag-${(sig.direction || 'BUY').toLowerCase()}">${sig.direction || 'BUY'}</span></td>
-                <td class="mono">${parseFloat(entry).toFixed(5)}</td>
-                <td class="mono">${parseFloat(sl).toFixed(5)}</td>
-                <td class="mono">${parseFloat(tp).toFixed(5)}</td>
-                <td class="mono">1 : ${rr}</td>
-                <td><span class="outcome-badge outcome-${mapping.class}">${mapping.label}</span></td>
+                <td data-label="Date/Time" class="mono" style="font-size: 0.8rem">${dStr} ${tStr}</td>
+                <td data-label="Symbol"><a href="#" class="tv-preview-link" style="text-decoration:none; color:inherit;"><b>${sig.asset}</b> 📈</a></td>
+                <td data-label="Side"><span class="direction-tag tag-${(sig.direction || 'BUY').toLowerCase()}">${sig.direction || 'BUY'}</span></td>
+                <td data-label="Entry" class="mono">${parseFloat(entry).toFixed(5)}</td>
+                <td data-label="SL" class="mono">${parseFloat(sl).toFixed(5)}</td>
+                <td data-label="TP" class="mono">${parseFloat(tp).toFixed(5)}</td>
+                <td data-label="R:R" class="mono">1 : ${rr}</td>
+                <td data-label="Outcome"><span class="outcome-badge outcome-${mapping.class}">${mapping.label}</span></td>
             `;
 
             // Add Modal Trigger to the icon link

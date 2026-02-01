@@ -1,4 +1,4 @@
-﻿@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');
 
 :root {
   --primary-cyan: #0891b2;
@@ -219,7 +219,7 @@ h1.brand-name {
 }
 
 .how-to-read li::before {
-  content: "•";
+  content: "�";
   margin-right: 8px;
   color: var(--primary-cyan);
 }
@@ -1123,5 +1123,55 @@ td {
 
   .chart-container {
     height: 350px;
+  }
+  /* Table to Card Conversion */
+  #history-table, 
+  #history-table thead, 
+  #history-table tbody, 
+  #history-table th, 
+  #history-table td, 
+  #history-table tr { 
+    display: block; 
+  }
+
+  #history-table thead {
+    display: none; 
+  }
+
+  #history-table tr {
+    margin-bottom: 20px;
+    border: 1px solid var(--glass-border);
+    border-radius: 16px;
+    background: var(--bg-card);
+    padding: 10px;
+    box-shadow: 0 4px 12px rgba(15, 23, 42, 0.04);
+  }
+
+  #history-table td {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 15px;
+    border-bottom: 1px solid rgba(15, 23, 42, 0.04);
+    text-align: right;
+    font-size: 0.9rem;
+  }
+
+  #history-table td:last-child {
+    border-bottom: none;
+    margin-top: 5px;
+    background: rgba(15, 23, 42, 0.02);
+    border-radius: 0 0 12px 12px;
+  }
+
+  #history-table td::before {
+    content: attr(data-label);
+    font-weight: 700;
+    text-transform: uppercase;
+    font-size: 0.7rem;
+    color: var(--text-secondary);
+    float: left;
+    text-align: left;
+    opacity: 0.8;
   }
 }

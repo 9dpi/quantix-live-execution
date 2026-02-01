@@ -235,6 +235,45 @@
         </div>
     </footer>
 
+    <!-- TradingView Inline Preview Modal -->
+    <div id="tv-modal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modal-title">EURUSD · M15 · TradingView Preview</h3>
+                <button onclick="closeTVModal()" class="close-btn">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="chart-container">
+                    <iframe id="tv-iframe" src="" frameborder="0" allowfullscreen></iframe>
+                </div>
+                <div class="signal-details-sidebar">
+                    <div class="detail-item">
+                        <label>Entry</label>
+                        <span id="modal-entry" class="mono">---</span>
+                    </div>
+                    <div class="detail-item">
+                        <label>Stop Loss</label>
+                        <span id="modal-sl" class="mono pulse-red">---</span>
+                    </div>
+                    <div class="detail-item">
+                        <label>Take Profit</label>
+                        <span id="modal-tp" class="mono pulse-green">---</span>
+                    </div>
+                    <div class="detail-item">
+                        <label>UTC Time</label>
+                        <span id="modal-utc" class="mono">---</span>
+                    </div>
+                    <div class="divider"></div>
+                    <a id="modal-external-link" href="#" target="_blank" class="btn-primary"
+                        style="text-decoration: none; text-align: center; display: block; padding: 10px; background: var(--primary-blue); color: #fff; border-radius: 6px; font-size: 0.85rem; font-weight: 700;">
+                        Open in TradingView ↗
+                    </a>
+                    <p class="modal-note">"Verify Entry, SL, and TP levels directly on the chart."</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Scripts -->
     <script type="module" src="./signal_record.js"></script>
 </body>

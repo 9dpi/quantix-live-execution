@@ -1,5 +1,5 @@
 const LIVE_API_URL = "https://signalgeniusai-production.up.railway.app/signal/latest";
-const HISTORY_API_URL = "https://signalgeniusai-production.up.railway.app/signal";
+const HISTORY_API_URL = "https://signalgeniusai-production.up.railway.app/api/signals";
 
 let activeTab = 'active';
 
@@ -121,22 +121,59 @@ async function loadHistory() {
     try {
         const asset = document.getElementById('filter-asset').value;
         const outcome = document.getElementById('filter-outcome').value;
+        const sort = document.getElementById('filter-sort').value;
 
-        let url = `${HISTORY_API_URL}/?limit=50`;
-        if (asset !== 'ALL') url += `&asset=${encodeURIComponent(asset)}`;
-        if (outcome !== 'ALL') url += `&state=${outcome}`;
+        let url = `${HISTORY_API_URL}?limit=100`;
 
+        // Asset filter
+        if (asset !== 'ALL') {
+            url += `&asset=${encodeURIComponent(asset)}`;
+        }
+
+        // Outcome filter - Map UI labels to backend states
+        if (outcome !== 'ALL') {
+            const stateMap = {
+                'PROFIT': 'TP_HIT',
+                'LOSS': 'SL_HIT',
+                'CANCELLED': 'CANCELLED',
+                'PENDING': 'WAITING_FOR_ENTRY'  // Backend will handle ENTRY_HIT too
+            };
+            const mappedState = stateMap[outcome];
+            if (mappedState) {
+                url += `&state=${mappedState}`;
+            }
+        }
+
+        console.log('Fetching history from:', url);
         const res = await fetch(url);
-        const signals = await res.json();
+
+        if (!res.ok) {
+            throw new Error(`API Error: ${res.status} ${res.statusText}`);
+        }
+
+        let signals = await res.json();
+
+        // Client-side sorting
+        if (sort === 'asc') {
+            signals.reverse();
+        }
 
         tbody.innerHTML = "";
-        if (signals.length === 0) {
+
+        if (!signals || signals.length === 0) {
             tbody.innerHTML = '<tr><td colspan="7" style="text-align:center">No records found.</td></tr>';
             return;
         }
 
         signals.forEach(sig => {
             const dt = new Date(sig.generated_at);
+
+            // Validate date
+            if (isNaN(dt.getTime())) {
+                console.warn('Invalid date for signal:', sig);
+                return;
+            }
+
             const dStr = dt.toLocaleDateString('en-CA');
             const tStr = dt.toLocaleTimeString('en-GB', { hour12: false, timeZone: 'UTC' }).slice(0, 5);
 
@@ -144,11 +181,11 @@ async function loadHistory() {
             const row = document.createElement('tr');
             row.innerHTML = `
                 <td class="mono" style="font-size: 0.8rem">${dStr} ${tStr}</td>
-                <td><b>${sig.asset}</b></td>
-                <td><span class="direction-tag tag-${sig.direction.toLowerCase()}">${sig.direction}</span></td>
-                <td class="mono">${parseFloat(sig.entry_price || sig.entry_low).toFixed(5)}</td>
-                <td class="mono">${parseFloat(sig.sl).toFixed(5)}</td>
-                <td class="mono">${parseFloat(sig.tp).toFixed(5)}</td>
+                <td><b>${sig.asset || 'N/A'}</b></td>
+                <td><span class="direction-tag tag-${(sig.direction || 'BUY').toLowerCase()}">${sig.direction || 'BUY'}</span></td>
+                <td class="mono">${parseFloat(sig.entry_price || sig.entry_low || 0).toFixed(5)}</td>
+                <td class="mono">${parseFloat(sig.sl || 0).toFixed(5)}</td>
+                <td class="mono">${parseFloat(sig.tp || 0).toFixed(5)}</td>
                 <td><span class="outcome-badge outcome-${mapping.class}">${mapping.label}</span></td>
             `;
             tbody.appendChild(row);
@@ -156,7 +193,7 @@ async function loadHistory() {
 
     } catch (e) {
         console.error("History fetch error:", e);
-        tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; color:var(--accent-red)">⚠️ Error loading history</td></tr>';
+        tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; color:var(--accent-red)">⚠️ Error loading history: ${e.message}</td></tr>`;
     }
 }
 

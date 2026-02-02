@@ -200,9 +200,9 @@ function displayActiveSignal(record) {
 
     if (state === 'WAITING_FOR_ENTRY') { label = "⏳ PENDING (Waiting Entry)"; color = "var(--primary-blue)"; }
     else if (state === 'ENTRY_HIT') { label = "🚀 LIVE (Monitoring)"; color = "var(--accent-green)"; }
-    else if (state === 'TP_HIT') { label = "✅ SUCCESSFUL"; color = "var(--accent-green)"; }
-    else if (state === 'SL_HIT') { label = "❌ NOT SUCCESSFUL"; color = "var(--accent-red)"; }
-    else if (state === 'CANCELLED') { label = "⚪ NO TRADE"; }
+    else if (state === 'TP_HIT') { label = "✅ TP REACHED"; color = "var(--accent-green)"; }
+    else if (state === 'SL_HIT') { label = "🛑 SL REACHED"; color = "var(--accent-red)"; }
+    else if (state === 'CANCELLED') { label = "⚪ EXPIRED / NO ENTRY"; }
 
     statusEl.innerText = label;
     statusEl.style.color = color;
@@ -346,9 +346,9 @@ async function loadHistory(append = false) {
 }
 
 function mapState(state) {
-    if (state === 'TP_HIT') return { label: 'Successful', class: 'tp' };
-    if (state === 'SL_HIT') return { label: 'Not Successful', class: 'sl' };
-    if (state === 'CANCELLED') return { label: 'No Trade', class: 'expired' };
+    if (state === 'TP_HIT') return { label: 'TP Reached', class: 'tp' };
+    if (state === 'SL_HIT') return { label: 'SL Reached', class: 'sl' };
+    if (state === 'CANCELLED') return { label: 'Expired', class: 'expired' };
     return { label: 'Pending', class: 'pending' };
 }
 

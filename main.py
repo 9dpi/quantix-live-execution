@@ -1,4 +1,5 @@
 from fastapi import FastAPI, Request
+from typing import Optional
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from signal_engine import get_latest_signal_safe, is_market_open

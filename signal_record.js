@@ -153,7 +153,7 @@ function displayActiveSignal(record) {
     const ts = record.executed_at || record.timestamp || record.generated_at;
     const dateObj = (ts && !isNaN(new Date(ts))) ? new Date(ts) : null;
     if (dateObj) {
-        const dStr = dateObj.toLocaleDateString('en-CA');
+        const dStr = dateObj.toLocaleDateString('en-CA', { timeZone: 'UTC' });
         const tStr = dateObj.toLocaleTimeString('en-GB', { hour12: false, timeZone: 'UTC' });
         document.getElementById('record-generated-at').innerText = `${dStr} ${tStr} UTC`;
     }
@@ -295,7 +295,7 @@ async function loadHistory(append = false) {
             const dt = new Date(sig.generated_at);
             if (isNaN(dt.getTime())) return;
 
-            const dStr = dt.toLocaleDateString('en-CA');
+            const dStr = dt.toLocaleDateString('en-CA', { timeZone: 'UTC' });
             const tStr = dt.toLocaleTimeString('en-GB', { hour12: false, timeZone: 'UTC' }).slice(0, 5);
 
             const entry = sig.entry_price || sig.entry_low || 0;

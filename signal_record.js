@@ -202,6 +202,7 @@ function displayActiveSignal(record) {
     else if (state === 'ENTRY_HIT') { label = "🚀 LIVE (Monitoring)"; color = "var(--accent-green)"; }
     else if (state === 'TP_HIT') { label = "✅ TP REACHED"; color = "var(--accent-green)"; }
     else if (state === 'SL_HIT') { label = "🛑 SL REACHED"; color = "var(--accent-red)"; }
+    else if (state === 'TIME_EXIT') { label = "⏱️ TIME-BASED EXIT"; color = "var(--primary-blue)"; }
     else if (state === 'CANCELLED') { label = "⚪ EXPIRED / NO ENTRY"; }
 
     statusEl.innerText = label;
@@ -250,7 +251,8 @@ async function loadHistory(append = false) {
                 'PROFIT': 'TP_HIT',
                 'LOSS': 'SL_HIT',
                 'CANCELLED': 'CANCELLED',
-                'PENDING': 'WAITING_FOR_ENTRY'
+                'PENDING': 'WAITING_FOR_ENTRY',
+                'TIME_EXIT': 'TIME_EXIT'
             };
             const mappedState = stateMap[outcome];
             if (mappedState) {
@@ -348,6 +350,7 @@ async function loadHistory(append = false) {
 function mapState(state) {
     if (state === 'TP_HIT') return { label: 'TP Reached', class: 'tp' };
     if (state === 'SL_HIT') return { label: 'SL Reached', class: 'sl' };
+    if (state === 'TIME_EXIT') return { label: 'Time-Based Exit', class: 'pending' };
     if (state === 'CANCELLED') return { label: 'Expired', class: 'expired' };
     return { label: 'Pending', class: 'pending' };
 }

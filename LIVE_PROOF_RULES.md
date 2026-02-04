@@ -9,9 +9,11 @@ To maintain absolute integrity and focus for this repository, the following rule
 - **❌ Không auto bot**: No autonomous execution without human-in-the-loop verification.
 
 ### ✅ MANDATORY (PHẢI)
-- **✅ ONE signal**: Only one signal generated per session.
-- **✅ ONE execution**: One deliberate act of placing the order.
-- **✅ ONE video**: One continuous recording as the ultimate proof.
+- **✅ Natural Flow**: Signals are generated based on quality, not limited to one per day.
+- **✅ Hard Lock**: Only one active trade per asset at a time.
+- **✅ 30m Limit**: Trades are auto-closed after 30 minutes to ensure rotation.
+- **✅ Full History**: Every released signal is archived in the History tab.
+- **✅ Live Verification**: Use the "Verify" button to audit levels on TradingView.
 
 ---
 **GOAL**: Absolute transparency through manual verification.

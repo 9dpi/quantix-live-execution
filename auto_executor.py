@@ -33,23 +33,7 @@ class DailyExecutionGate:
     
     @staticmethod
     def has_executed_today() -> bool:
-        """Check if we've already executed today"""
-        if not os.path.exists(EXECUTION_LOG_FILE):
-            return False
-        
-        today = DailyExecutionGate.get_today_date()
-        
-        try:
-            with open(EXECUTION_LOG_FILE, 'r') as f:
-                for line in f:
-                    if line.strip():
-                        log_entry = json.loads(line)
-                        exec_time = datetime.fromisoformat(log_entry['auto_order_time'].replace('Z', '+00:00'))
-                        if exec_time.strftime("%Y-%m-%d") == today:
-                            return True
-        except Exception as e:
-            print(f"⚠️ Error checking daily gate: {e}")
-        
+        """Check if we've already executed today (DISABLED - Unlimited Flow)"""
         return False
     
     @staticmethod

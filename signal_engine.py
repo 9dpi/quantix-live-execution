@@ -42,7 +42,8 @@ def consume_ai_core_signal():
     if sb_url and sb_key:
         try:
             # 1. NEW: Try Supabase Direct (Primary)
-            url = f"{sb_url}/rest/v1/fx_signals?select=*&status=eq.ACTIVE&order=generated_at.desc&limit=1"
+            # Fetch signals that are either waiting for entry or already hit entry
+            url = f"{sb_url}/rest/v1/fx_signals?select=*&status=in.(PUBLISHED,ENTRY_HIT)&order=generated_at.desc&limit=1"
             headers = {
                 "apikey": sb_key, 
                 "Authorization": f"Bearer {sb_key}",

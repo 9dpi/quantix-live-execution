@@ -25,15 +25,8 @@ def load_persisted_signal():
             with open("execution_log.json", "r") as f:
                 data = json.load(f)
                 if isinstance(data, dict) and data.get("status") == "EXECUTED":
-                    # DAILY RESET: Only load if it was executed today (UTC)
-                    exec_at = data.get("executed_at")
-                    if exec_at:
-                        exec_date = datetime.fromisoformat(exec_at.replace('Z', '+00:00')).strftime("%Y-%m-%d")
-                        today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
-                        if exec_date == today:
-                            return data
-                        else:
-                            print(f"♻️ Clearing old signal from {exec_date} (Today: {today})")
+                    # DAILY RESET REMOVED per user request
+                    return data
     except Exception as e:
         print(f"⚠️ Failed to load persistent log: {e}")
     return None
@@ -43,13 +36,8 @@ def get_active_signal():
     global CURRENT_SIGNAL
     
     if CURRENT_SIGNAL:
-        exec_at = CURRENT_SIGNAL.get("executed_at")
-        if exec_at:
-            exec_date = datetime.fromisoformat(exec_at.replace('Z', '+00:00')).strftime("%Y-%m-%d")
-            today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
-            if exec_date != today:
-                print(f"♻️ Resetting session signal from {exec_date}")
-                CURRENT_SIGNAL = None
+        # DAILY RESET REMOVED per user request
+        pass
     
     # If still None, try reloading from file (but load_persisted_signal also checks date)
     if CURRENT_SIGNAL is None:

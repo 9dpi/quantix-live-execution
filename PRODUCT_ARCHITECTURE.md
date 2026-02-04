@@ -1,10 +1,13 @@
 # Quantix Signal Genius AI - System Architecture (2026-01-30)
 
-## 🏗️ Hybrid Architecture Overview
+## 🏗️ All-on-Cloud Architecture Overview (v3.0)
 
-Due to Twelve Data's blocking of Cloud IPs, we operate a **Hybrid Architecture**:
-- **Data Ingestion & Analysis**: Local (Home Miner) 🏠
-- **Storage & Distribution**: Cloud (Supabase + Railway) ☁️
+Quantix now operates a **Full Cloud Architecture** on Railway:
+- **Data Ingestion & Analysis**: Cloud (Railway - Analyzer Service) ☁️
+- **Monitoring & Lifecycle**: Cloud (Railway - Watcher Service) ☁️
+- **Storage & distribution**: Cloud (Supabase + Railway API) ☁️
+
+*Note: Home Miner (Local) is now decommissioned and acts only as a manual backup.*
 
 ---
 

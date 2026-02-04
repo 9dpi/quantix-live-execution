@@ -8,12 +8,12 @@ To maintain absolute integrity and focus for this repository, the following rule
 - **❌ Không history**: Do not dwell on past performance; current execution is the only truth.
 - **❌ Không auto bot**: No autonomous execution without human-in-the-loop verification.
 
-### ✅ MANDATORY (PHẢI)
-- **✅ Natural Flow**: Signals are generated based on quality, not limited to one per day.
-- **✅ Hard Lock**: Only one active trade per asset at a time.
-- **✅ 30m Limit**: Trades are auto-closed after 30 minutes to ensure rotation.
-- **✅ Full History**: Every released signal is archived in the History tab.
-- **✅ Live Verification**: Use the "Verify" button to audit levels on TradingView.
+### ✅ MANDATORY RULES (PHẢI TUÂN THỦ)
+- **✅ Natural Flow**: Tín hiệu được sinh ra tự nhiên theo chất lượng thị trường, không giới hạn số lượng mỗi ngày.
+- **✅ Hard Lock**: Cơ chế khóa cứng, không cho phép bắn tín hiệu trùng lặp trên cùng một cặp tiền và khung thời gian.
+- **✅ 30m Limit**: Mọi giao dịch chủ động sẽ tự động đóng sau tối đa 30 phút để quản trị rủi ro và vòng quay lệnh.
+- **✅ Full History**: Mọi tín hiệu đã phát hành đều được lưu trữ minh bạch tại tab History, không xóa bỏ hoặc chỉnh sửa.
+- **✅ Live Verification**: Mỗi tín hiệu đều được neo vào một Message ID duy nhất trên Telegram để đối soát công khai.
 
 ---
 **GOAL**: Absolute transparency through manual verification.

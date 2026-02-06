@@ -365,7 +365,7 @@ async function loadHistory(append = false) {
             row.innerHTML = `
                 <td data-label="Created" class="mono" style="font-size: 0.8rem">${dStr} ${tStr}</td>
                 <td data-label="Side"><span class="pill ${direction.toLowerCase() === 'buy' ? 'up' : 'down'}">${direction}</span></td>
-                <td data-label="AI Score" class="mono" style="font-weight:700; color:var(--quantix-accent)">${displayConfidence}%</td>
+                <td data-label="AI Confidence" class="mono" style="font-weight:700; color:var(--quantix-accent)">${displayConfidence}%</td>
                 <td data-label="Entry" class="mono">${parseFloat(entry).toFixed(5)}</td>
                 <td data-label="TP" class="mono" style="color:var(--trade-up)">${parseFloat(tp).toFixed(5)}</td>
                 <td data-label="SL" class="mono" style="color:var(--trade-down)">${parseFloat(sl).toFixed(5)}</td>

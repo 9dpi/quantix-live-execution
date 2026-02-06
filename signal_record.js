@@ -438,8 +438,23 @@ function mapState(state) {
     return { label: 'Pending', class: 'pending' };
 }
 
+function updateHistoryClock() {
+    const el = document.getElementById('dynamic-history-title');
+    if (!el) return;
+    const now = new Date();
+    const utcStr = now.getUTCFullYear() + '-' +
+        String(now.getUTCMonth() + 1).padStart(2, '0') + '-' +
+        String(now.getUTCDate()).padStart(2, '0') + ' ' +
+        String(now.getUTCHours()).padStart(2, '0') + ':' +
+        String(now.getUTCMinutes()).padStart(2, '0') + ':' +
+        String(now.getUTCSeconds()).padStart(2, '0');
+    el.textContent = `Live Executions [ ${utcStr} UTC ]`;
+}
+
 // Initial Run
 document.addEventListener('DOMContentLoaded', () => {
+    updateHistoryClock();
+    setInterval(updateHistoryClock, 1000);
     fetchLatestSignal();
 
     const fd = document.getElementById('filter-date');

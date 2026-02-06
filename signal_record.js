@@ -448,7 +448,7 @@ function updateHistoryClock() {
         String(now.getUTCHours()).padStart(2, '0') + ':' +
         String(now.getUTCMinutes()).padStart(2, '0') + ':' +
         String(now.getUTCSeconds()).padStart(2, '0');
-    el.textContent = `Live Executions [ ${utcStr} UTC ]`;
+    el.innerHTML = `Live Executions <span style="font-size: 0.8rem; color: #475569; font-weight: 500; margin-left: 8px;">[ ${utcStr} UTC ]</span>`;
 }
 
 // Initial Run

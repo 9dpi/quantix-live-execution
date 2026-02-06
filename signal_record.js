@@ -211,7 +211,8 @@ function displayActiveSignal(record) {
     document.getElementById('record-sl').textContent = parseFloat(sl).toFixed(5);
 
     // AI & Constraints
-    document.getElementById('record-confidence').textContent = `${confidence}%`;
+    const displayConfidence = confidence <= 1 ? Math.round(confidence * 100) : Math.round(confidence);
+    document.getElementById('record-confidence').textContent = `${displayConfidence}%`;
 
     // Duration Logic
     const entryLimit = record.activation_limit_mins || 15;

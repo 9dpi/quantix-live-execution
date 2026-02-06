@@ -234,7 +234,7 @@ function displayActiveSignal(record) {
     const statusBadge = document.getElementById('record-status-badge');
 
     if (state === 'WAITING_FOR_ENTRY') {
-        statusBadge.textContent = 'PENDING ENTRY';
+        statusBadge.textContent = 'WAITING FOR ENTRY';
         statusBadge.style.color = 'var(--quantix-accent)';
     } else if (state === 'ENTRY_HIT') {
         statusBadge.textContent = 'LIVE TRADE';

@@ -1,10 +1,10 @@
-# Quantix Signal Genius AI - System Architecture (2026-01-30)
+# Quantix Signal Genius AI - System Architecture (2026-02-06)
 
 ## 🏗️ All-on-Cloud Architecture Overview (v3.0)
 
 Quantix now operates a **Full Cloud Architecture** on Railway:
 - **Data Ingestion & Analysis**: Cloud (Railway - Analyzer Service) ☁️
-- **Monitoring & Lifecycle**: Cloud (Railway - Watcher Service) ☁️
+- **Monitoring & Lifecycle**: Cloud (Railway - Watcher Service) [Binance Data Feed] ☁️
 - **Storage & distribution**: Cloud (Supabase + Railway API) ☁️
 
 *Note: Home Miner (Local) is now decommissioned and acts only as a manual backup.*
@@ -14,8 +14,8 @@ Quantix now operates a **Full Cloud Architecture** on Railway:
 ## 📊 Complete Signal Flow
 
 ```
-[T0] Live Market Data (TwelveData API)
-     ↓ (every 120 seconds)
+[T0] Live Market Data (Binance EURUSDT WebSocket/REST)
+     ↓ (Zero-latency / Real-time)
      
 [T0+Δ] QUANTIX AI CORE - Home Miner 🏠
 ├─ Location: Local Machine (Residential IP)
@@ -220,7 +220,7 @@ Signal_Genius_AI/             (Web Dashboard)
 ---
 
 **Last Updated**: 2026-01-30  
-**Architecture Version**: 2.2 (Hybrid + 3 Templates + Fixed RR)  
+**Architecture Version**: 3.1 (Railway Watcher + Binance Feed + 35m Lifecycle)  
 **Status**: ✅ Production Ready
 
 

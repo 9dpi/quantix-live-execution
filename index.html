@@ -457,6 +457,21 @@
             color: var(--text-secondary);
         }
 
+        .pill.up {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--trade-up);
+        }
+
+        .pill.down {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--trade-down);
+        }
+
+        .pill.neut {
+            background: rgba(100, 116, 139, 0.1);
+            color: var(--text-secondary);
+        }
+
         .verify-btn {
             padding: 6px 12px;
             background: transparent;
@@ -679,12 +694,15 @@
                 <table class="history-table">
                     <thead>
                         <tr>
-                            <th>Date/Time</th>
+                            <th>Created</th>
                             <th>Side</th>
+                            <th>AI Score</th>
                             <th>Entry</th>
                             <th>TP</th>
                             <th>SL</th>
-                            <th>R:R</th>
+                            <th>Win/Loss</th>
+                            <th>Closed</th>
+                            <th>Status</th>
                         </tr>
                     </thead>
                     <tbody id="history-body">

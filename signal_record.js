@@ -270,7 +270,7 @@ async function loadHistory(append = false) {
         historyOffset = 0;
     }
 
-    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center">⏳ Fetching History...</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="9" style="text-align:center">⏳ Fetching History...</td></tr>';
     if (prevBtn) prevBtn.disabled = true;
     if (nextBtn) nextBtn.disabled = true;
 
@@ -327,7 +327,7 @@ async function loadHistory(append = false) {
         if (!signals || signals.length === 0) {
             tbody.innerHTML = `
                 <tr>
-                    <td colspan="6" style="text-align:center; padding: 2rem; color: var(--text-secondary);">
+                    <td colspan="9" style="text-align:center; padding: 2rem; color: var(--text-secondary);">
                         <div style="font-weight: 600; font-size: 1.1rem; margin-bottom: 0.5rem; color: var(--text-primary);">No released signals in this period.</div>
                         <div style="font-size: 0.9rem;">Signals appear here only after being published on Telegram.</div>
                     </td>
@@ -346,18 +346,32 @@ async function loadHistory(append = false) {
             const entry = sig.entry_price || sig.entry_low || 0;
             const sl = sig.sl || 0;
             const tp = sig.tp || 0;
-            const rr = calculateRR(entry, sl, tp, sig.direction);
-            const tf = sig.timeframe || 'M15';
+            const direction = sig.direction || 'BUY';
 
-            const mapping = mapState(sig.state);
+            const confidence = sig.confidence || sig.ai_confidence || 0;
+            const displayConfidence = confidence <= 1 ? Math.round(confidence * 100) : Math.round(confidence);
+
+            let closedStr = "--:--";
+            if (sig.closed_at) {
+                const cdt = new Date(sig.closed_at);
+                closedStr = cdt.toLocaleTimeString('en-GB', { hour12: false, timeZone: 'UTC' }).slice(0, 5);
+            }
+
+            const statusLabel = getStatusLabel(sig);
+            const pips = getPipsInfo(sig);
+            const resClass = (sig.result || '').toUpperCase() === 'PROFIT' ? 'up' : ((sig.result || '').toUpperCase() === 'LOSS' ? 'down' : 'neut');
+
             const row = document.createElement('tr');
             row.innerHTML = `
-                <td data-label="Date/Time" class="mono" style="font-size: 0.8rem">${dStr} ${tStr}</td>
-                <td data-label="Side"><span class="direction-tag tag-${(sig.direction || 'BUY').toLowerCase()}">${sig.direction || 'BUY'}</span></td>
+                <td data-label="Created" class="mono" style="font-size: 0.8rem">${dStr} ${tStr}</td>
+                <td data-label="Side"><span class="pill ${direction.toLowerCase() === 'buy' ? 'up' : 'down'}">${direction}</span></td>
+                <td data-label="AI Score" class="mono" style="font-weight:700; color:var(--quantix-accent)">${displayConfidence}%</td>
                 <td data-label="Entry" class="mono">${parseFloat(entry).toFixed(5)}</td>
-                <td data-label="TP" class="mono">${parseFloat(tp).toFixed(5)}</td>
-                <td data-label="SL" class="mono">${parseFloat(sl).toFixed(5)}</td>
-                <td data-label="R:R" class="mono">1 : ${rr}</td>
+                <td data-label="TP" class="mono" style="color:var(--trade-up)">${parseFloat(tp).toFixed(5)}</td>
+                <td data-label="SL" class="mono" style="color:var(--trade-down)">${parseFloat(sl).toFixed(5)}</td>
+                <td data-label="Win/Loss" class="mono" style="font-weight:700; color:${pips.color}">${pips.label}</td>
+                <td data-label="Closed" class="mono" style="font-size: 0.75rem">${closedStr}</td>
+                <td data-label="Status"><span class="pill ${resClass}" style="min-width:80px; text-align:center">${statusLabel}</span></td>
             `;
 
             tbody.appendChild(row);
@@ -373,8 +387,47 @@ async function loadHistory(append = false) {
 
     } catch (e) {
         console.error("History fetch error:", e);
-        tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; color:var(--accent-red)">⚠️ Error loading history</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="9" style="text-align:center; color:var(--accent-red)">⚠️ Error loading history</td></tr>`;
     }
+}
+
+function getStatusLabel(s) {
+    if (!s) return '--';
+    const state = (s.state || '').toUpperCase();
+    const result = (s.result || '').toUpperCase();
+
+    if (result === 'PROFIT') return 'TP Hit';
+    if (result === 'LOSS') return 'SL Hit';
+    if (state === 'ENTRY_HIT') return 'Entry Hit';
+    if (state === 'WAITING_FOR_ENTRY') return 'Waiting...';
+    if (state === 'CANCELLED' || state === 'EXPIRED') return 'Expired';
+    if (state === 'TIME_EXIT') return 'Time Exit';
+
+    return state.replace(/_/g, ' ');
+}
+
+function getPipsInfo(s) {
+    const entry = parseFloat(s.entry_price || s.entry_low || 0);
+    const tp = parseFloat(s.tp || 0);
+    const sl = parseFloat(s.sl || 0);
+    const direction = (s.direction || 'BUY').toUpperCase();
+    const result = (s.result || '').toUpperCase();
+
+    let dist = 0;
+    let label = '--';
+    let color = 'var(--text-secondary)';
+
+    if (result === 'PROFIT') {
+        dist = Math.abs(entry - tp);
+        label = `+${Math.round(dist * 10000 * 10) / 10} pips`;
+        color = 'var(--trade-up)';
+    } else if (result === 'LOSS') {
+        dist = -Math.abs(entry - sl);
+        label = `${Math.round(dist * 10000 * 10) / 10} pips`;
+        color = 'var(--trade-down)';
+    }
+
+    return { label, color };
 }
 
 function mapState(state) {

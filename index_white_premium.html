@@ -130,7 +130,7 @@
 
         /* Price Card */
         .price-card {
-            padding: 0;
+            padding: 2rem 0;
             margin-bottom: 2rem;
         }
 
@@ -238,11 +238,6 @@
             color: var(--trade-down);
         }
 
-        .signal-badge.expired {
-            background: rgba(100, 116, 139, 0.1);
-            color: #64748b;
-        }
-
         .card-section {
             padding: 1.5rem;
         }
@@ -268,71 +263,6 @@
             font-family: var(--font-mono);
             font-size: 0.85rem;
             font-weight: 600;
-        }
-
-        /* Signal Template Refinement */
-        .signal-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: baseline;
-            margin-bottom: 6px;
-        }
-
-        .sig-label {
-            font-size: 0.75rem;
-            color: var(--text-secondary);
-            font-weight: 500;
-        }
-
-        .sig-value {
-            font-size: 0.85rem;
-            font-weight: 700;
-            color: var(--text-primary);
-        }
-
-        .sig-value.mono {
-            font-family: var(--font-mono);
-            letter-spacing: -0.5px;
-        }
-
-        .sig-section {
-            padding: 12px 1.5rem;
-            border-top: 1px solid var(--border-subtle);
-        }
-
-        .pulse-active {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background: var(--trade-up);
-            box-shadow: 0 0 10px var(--trade-up);
-            animation: pulse-ring 2s infinite;
-        }
-
-        .pulse-scanning {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background: #eab308;
-            box-shadow: 0 0 10px #eab308;
-            animation: pulse-ring 1.5s infinite;
-        }
-
-        @keyframes pulse-ring {
-            0% {
-                transform: scale(0.95);
-                opacity: 0.8;
-            }
-
-            50% {
-                transform: scale(1.1);
-                opacity: 1;
-            }
-
-            100% {
-                transform: scale(0.95);
-                opacity: 0.8;
-            }
         }
 
         /* Viewport */
@@ -478,40 +408,13 @@
         .hidden {
             display: none !important;
         }
-
-        /* Mini Footer */
-        .mini-footer {
-            margin-top: 1rem;
-            padding: 1.5rem 0;
-            border-top: 1px solid var(--border-subtle);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            color: var(--text-secondary);
-            font-size: 0.65rem;
-            font-weight: 500;
-        }
-
-        .footer-status {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .status-dot {
-            width: 5px;
-            height: 5px;
-            background: var(--trade-up);
-            border-radius: 50%;
-            box-shadow: 0 0 5px var(--trade-up);
-        }
     </style>
 </head>
 
 <body>
     <header class="header-strip">
         <div class="brand-zone">
-            <div class="brand-logo">S</div>
+            <div class="brand-logo">Q</div>
             <div class="brand-name">
                 <span class="name-prefix">Signal Genius</span>
                 <span class="name-suffix">AI</span>
@@ -525,21 +428,19 @@
     </header>
 
     <main class="app-shell">
-        <aside class="sidebar" id="sidebar-content">
-            <!-- Sidebar Header / Price Card -->
+        <section class="sidebar">
+            <!-- Live Price Card -->
             <div class="price-card">
-                <div
-                    style="display:flex; justify-content:space-between; font-size:0.7rem; color:var(--text-primary); font-weight:700; align-items:center;">
-                    <span>EUR / USD</span>
-                    <div style="display:flex; align-items:center; gap:6px;">
-                        <div id="connection-pulse" class="pulse-scanning"></div>
-                        <span id="connection-status" style="color:var(--text-primary)">LIVE DATA</span>
-                    </div>
+                <div class="price-header">
+                    <span class="price-asset">EURUSD Real-time</span>
+                    <span class="connection-status">
+                        <span class="pulse-scanning"></span>
+                        LIVE DATA
+                    </span>
                 </div>
-                <div class="current-price" id="price-main">--.-----</div>
+                <div class="current-price" id="price-main">0.00000</div>
                 <div style="height: 60px; margin-top: 10px; position: relative;">
-                    <svg id="spark" width="100%" height="60" viewBox="0 0 100 60" preserveAspectRatio="none"
-                        style="filter: drop-shadow(0 0 5px rgba(56, 189, 248, 0.4));">
+                    <svg id="spark" width="100%" height="60" viewBox="0 0 100 60" preserveAspectRatio="none">
                         <defs>
                             <linearGradient id="sparkGradient" x1="0%" y1="0%" x2="0%" y2="100%">
                                 <stop offset="0%" stop-color="rgba(14, 165, 233, 0.2)" />
@@ -551,102 +452,41 @@
                             stroke-linecap="round" style="transition: all 0.5s ease;" />
                     </svg>
                 </div>
+                <div
+                    style="font-size:0.65rem; color:var(--text-secondary); font-family:var(--font-mono); margin-top:4px;">
+                    Spread: <span id="price-spread" style="color:var(--text-primary)">0.3 pips</span>
+                </div>
             </div>
 
             <!-- Active Signal -->
-            <!-- Signal Template Container -->
-            <div id="signal-record"
-                style="display:none; flex-direction:column; background:var(--bg-surface); border:1px solid var(--border-subtle); border-radius:8px;">
+            <div id="signal-record" class="signal-card hidden">
                 <div class="card-header">
-                    <div style="display:flex; align-items:center; gap:10px;">
-                        <i data-lucide="brain-circuit" size="20" style="color:var(--quantix-accent)"></i>
-                        <span class="card-title" style="letter-spacing:1px; color:var(--text-primary);">SIGNAL GENIUS
-                            PREDICTION</span>
-                    </div>
-                    <div class="pulse-active" id="record-pulse"></div>
+                    <span class="card-title">Active Signal</span>
+                    <span id="record-direction" class="signal-badge buy">BUY</span>
                 </div>
-                <div
-                    style="margin-top:4px; margin-bottom: 20px; font-family:var(--font-mono); font-size:0.65rem; color:var(--text-secondary); text-transform:uppercase; letter-spacing:0.5px; border-bottom: 1px solid var(--border-subtle); padding: 0 1.5rem 12px 1.5rem;">
-                    <i data-lucide="zap" size="10" style="margin-right:4px;"></i> <span id="record-subtitle">Pre-Market
-                        Structure Analysis</span>
-                </div>
-
-                <div class="sig-section" style="border-top:none; padding-top:0;">
-                    <div class="signal-row">
-                        <span class="sig-label">Asset:</span>
-                        <span class="sig-value" id="record-asset">EURUSD</span>
-                    </div>
-                    <div class="signal-row">
-                        <span class="sig-label">Timeframe:</span>
-                        <span class="sig-value" id="record-tf">M15</span>
-                    </div>
-                    <div class="signal-row">
-                        <span class="sig-label">Direction:</span>
-                        <b id="record-direction-text" class="sig-value"></b>
-                    </div>
-                </div>
-
-                <div class="sig-section">
-                    <div class="signal-row" style="margin-bottom:12px;">
-                        <span class="sig-label">Status:</span>
-                        <span id="record-status-badge" class="sig-value"
-                            style="color:var(--quantix-accent)">PENDING</span>
-                    </div>
-                    <div class="signal-row">
-                        <span class="sig-label">Entry Price:</span>
-                        <span id="record-entry" class="sig-value mono"></span>
-                    </div>
-                    <div class="signal-row">
-                        <span class="sig-label">Take Profit:</span>
-                        <span id="record-tp" class="sig-value mono" style="color:var(--trade-up)"></span>
-                    </div>
-                    <div class="signal-row">
-                        <span class="sig-label">Stop Loss:</span>
-                        <span id="record-sl" class="sig-value mono" style="color:var(--trade-down)"></span>
-                    </div>
-                </div>
-
-                <div class="sig-section">
-                    <div class="signal-row">
-                        <span class="sig-label">AI Probability</span>
-                        <span id="record-confidence" class="sig-value" style="color:var(--quantix-accent)"></span>
-                    </div>
-                    <div class="signal-row">
-                        <span class="sig-label">Valid Until:</span>
-                        <span id="record-valid-until" class="sig-value"></span>
-                    </div>
-                </div>
-
-                <div class="sig-section" style="border-bottom:none; padding-bottom:1.5rem;">
-                    <div style="font-size: 0.7rem; color: var(--text-secondary); line-height: 1.8; margin-bottom:12px;">
-                        <div style="display:flex; align-items:center; gap:6px;">⏱️ <span style="flex:1">Entry
-                                valid:</span> <b style="color:var(--text-primary)" id="record-entry-duration">15m</b>
-                        </div>
-                        <div style="display:flex; align-items:center; gap:6px;">⏱️ <span style="flex:1">Max trade
-                                duration:</span> <b style="color:var(--text-primary)" id="record-max-duration">35m</b>
-                        </div>
-                    </div>
-
-                    <div
-                        style="font-size: 0.65rem; color: #64748b; font-style: italic; line-height: 1.4; padding: 10px; background: rgba(0,0,0,0.05); border-radius: 4px; border-left: 2px solid var(--border-subtle);">
-                        ⚠️ Signal will auto-close if TP/SL not hit within <span id="record-warning-time">35</span>m.
-                    </div>
+                <div class="card-section">
+                    <div class="level-item"><span>Entry</span><b id="record-entry">—</b></div>
+                    <div class="level-item"><span>Take Profit</span><b id="record-tp"
+                            style="color:var(--trade-up)">—</b></div>
+                    <div class="level-item"><span>Stop Loss</span><b id="record-sl"
+                            style="color:var(--trade-down)">—</b></div>
+                    <div class="level-item"><span>R:R</span><b id="record-rr">—</b></div>
+                    <div class="level-item"><span>Generated</span><b id="record-generated-at">—</b></div>
                 </div>
             </div>
 
-            <div id="market-closed"
-                style="display:none; flex:1; flex-direction:column; align-items:center; justify-content:center; color:var(--text-secondary); text-align:center; padding: 2rem;">
-                <i data-lucide="moon" size="48" style="opacity: 0.2; margin-bottom: 1rem;"></i>
-                <h3 style="margin-bottom:0.5rem;">Market Closed</h3>
-                <p style="font-size: 0.8rem;">Forex market is currently closed.<br>Signals will resume soon.</p>
+            <!-- Market Closed -->
+            <div id="market-closed" class="signal-card hidden">
+                <div class="card-section" style="text-align:center; padding:3rem 2rem;">
+                    <div style="font-size:3rem; margin-bottom:1rem;">🌙</div>
+                    <h3 style="margin-bottom:0.5rem;">Market Closed</h3>
+                    <p style="color:var(--text-secondary); font-size:0.85rem;">
+                        Forex market is currently closed.<br>
+                        Signals will resume during market hours.
+                    </p>
+                </div>
             </div>
-
-            <div id="no-signal-view"
-                style="display:flex; flex:1; flex-direction:column; align-items:center; justify-content:center; color:var(--text-secondary); text-align:center; padding: 2rem;">
-                <i data-lucide="radar" size="48" style="opacity: 0.2; margin-bottom: 1rem;"></i>
-                <div id="scanning-text" style="font-size: 0.8rem; font-weight: 500;">Scanning Market...</div>
-            </div>
-        </aside>
+        </section>
 
         <section class="viewport">
             <div class="history-container">
@@ -679,12 +519,16 @@
                 <table class="history-table">
                     <thead>
                         <tr>
+                            <th>ID</th>
                             <th>Date/Time</th>
                             <th>Side</th>
                             <th>Entry</th>
                             <th>TP</th>
                             <th>SL</th>
                             <th>R:R</th>
+                            <th>Closed</th>
+                            <th>Outcome</th>
+                            <th>Verify</th>
                         </tr>
                     </thead>
                     <tbody id="history-body">
@@ -694,79 +538,13 @@
                     </tbody>
                 </table>
 
-                <style>
-                    .pagination-container {
-                        display: flex;
-                        justify-content: center;
-                        align-items: center;
-                        gap: 1.5rem;
-                        margin-top: 1.5rem;
-                    }
-
-                    .page-info {
-                        font-size: 0.85rem;
-                        font-weight: 600;
-                        color: var(--text-secondary);
-                        min-width: 100px;
-                        text-align: center;
-                    }
-
-                    .pagination-btn {
-                        padding: 8px 16px;
-                        background: var(--bg-surface);
-                        border: 1px solid var(--border-subtle);
-                        border-radius: 6px;
-                        font-size: 0.75rem;
-                        font-weight: 700;
-                        color: var(--text-primary);
-                        cursor: pointer;
-                        transition: all 0.2s ease;
-                        text-transform: uppercase;
-                        letter-spacing: 0.5px;
-                        display: flex;
-                        align-items: center;
-                        gap: 8px;
-                    }
-
-                    .pagination-btn:hover:not(:disabled) {
-                        border-color: var(--quantix-accent);
-                        color: var(--quantix-accent);
-                        background: var(--bg-hover);
-                    }
-
-                    .pagination-btn:disabled {
-                        opacity: 0.5;
-                        cursor: not-allowed;
-                    }
-                </style>
-
-                <div class="pagination-container">
-                    <button id="prev-btn" class="pagination-btn" disabled>
-                        ← Prev
-                    </button>
-                    <span id="page-info" class="page-info">Page 1</span>
-                    <button id="next-btn" class="pagination-btn">
-                        Next →
-                    </button>
-                </div>
-
-                <div class="mini-footer">
-                    <div>&copy; 2026 SIGNAL GENIUS AI. Professional Trading Intelligence.</div>
-                    <div class="footer-status">
-                        <span class="status-dot"></span>
-                        System Operational
-                    </div>
+                <div style="text-align:center; margin-top:2rem;">
+                    <button id="load-more-btn" class="verify-btn" style="display:none;">Load More Signals</button>
                 </div>
             </div>
         </section>
     </main>
 
-
-
-    <script src="https://unpkg.com/lucide@latest"></script>
-    <script>
-        lucide.createIcons();
-    </script>
     <script src="./signal_record.js"></script>
 </body>
 

@@ -4,6 +4,11 @@ let livePrice = null;
 let prevPrice = 0;
 let activeTab = 'active';
 
+// Pagination State
+let allHistory = [];
+let currentPage = 1;
+const itemsPerPage = 10;
+
 // --- UTILS ---
 
 function calcConfidence(val) {
@@ -166,8 +171,6 @@ function displayActiveSignal(record) {
 
 async function loadHistory() {
     const tbody = document.getElementById('history-body');
-    const pageInfo = document.getElementById('page-info');
-
     tbody.innerHTML = '<tr><td colspan="9" style="text-align:center">⏳ Fetching History...</td></tr>';
 
     try {
@@ -177,59 +180,87 @@ async function loadHistory() {
 
         if (!json.success) throw new Error(json.message);
 
-        const signals = json.history;
-        tbody.innerHTML = "";
-
-        if (!signals || signals.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="9" style="text-align:center; padding: 2rem;">No released signals in this period.</td></tr>';
-            return;
-        }
-
-        signals.forEach(sig => {
-            const dt = new Date(sig.generated_at);
-            const dStr = dt.toLocaleDateString('en-CA', { timeZone: 'UTC' });
-            const tStr = dt.toLocaleTimeString('en-GB', { hour12: false, timeZone: 'UTC' }).slice(0, 5);
-
-            const entry = sig.entry_price || sig.entry || 0;
-            const sl = sig.stop_loss || sig.sl || 0;
-            const tp = sig.take_profit || sig.tp || 0;
-            const direction = (sig.direction || sig.side || 'BUY').toUpperCase();
-            const conf = calcConfidence(sig.release_confidence || 0);
-
-            let closedStr = "--:--";
-            if (sig.closed_at) {
-                const cdt = new Date(sig.closed_at);
-                closedStr = cdt.toLocaleTimeString('en-GB', { hour12: false, timeZone: 'UTC' }).slice(0, 5);
-            }
-
-            const statusLabel = getStatusLabel(sig);
-            const pips = getPipsInfo(sig);
-
-            let resClass = 'neut';
-            if (sig.result === 'PROFIT') resClass = 'up';
-            else if (sig.result === 'LOSS') resClass = 'down';
-            else if (sig.status === 'EXPIRED') resClass = 'expired';
-
-            const row = document.createElement('tr');
-            row.innerHTML = `
-                <td class="mono" style="font-size: 0.8rem">${dStr} ${tStr}</td>
-                <td><span class="pill ${direction === 'BUY' ? 'up' : 'down'}">${direction}</span></td>
-                <td class="mono" style="font-weight:700; color:var(--quantix-accent)">${conf}%</td>
-                <td class="mono">${parseFloat(entry).toFixed(5)}</td>
-                <td class="mono" style="color:var(--trade-up)">${parseFloat(tp).toFixed(5)}</td>
-                <td class="mono" style="color:var(--trade-down)">${parseFloat(sl).toFixed(5)}</td>
-                <td class="mono" style="font-weight:700; color:${pips.color}">${pips.label}</td>
-                <td class="mono" style="font-size: 0.75rem">${closedStr}</td>
-                <td><span class="pill ${resClass}" style="min-width:80px; text-align:center">${statusLabel}</span></td>
-            `;
-            tbody.appendChild(row);
-        });
-
-        if (pageInfo) pageInfo.innerText = "Page 1 of 1";
+        allHistory = json.history || [];
+        currentPage = 1;
+        renderHistoryPage();
 
     } catch (e) {
         console.error("History fetch error:", e);
         tbody.innerHTML = `<tr><td colspan="9" style="text-align:center; color:var(--trade-down)">⚠️ Error loading history</td></tr>`;
+    }
+}
+
+function renderHistoryPage() {
+    const tbody = document.getElementById('history-body');
+    const pageInfo = document.getElementById('page-info');
+    const prevBtn = document.getElementById('prev-btn');
+    const nextBtn = document.getElementById('next-btn');
+
+    tbody.innerHTML = "";
+
+    if (allHistory.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="9" style="text-align:center; padding: 2rem;">No released signals in this period.</td></tr>';
+        if (pageInfo) pageInfo.innerText = "Page 0 of 0";
+        return;
+    }
+
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    const pageData = allHistory.slice(startIndex, endIndex);
+
+    pageData.forEach(sig => {
+        const dt = new Date(sig.generated_at);
+        const dStr = dt.toLocaleDateString('en-CA', { timeZone: 'UTC' });
+        const tStr = dt.toLocaleTimeString('en-GB', { hour12: false, timeZone: 'UTC' }).slice(0, 5);
+
+        const entry = sig.entry_price || sig.entry || 0;
+        const sl = sig.stop_loss || sig.sl || 0;
+        const tp = sig.take_profit || sig.tp || 0;
+        const direction = (sig.direction || sig.side || 'BUY').toUpperCase();
+        const conf = calcConfidence(sig.release_confidence || 0);
+
+        let closedStr = "--:--";
+        if (sig.closed_at) {
+            const cdt = new Date(sig.closed_at);
+            closedStr = cdt.toLocaleTimeString('en-GB', { hour12: false, timeZone: 'UTC' }).slice(0, 5);
+        }
+
+        const statusLabel = getStatusLabel(sig);
+        const pips = getPipsInfo(sig);
+
+        let resClass = 'neut';
+        if (sig.result === 'PROFIT') resClass = 'up';
+        else if (sig.result === 'LOSS') resClass = 'down';
+        else if (sig.status === 'EXPIRED') resClass = 'expired';
+
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td class="mono" style="font-size: 0.8rem">${dStr} ${tStr}</td>
+            <td><span class="pill ${direction === 'BUY' ? 'up' : 'down'}">${direction}</span></td>
+            <td class="mono" style="font-weight:700; color:var(--quantix-accent)">${conf}%</td>
+            <td class="mono">${parseFloat(entry).toFixed(5)}</td>
+            <td class="mono" style="color:var(--trade-up)">${parseFloat(tp).toFixed(5)}</td>
+            <td class="mono" style="color:var(--trade-down)">${parseFloat(sl).toFixed(5)}</td>
+            <td class="mono" style="font-weight:700; color:${pips.color}">${pips.label}</td>
+            <td class="mono" style="font-size: 0.75rem">${closedStr}</td>
+            <td><span class="pill ${resClass}" style="min-width:80px; text-align:center">${statusLabel}</span></td>
+        `;
+        tbody.appendChild(row);
+    });
+
+    const totalPages = Math.ceil(allHistory.length / itemsPerPage);
+    if (pageInfo) pageInfo.innerText = `Page ${currentPage} of ${totalPages}`;
+
+    if (prevBtn) prevBtn.disabled = (currentPage === 1);
+    if (nextBtn) nextBtn.disabled = (currentPage === totalPages || totalPages === 0);
+}
+
+function changePage(dir) {
+    const totalPages = Math.ceil(allHistory.length / itemsPerPage);
+    const newPage = currentPage + dir;
+    if (newPage >= 1 && newPage <= totalPages) {
+        currentPage = newPage;
+        renderHistoryPage();
     }
 }
 
@@ -288,6 +319,12 @@ document.addEventListener('DOMContentLoaded', () => {
     setInterval(updateHistoryClock, 1000);
     fetchLatestSignal();
     loadHistory();
+
+    const prevBtn = document.getElementById('prev-btn');
+    const nextBtn = document.getElementById('next-btn');
+
+    if (prevBtn) prevBtn.addEventListener('click', () => changePage(-1));
+    if (nextBtn) nextBtn.addEventListener('click', () => changePage(1));
 
     setInterval(() => {
         if (activeTab === 'active') fetchLatestSignal();

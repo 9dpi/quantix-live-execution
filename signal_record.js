@@ -140,7 +140,7 @@ async function fetchLatestSignal() {
 
     try {
         // Fetch directly from Supabase - latest active signal
-        const url = `${SB_URL}?select=*&telegram_message_id=not.is.null&order=generated_at.desc&limit=1`;
+        const url = `${SB_URL}?select=*&is_test=eq.false&order=generated_at.desc&limit=1`;
 
         const response = await fetch(url, {
             headers: {
@@ -195,7 +195,8 @@ function displayActiveSignal(record) {
     const entry = record.entry_price || record.entry_low || 0;
     const tp = record.tp || 0;
     const sl = record.sl || 0;
-    const confidence = record.release_confidence || record.confidence || record.ai_confidence || 85;
+    // IMMUTABLE RULE: Strict read from release_confidence only
+    const confidence = record.release_confidence || 0;
 
     document.getElementById('record-asset').textContent = asset;
     document.getElementById('record-tf').textContent = tf;
@@ -280,7 +281,7 @@ async function loadHistory(append = false) {
 
         let url = `${SB_URL}?select=*&limit=${PAGE_SIZE}&offset=${historyOffset}`;
         url += `&order=generated_at.desc`; // Default newest first
-        url += `&telegram_message_id=not.is.null`; // SINGLE SOURCE OF TRUTH: Only telegram-released signals
+        url += `&is_test=eq.false`; // Show only real signals (including reconstructed ones)
 
         // Date Range Filter
         if (dateRange !== "0") {
@@ -349,7 +350,8 @@ async function loadHistory(append = false) {
             const tp = sig.tp || 0;
             const direction = sig.direction || 'BUY';
 
-            const confidence = sig.release_confidence || sig.confidence || sig.ai_confidence || 0;
+            // IMMUTABLE RULE: Strict read from release_confidence only
+            const confidence = sig.release_confidence || 0;
             const floatConfidence = parseFloat(confidence);
             const displayConfidence = floatConfidence <= 1.2 ? Math.round(floatConfidence * 100) : Math.round(floatConfidence);
 
@@ -361,7 +363,13 @@ async function loadHistory(append = false) {
 
             const statusLabel = getStatusLabel(sig);
             const pips = getPipsInfo(sig);
-            const resClass = (sig.result || '').toUpperCase() === 'PROFIT' ? 'up' : ((sig.result || '').toUpperCase() === 'LOSS' ? 'down' : 'neut');
+
+            // Determine CSS class based on outcome/reason
+            let resClass = 'neut';
+            if (sig.result === 'PROFIT') resClass = 'up';
+            else if (sig.result === 'LOSS') resClass = 'down';
+            else if (sig.state === 'CANCELLED' || sig.state === 'EXPIRED') resClass = 'expired';
+            else if (sig.state === 'TIME_EXIT') resClass = 'neut';
 
             const row = document.createElement('tr');
             row.innerHTML = `
@@ -398,12 +406,12 @@ function getStatusLabel(s) {
     const state = (s.state || '').toUpperCase();
     const result = (s.result || '').toUpperCase();
 
-    if (result === 'PROFIT') return 'TP Hit';
-    if (result === 'LOSS') return 'SL Hit';
-    if (state === 'ENTRY_HIT') return 'Entry Hit';
-    if (state === 'WAITING_FOR_ENTRY') return 'Waiting...';
-    if (state === 'CANCELLED' || state === 'EXPIRED') return 'Expired';
+    if (result === 'PROFIT' || state === 'TP_HIT') return 'TP Hit';
+    if (result === 'LOSS' || state === 'SL_HIT') return 'SL Hit';
     if (state === 'TIME_EXIT') return 'Time Exit';
+    if (state === 'CANCELLED' || state === 'EXPIRED') return 'Expired'; // No Entry
+    if (state === 'ENTRY_HIT') return 'Live Trade';
+    if (state === 'WAITING_FOR_ENTRY') return 'Waiting...';
 
     return state.replace(/_/g, ' ');
 }
@@ -427,6 +435,12 @@ function getPipsInfo(s) {
         dist = -Math.abs(entry - sl);
         label = `${Math.round(dist * 10000 * 10) / 10} pips`;
         color = 'var(--trade-down)';
+    } else if (state === 'CANCELLED' || state === 'EXPIRED') {
+        label = 'No Entry';
+        color = 'var(--text-secondary)';
+    } else if (state === 'TIME_EXIT') {
+        label = 'Timeout';
+        color = 'var(--text-secondary)';
     }
 
     return { label, color };

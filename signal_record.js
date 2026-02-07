@@ -141,6 +141,13 @@ function displayActiveSignal(record) {
     const sl = record.sl || record.stop_loss || 0;
     const conf = calcConfidence(record.release_confidence || 0);
 
+    // Duration Logic
+    const entryLimit = record.activation_limit_mins || 35;
+    const maxTrade = record.max_monitoring_mins || 90;
+    document.getElementById('record-entry-duration').textContent = `${entryLimit}m`;
+    document.getElementById('record-max-duration').textContent = `${maxTrade}m`;
+    document.getElementById('record-warning-time').textContent = maxTrade;
+
     document.getElementById('record-asset').textContent = asset;
     document.getElementById('record-tf').textContent = tf;
 
@@ -229,15 +236,24 @@ function renderHistoryPage() {
         const pips = getPipsInfo(sig);
 
         let resClass = 'neut';
-        if (sig.result === 'PROFIT') resClass = 'up';
-        else if (sig.result === 'LOSS') resClass = 'down';
-        else if (sig.status === 'EXPIRED') resClass = 'expired';
+        let confColor = 'var(--quantix-accent)'; // DEFAULT for active
+
+        if (sig.result === 'PROFIT') {
+            resClass = 'up';
+            confColor = 'var(--text-secondary)'; // GREY for closed per v3.1
+        } else if (sig.result === 'LOSS') {
+            resClass = 'down';
+            confColor = 'var(--text-secondary)'; // GREY for closed per v3.1
+        } else if (sig.status === 'EXPIRED' || (sig.state && sig.state.includes('EXPIRED'))) {
+            resClass = 'expired';
+            confColor = 'var(--text-secondary)';
+        }
 
         const row = document.createElement('tr');
         row.innerHTML = `
             <td class="mono" style="font-size: 0.8rem">${dStr} ${tStr}</td>
             <td><span class="pill ${direction === 'BUY' ? 'up' : 'down'}">${direction}</span></td>
-            <td class="mono" style="font-weight:700; color:var(--quantix-accent)">${conf}%</td>
+            <td class="mono" style="font-weight:700; color:${confColor}">${conf}%</td>
             <td class="mono">${parseFloat(entry).toFixed(5)}</td>
             <td class="mono" style="color:var(--trade-up)">${parseFloat(tp).toFixed(5)}</td>
             <td class="mono" style="color:var(--trade-down)">${parseFloat(sl).toFixed(5)}</td>

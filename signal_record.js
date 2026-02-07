@@ -195,7 +195,7 @@ function displayActiveSignal(record) {
     const entry = record.entry_price || record.entry_low || 0;
     const tp = record.tp || 0;
     const sl = record.sl || 0;
-    const confidence = record.confidence || record.ai_confidence || 85;
+    const confidence = record.release_confidence || record.confidence || record.ai_confidence || 85;
 
     document.getElementById('record-asset').textContent = asset;
     document.getElementById('record-tf').textContent = tf;
@@ -210,8 +210,9 @@ function displayActiveSignal(record) {
     document.getElementById('record-tp').textContent = parseFloat(tp).toFixed(5);
     document.getElementById('record-sl').textContent = parseFloat(sl).toFixed(5);
 
-    // AI & Constraints
-    const displayConfidence = confidence <= 1 ? Math.round(confidence * 100) : Math.round(confidence);
+    // AI Confidence Formatting (Support both 0-1 and 0-100 ranges)
+    const floatConfidence = parseFloat(confidence);
+    const displayConfidence = floatConfidence <= 1.2 ? Math.round(floatConfidence * 100) : Math.round(floatConfidence);
     document.getElementById('record-confidence').textContent = `${displayConfidence}%`;
 
     // Duration Logic
@@ -348,8 +349,9 @@ async function loadHistory(append = false) {
             const tp = sig.tp || 0;
             const direction = sig.direction || 'BUY';
 
-            const confidence = sig.confidence || sig.ai_confidence || 0;
-            const displayConfidence = confidence <= 1 ? Math.round(confidence * 100) : Math.round(confidence);
+            const confidence = sig.release_confidence || sig.confidence || sig.ai_confidence || 0;
+            const floatConfidence = parseFloat(confidence);
+            const displayConfidence = floatConfidence <= 1.2 ? Math.round(floatConfidence * 100) : Math.round(floatConfidence);
 
             let closedStr = "--:--";
             if (sig.closed_at) {

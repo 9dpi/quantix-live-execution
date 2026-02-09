@@ -164,7 +164,7 @@ function displayActiveSignal(record) {
     const state = (record.status || record.state || 'WAITING').toUpperCase();
     const statusBadge = document.getElementById('record-status-badge');
 
-    if (state === 'WAITING' || state === 'WAITING_FOR_ENTRY') {
+    if (state === 'WAITING' || state === 'WAITING_FOR_ENTRY' || state === 'PUBLISHED') {
         statusBadge.textContent = 'WAITING FOR ENTRY';
         statusBadge.style.color = 'var(--quantix-accent)';
     } else if (state === 'ACTIVE' || state === 'ENTRY_HIT') {
@@ -238,13 +238,13 @@ function renderHistoryPage() {
         let resClass = 'neut';
         let confColor = 'var(--quantix-accent)'; // DEFAULT for active
 
-        if (sig.result === 'PROFIT') {
+        if (sig.result === 'PROFIT' || sig.status === 'CLOSED_TP') {
             resClass = 'up';
             confColor = 'var(--text-secondary)'; // GREY for closed per v3.1
-        } else if (sig.result === 'LOSS') {
+        } else if (sig.result === 'LOSS' || sig.status === 'CLOSED_SL') {
             resClass = 'down';
             confColor = 'var(--text-secondary)'; // GREY for closed per v3.1
-        } else if (sig.status === 'EXPIRED' || (sig.state && sig.state.includes('EXPIRED'))) {
+        } else if (sig.status === 'EXPIRED' || sig.status === 'CLOSED_TIMEOUT' || (sig.state && sig.state.includes('EXPIRED'))) {
             resClass = 'expired';
             confColor = 'var(--text-secondary)';
         }
@@ -285,11 +285,12 @@ function getStatusLabel(s) {
     const status = (s.status || s.state || '').toUpperCase();
     const result = (s.result || '').toUpperCase();
 
-    if (result === 'PROFIT') return 'TP Hit';
-    if (result === 'LOSS') return 'SL Hit';
+    if (result === 'PROFIT' || status === 'CLOSED_TP') return 'TP Hit';
+    if (result === 'LOSS' || status === 'CLOSED_SL') return 'SL Hit';
+    if (status === 'CLOSED_TIMEOUT') return 'Timeout';
     if (status === 'EXPIRED') return 'Expired';
     if (status === 'ACTIVE' || status === 'ENTRY_HIT') return 'Live Trade';
-    if (status === 'WAITING' || status === 'WAITING_FOR_ENTRY') return 'Waiting...';
+    if (status === 'WAITING' || status === 'WAITING_FOR_ENTRY' || status === 'PUBLISHED') return 'Waiting...';
     return status.replace(/_/g, ' ');
 }
 

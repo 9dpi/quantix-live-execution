@@ -139,7 +139,7 @@ function displayActiveSignal(record) {
     const entry = record.entry_price || record.entry || 0;
     const tp = record.tp || record.take_profit || 0;
     const sl = record.sl || record.stop_loss || 0;
-    const conf = calcConfidence(record.release_confidence || 0);
+    const conf = calcConfidence(record.release_confidence || record.ai_confidence || 0);
 
     // Duration Logic
     const entryLimit = record.activation_limit_mins || 35;
@@ -224,7 +224,7 @@ function renderHistoryPage() {
         const sl = sig.stop_loss || sig.sl || 0;
         const tp = sig.take_profit || sig.tp || 0;
         const direction = (sig.direction || sig.side || 'BUY').toUpperCase();
-        const conf = calcConfidence(sig.release_confidence || 0);
+        const conf = calcConfidence(sig.release_confidence || sig.ai_confidence || 0);
 
         let closedStr = "--:--";
         if (sig.closed_at) {

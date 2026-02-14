@@ -1,4 +1,5 @@
-const API_BASE = 'https://telesignal-production.up.railway.app';
+const API_BASE = 'https://quantixaicore-production.up.railway.app';
+const API_V1 = `${API_BASE}/api/v1`;
 let pHistory = [];
 let livePrice = null;
 let prevPrice = 0;
@@ -109,7 +110,7 @@ async function fetchLatestSignal() {
     }
 
     try {
-        const res = await fetch(`${API_BASE}/api/signals`);
+        const res = await fetch(`${API_V1}/signals/latest`);
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const json = await res.json();
 
@@ -181,7 +182,7 @@ async function loadHistory() {
     tbody.innerHTML = '<tr><td colspan="9" style="text-align:center">⏳ Fetching History...</td></tr>';
 
     try {
-        const res = await fetch(`${API_BASE}/api/signals`);
+        const res = await fetch(`${API_V1}/signals/latest`);
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const json = await res.json();
 

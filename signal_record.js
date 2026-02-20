@@ -10,7 +10,89 @@ let allHistory = [];
 let currentPage = 1;
 const itemsPerPage = 10;
 
-// ... (utils unchanged)
+// --- UTILS ---
+
+function calcConfidence(val) {
+    if (val === undefined || val === null) return 0;
+    if (val <= 1.2) return Math.round(val * 100);
+    return Math.round(val);
+}
+
+function calculateRR(entry, sl, tp, direction) {
+    if (!entry || !sl || !tp) return "n/a";
+    try {
+        const r = Math.abs(entry - sl);
+        const rwd = Math.abs(tp - entry);
+        if (r === 0) return "1.00";
+        return (rwd / r).toFixed(2);
+    } catch (e) { return "n/a"; }
+}
+
+function getTradingViewLink(symbol, timeframe) {
+    if (!symbol) return "#";
+    const cleanSymbol = symbol.replace('/', '');
+    const tvSymbol = cleanSymbol.includes(':') ? cleanSymbol : `FX:${cleanSymbol}`;
+    const tf = timeframe ? timeframe.replace('M', '') : '15';
+    return `https://www.tradingview.com/chart/?symbol=${tvSymbol}&interval=${tf}`;
+}
+
+// --- TRADINGVIEW MODAL LOGIC ---
+
+window.openTVPreview = (symbol, timeframe, entry, sl, tp, generated_at) => {
+    const modal = document.getElementById('tv-modal');
+    const iframe = document.getElementById('tv-iframe');
+
+    document.getElementById('modal-title').innerText = `${symbol} \u00b7 ${timeframe} \u00b7 TradingView Preview`;
+    document.getElementById('modal-entry').innerText = parseFloat(entry).toFixed(5);
+    document.getElementById('modal-sl').innerText = parseFloat(sl).toFixed(5);
+    document.getElementById('modal-tp').innerText = parseFloat(tp).toFixed(5);
+
+    const dt = new Date(generated_at);
+    document.getElementById('modal-utc').innerText = dt.toISOString().replace('T', ' ').slice(0, 16);
+    document.getElementById('modal-external-link').href = getTradingViewLink(symbol, timeframe);
+
+    const cleanSymbol = symbol.replace('/', '');
+    const tvSymbol = cleanSymbol.includes(':') ? cleanSymbol : `FX:${cleanSymbol}`;
+    const tf = timeframe ? timeframe.replace('M', '') : '15';
+    iframe.src = `https://s.tradingview.com/widgetembed/?symbol=${tvSymbol}&interval=${tf}&theme=dark`;
+
+    modal.classList.add('active');
+    document.body.style.overflow = 'hidden';
+};
+
+window.closeTVModal = () => {
+    const modal = document.getElementById('tv-modal');
+    const iframe = document.getElementById('tv-iframe');
+    iframe.src = "";
+    modal.classList.remove('active');
+    document.body.style.overflow = 'auto';
+};
+
+document.addEventListener('click', (e) => {
+    const modal = document.getElementById('tv-modal');
+    if (e.target === modal) closeTVModal();
+});
+
+// Tab Switching Logic
+window.switchTab = (tab) => {
+    activeTab = tab;
+
+    document.querySelectorAll('.nav-link').forEach(link => {
+        link.classList.remove('active');
+        if (tab === 'logs' && (link.innerText.includes('Logs') || link.innerText.includes('System Logs'))) {
+            link.classList.add('active');
+        } else if (tab === 'overview' && link.innerText.includes('Overview')) {
+            link.classList.add('active');
+        }
+    });
+
+    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+    const target = document.getElementById(`${tab}-tab`);
+    if (target) target.classList.add('active');
+
+    if (tab === 'overview') loadHistory();
+    if (tab === 'logs') fetchLogs();
+};
 
 // --- DATA FETCHING ---
 
@@ -57,7 +139,54 @@ async function fetchLatestSignal() {
     }
 }
 
-// ... (displayActiveSignal unchanged)
+function displayActiveSignal(record) {
+    const recordEl = document.getElementById('signal-record');
+    if (!recordEl) return;
+
+    recordEl.style.display = 'flex';
+    document.getElementById('market-closed').style.display = 'none';
+    document.getElementById('no-signal-view').style.display = 'none';
+
+    const asset = record.asset || 'EURUSD';
+    const tf = record.timeframe || 'M15';
+    const direction = (record.direction || record.side || 'BUY').toUpperCase();
+    const entry = record.entry_price || record.entry || 0;
+    const tp = record.tp || record.take_profit || 0;
+    const sl = record.sl || record.stop_loss || 0;
+    const conf = calcConfidence(record.release_confidence || 0);
+
+    const entryLimit = record.activation_limit_mins || 35;
+    const maxTrade = record.max_monitoring_mins || 90;
+    document.getElementById('record-entry-duration').textContent = `${entryLimit}m`;
+    document.getElementById('record-max-duration').textContent = `${maxTrade}m`;
+    document.getElementById('record-warning-time').textContent = maxTrade;
+
+    document.getElementById('record-asset').textContent = asset;
+    document.getElementById('record-tf').textContent = tf;
+
+    const dirText = direction === 'BUY' ? '\uD83D\uDFE2 BUY' : '\uD83D\uDD34 SELL';
+    document.getElementById('record-direction-text').textContent = dirText;
+    document.getElementById('record-direction-text').style.color = direction === 'BUY' ? 'var(--trade-up)' : 'var(--trade-down)';
+
+    document.getElementById('record-entry').textContent = parseFloat(entry).toFixed(5);
+    document.getElementById('record-tp').textContent = parseFloat(tp).toFixed(5);
+    document.getElementById('record-sl').textContent = parseFloat(sl).toFixed(5);
+    document.getElementById('record-confidence').textContent = `${conf}%`;
+
+    const state = (record.status || record.state || 'WAITING').toUpperCase();
+    const statusBadge = document.getElementById('record-status-badge');
+
+    if (state === 'WAITING' || state === 'WAITING_FOR_ENTRY' || state === 'PUBLISHED') {
+        statusBadge.textContent = 'WAITING FOR ENTRY';
+        statusBadge.style.color = 'var(--quantix-accent)';
+    } else if (state === 'ACTIVE' || state === 'ENTRY_HIT') {
+        statusBadge.textContent = 'LIVE TRADE';
+        statusBadge.style.color = 'var(--trade-up)';
+    } else {
+        statusBadge.textContent = state.replace(/_/g, ' ');
+        statusBadge.style.color = 'var(--text-secondary)';
+    }
+}
 
 async function loadHistory() {
     const tbody = document.getElementById('history-body');

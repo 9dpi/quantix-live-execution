@@ -79,9 +79,11 @@ window.switchTab = (tab) => {
     // Update Nav Links
     document.querySelectorAll('.nav-link').forEach(link => {
         link.classList.remove('active');
-        if (link.innerText.toLowerCase().includes(tab.toLowerCase())) link.classList.add('active');
-        // Handle "System Logs" specifically
-        if (tab === 'logs' && link.innerText.includes('Logs')) link.classList.add('active');
+        if (tab === 'logs' && (link.innerText.includes('Logs') || link.innerText.includes('System Logs'))) {
+            link.classList.add('active');
+        } else if (tab === 'overview' && link.innerText.includes('Overview')) {
+            link.classList.add('active');
+        }
     });
 
     // Toggle Content

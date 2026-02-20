@@ -637,6 +637,36 @@
                 margin: 0 !important;
             }
         }
+
+        /* Logs Tab Styles */
+        .section-container {
+            flex: 1;
+            min-height: 0;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .section-header {
+            padding: 1rem 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--bg-hover);
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .section-title {
+            font-size: 0.7rem;
+            font-weight: 700;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        .content-scroller {
+            flex: 1;
+            overflow-y: auto;
+        }
     </style>
 </head>
 
@@ -655,7 +685,8 @@
         </button>
 
         <nav class="nav-links" id="mobile-nav">
-            <a href="#" class="nav-link active">Overview</a>
+            <a href="javascript:void(0)" class="nav-link active" onclick="switchTab('overview')">Overview</a>
+            <a href="javascript:void(0)" class="nav-link" onclick="switchTab('logs')">System Logs</a>
             <a href="#" class="nav-link">Contact</a>
             <a href="#" class="nav-link">Legal</a>
         </nav>
@@ -786,118 +817,192 @@
         </aside>
 
         <section class="viewport">
-            <div class="history-container">
-                <div class="history-header">
-                    <h2 class="history-title" id="dynamic-history-title">Live Executions [ --:-- UTC ]</h2>
+            <!-- Overview Tab (Existing History) -->
+            <div id="overview-tab" class="tab-content active" style="flex-direction: column;">
+                <div class="history-container">
+                    <div class="history-header">
+                        <h2 class="history-title" id="dynamic-history-title">Live Executions [ --:-- UTC ]</h2>
 
-                    <div style="display:flex; align-items:center; gap:1.5rem;">
-                        <div class="outcome-tabs" id="filter-outcome-tabs">
-                            <button class="outcome-tab active" data-value="ALL">All</button>
-                            <button class="outcome-tab" data-value="PROFIT">TP Reached</button>
-                            <button class="outcome-tab" data-value="LOSS">SL Reached</button>
-                            <button class="outcome-tab" data-value="PENDING">Pending</button>
-                            <button class="outcome-tab" data-value="CANCELLED">Expired</button>
+                        <div style="display:flex; align-items:center; gap:1.5rem;">
+                            <div class="outcome-tabs" id="filter-outcome-tabs">
+                                <button class="outcome-tab active" data-value="ALL">All</button>
+                                <button class="outcome-tab" data-value="PROFIT">TP Reached</button>
+                                <button class="outcome-tab" data-value="LOSS">SL Reached</button>
+                                <button class="outcome-tab" data-value="PENDING">Pending</button>
+                                <button class="outcome-tab" data-value="CANCELLED">Expired</button>
+                            </div>
+
+                            <div style="display:flex; align-items:center; gap:8px;">
+                                <span
+                                    style="font-size:0.7rem; font-weight:800; color:var(--text-secondary); text-transform:uppercase;">Lookback:</span>
+                                <select id="filter-date"
+                                    style="padding:6px 10px; border-radius:6px; border:1px solid var(--border-subtle); background:var(--bg-surface); font-size:0.75rem; font-weight:600; outline:none; cursor:pointer;">
+                                    <option value="1">24h</option>
+                                    <option value="7" selected>7d</option>
+                                    <option value="30">30d</option>
+                                    <option value="0">All</option>
+                                </select>
+                            </div>
                         </div>
+                    </div>
 
-                        <div style="display:flex; align-items:center; gap:8px;">
-                            <span
-                                style="font-size:0.7rem; font-weight:800; color:var(--text-secondary); text-transform:uppercase;">Lookback:</span>
-                            <select id="filter-date"
-                                style="padding:6px 10px; border-radius:6px; border:1px solid var(--border-subtle); background:var(--bg-surface); font-size:0.75rem; font-weight:600; outline:none; cursor:pointer;">
-                                <option value="1">24h</option>
-                                <option value="7" selected>7d</option>
-                                <option value="30">30d</option>
-                                <option value="0">All</option>
-                            </select>
+                    <table class="history-table">
+                        <thead>
+                            <tr>
+                                <th>Created</th>
+                                <th>Side</th>
+                                <th>AI Confidence</th>
+                                <th>Entry</th>
+                                <th>TP</th>
+                                <th>SL</th>
+                                <th>Win/Loss</th>
+                                <th>Closed</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="history-body">
+                            <tr>
+                                <td colspan="10" style="text-align:center; padding:2rem;">Loading...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <style>
+                        .pagination-container {
+                            display: flex;
+                            justify-content: center;
+                            align-items: center;
+                            gap: 1.5rem;
+                            margin-top: 1.5rem;
+                        }
+
+                        .page-info {
+                            font-size: 0.85rem;
+                            font-weight: 600;
+                            color: var(--text-secondary);
+                            min-width: 100px;
+                            text-align: center;
+                        }
+
+                        .pagination-btn {
+                            padding: 8px 16px;
+                            background: var(--bg-surface);
+                            border: 1px solid var(--border-subtle);
+                            border-radius: 6px;
+                            font-size: 0.75rem;
+                            font-weight: 700;
+                            color: var(--text-primary);
+                            cursor: pointer;
+                            transition: all 0.2s ease;
+                            text-transform: uppercase;
+                            letter-spacing: 0.5px;
+                            display: flex;
+                            align-items: center;
+                            gap: 8px;
+                        }
+
+                        .pagination-btn:hover:not(:disabled) {
+                            border-color: var(--quantix-accent);
+                            color: var(--quantix-accent);
+                            background: var(--bg-hover);
+                        }
+
+                        .pagination-btn:disabled {
+                            opacity: 0.5;
+                            cursor: not-allowed;
+                        }
+                    </style>
+
+                    <div class="pagination-container">
+                        <button id="prev-btn" class="pagination-btn" disabled>
+                            ← Prev
+                        </button>
+                        <span id="page-info" class="page-info">Page 1</span>
+                        <button id="next-btn" class="pagination-btn">
+                            Next →
+                        </button>
+                    </div>
+
+                    <div class="mini-footer">
+                        <div>&copy; 2026 SIGNAL GENIUS AI. Professional Trading Intelligence.</div>
+                        <div class="footer-status">
+                            <span class="status-dot"></span>
+                            System Operational
                         </div>
                     </div>
                 </div>
 
-                <table class="history-table">
-                    <thead>
-                        <tr>
-                            <th>Created</th>
-                            <th>Side</th>
-                            <th>AI Confidence</th>
-                            <th>Entry</th>
-                            <th>TP</th>
-                            <th>SL</th>
-                            <th>Win/Loss</th>
-                            <th>Closed</th>
-                            <th>Status</th>
-                        </tr>
-                    </thead>
-                    <tbody id="history-body">
-                        <tr>
-                            <td colspan="10" style="text-align:center; padding:2rem;">Loading...</td>
-                        </tr>
-                    </tbody>
-                </table>
+                <!-- Logs Tab Content -->
+                <div id="logs-tab" class="tab-content"
+                    style="padding:0; height: 100%; display: none; flex-direction: column; overflow: hidden;">
+                    <!-- Validation Table (Trades) -->
+                    <div class="section-container"
+                        style="flex: 1; min-height: 0; display: flex; flex-direction: column;">
+                        <div class="section-header">
+                            <div class="section-title">Validation Events (Trader Proof)</div>
+                            <button onclick="fetchLogs()"
+                                style="background:transparent; border:none; color:var(--text-secondary); cursor:pointer;"
+                                title="Refresh Logs">
+                                <i data-lucide="refresh-cw" size="14"></i>
+                            </button>
+                        </div>
+                        <div class="content-scroller" style="flex: 1; overflow-y: auto;">
+                            <table class="history-table">
+                                <thead>
+                                    <tr>
+                                        <th style="width:160px">Timestamp</th>
+                                        <th style="width:80px">Signal ID</th>
+                                        <th style="width:100px">Type</th>
+                                        <th style="width:90px">Val Price</th>
+                                        <th style="width:120px">Status</th>
+                                        <th>Details</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="logs-body"></tbody>
+                            </table>
+                        </div>
+                    </div>
 
-                <style>
-                    .pagination-container {
-                        display: flex;
-                        justify-content: center;
-                        align-items: center;
-                        gap: 1.5rem;
-                        margin-top: 1.5rem;
-                    }
+                    <!-- Heartbeat Table (Machine Mind) -->
+                    <div class="section-container"
+                        style="flex: 1; min-height: 0; display: flex; flex-direction: column; border-top: 1px solid var(--border-subtle);">
+                        <div class="section-header">
+                            <div class="section-title">AI Machine Heartbeat (Thinking Mind)</div>
+                            <div style="font-size: 0.7rem; color: var(--text-secondary);">Real-time Market Evaluation
+                            </div>
+                        </div>
+                        <div class="content-scroller" style="flex: 1; overflow-y: auto;">
+                            <table class="history-table">
+                                <thead>
+                                    <tr>
+                                        <th style="width:160px">Timestamp</th>
+                                        <th style="width:100px">Asset</th>
+                                        <th style="width:100px">Action</th>
+                                        <th style="width:80px">Conf</th>
+                                        <th style="width:80px">Strong</th>
+                                        <th>Refinement Reason</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="heartbeat-body">
+                                    <tr>
+                                        <td colspan="6"
+                                            style="text-align:center; padding:20px; color:var(--text-secondary)">
+                                            Scanning
+                                            machine heartbeat...</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
 
-                    .page-info {
-                        font-size: 0.85rem;
-                        font-weight: 600;
-                        color: var(--text-secondary);
-                        min-width: 100px;
-                        text-align: center;
-                    }
-
-                    .pagination-btn {
-                        padding: 8px 16px;
-                        background: var(--bg-surface);
-                        border: 1px solid var(--border-subtle);
-                        border-radius: 6px;
-                        font-size: 0.75rem;
-                        font-weight: 700;
-                        color: var(--text-primary);
-                        cursor: pointer;
-                        transition: all 0.2s ease;
-                        text-transform: uppercase;
-                        letter-spacing: 0.5px;
-                        display: flex;
-                        align-items: center;
-                        gap: 8px;
-                    }
-
-                    .pagination-btn:hover:not(:disabled) {
-                        border-color: var(--quantix-accent);
-                        color: var(--quantix-accent);
-                        background: var(--bg-hover);
-                    }
-
-                    .pagination-btn:disabled {
-                        opacity: 0.5;
-                        cursor: not-allowed;
-                    }
-                </style>
-
-                <div class="pagination-container">
-                    <button id="prev-btn" class="pagination-btn" disabled>
-                        ← Prev
-                    </button>
-                    <span id="page-info" class="page-info">Page 1</span>
-                    <button id="next-btn" class="pagination-btn">
-                        Next →
-                    </button>
-                </div>
-
-                <div class="mini-footer">
-                    <div>&copy; 2026 SIGNAL GENIUS AI. Professional Trading Intelligence.</div>
-                    <div class="footer-status">
-                        <span class="status-dot"></span>
-                        System Operational
+                    <div class="mini-footer" style="padding: 1.5rem 2rem;">
+                        <div>&copy; 2026 SIGNAL GENIUS AI. Professional Trading Intelligence.</div>
+                        <div class="footer-status">
+                            <span class="status-dot"></span>
+                            System Operational
+                        </div>
                     </div>
                 </div>
-            </div>
         </section>
     </main>
 

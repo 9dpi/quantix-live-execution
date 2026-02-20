@@ -2,7 +2,7 @@ const API_BASE = 'https://telesignal-production.up.railway.app';
 let pHistory = [];
 let livePrice = null;
 let prevPrice = 0;
-let activeTab = 'active';
+let activeTab = 'overview'; // Default to overview
 
 // Pagination State
 let allHistory = [];
@@ -75,13 +75,22 @@ document.addEventListener('click', (e) => {
 // Tab Switching Logic
 window.switchTab = (tab) => {
     activeTab = tab;
-    document.querySelectorAll('.tab-btn').forEach(btn => {
-        btn.classList.remove('active');
-        if (btn.innerText.toLowerCase().includes(tab)) btn.classList.add('active');
+
+    // Update Nav Links
+    document.querySelectorAll('.nav-link').forEach(link => {
+        link.classList.remove('active');
+        if (link.innerText.toLowerCase().includes(tab.toLowerCase())) link.classList.add('active');
+        // Handle "System Logs" specifically
+        if (tab === 'logs' && link.innerText.includes('Logs')) link.classList.add('active');
     });
+
+    // Toggle Content
     document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-    document.getElementById(`${tab}-tab`).classList.add('active');
-    if (tab === 'history') loadHistory();
+    const target = document.getElementById(`${tab}-tab`);
+    if (target) target.classList.add('active');
+
+    if (tab === 'overview') loadHistory();
+    if (tab === 'logs') fetchLogs();
 };
 
 // --- DATA FETCHING ---
@@ -95,6 +104,8 @@ function isMarketOpen() {
     if (day === 0 && hour < 22) return false;
     return true;
 }
+
+const AI_CORE_API = 'https://quantixaicore-production.up.railway.app/api/v1';
 
 async function fetchLatestSignal() {
     const recordEl = document.getElementById('signal-record');
@@ -178,6 +189,7 @@ function displayActiveSignal(record) {
 
 async function loadHistory() {
     const tbody = document.getElementById('history-body');
+    if (!tbody) return;
     tbody.innerHTML = '<tr><td colspan="9" style="text-align:center">⏳ Fetching History...</td></tr>';
 
     try {
@@ -188,6 +200,7 @@ async function loadHistory() {
         if (!json.success) throw new Error(json.message);
 
         allHistory = json.history || [];
+        allHistory.sort((a, b) => new Date(b.generated_at) - new Date(a.generated_at));
         currentPage = 1;
         renderHistoryPage();
 
@@ -203,6 +216,7 @@ function renderHistoryPage() {
     const prevBtn = document.getElementById('prev-btn');
     const nextBtn = document.getElementById('next-btn');
 
+    if (!tbody) return;
     tbody.innerHTML = "";
 
     if (allHistory.length === 0) {
@@ -236,14 +250,14 @@ function renderHistoryPage() {
         const pips = getPipsInfo(sig);
 
         let resClass = 'neut';
-        let confColor = 'var(--quantix-accent)'; // DEFAULT for active
+        let confColor = 'var(--quantix-accent)';
 
         if (sig.result === 'PROFIT' || sig.status === 'CLOSED_TP') {
             resClass = 'up';
-            confColor = 'var(--text-secondary)'; // GREY for closed per v3.1
+            confColor = 'var(--text-secondary)';
         } else if (sig.result === 'LOSS' || sig.status === 'CLOSED_SL') {
             resClass = 'down';
-            confColor = 'var(--text-secondary)'; // GREY for closed per v3.1
+            confColor = 'var(--text-secondary)';
         } else if (sig.status === 'EXPIRED' || sig.status === 'CLOSED_TIMEOUT' || (sig.state && sig.state.includes('EXPIRED'))) {
             resClass = 'expired';
             confColor = 'var(--text-secondary)';
@@ -330,6 +344,104 @@ function updateHistoryClock() {
     el.innerHTML = `Live Executions <span style="font-size: 0.8rem; color: #475569; font-weight: 500; margin-left: 8px;">[ ${utcStr} UTC ]</span>`;
 }
 
+
+async function fetchLogs() {
+    const tbody = document.getElementById('logs-body');
+    if (!tbody) return;
+
+    // Also refresh heartbeat
+    fetchHeartbeat();
+
+    try {
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:20px; color:var(--text-secondary)">Loading validation data...</td></tr>';
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 8000);
+
+        let res = await fetch(`${AI_CORE_API}/validation-logs?limit=50`, { signal: controller.signal });
+        clearTimeout(timeoutId);
+
+        const json = await res.json();
+        if (json.success && json.data) {
+            tbody.innerHTML = '';
+            if (json.data.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:20px; color:var(--text-secondary)">No validation events recorded yet (Waiting for first signal).</td></tr>';
+                return;
+            }
+            json.data.forEach(log => {
+                const tr = document.createElement('tr');
+                const isDisc = log.is_discrepancy;
+                const statusColor = isDisc ? 'var(--trade-down)' : 'var(--trade-up)';
+                const statusIcon = isDisc ? '⚠️' : '✅';
+                const statusText = isDisc ? 'PRICE MISMATCH' : 'PRICE MATCHED';
+
+                let ts = new Date(log.created_at).toLocaleString();
+
+                // Proof (Candle Data)
+                let proof = '';
+                if (log.validator_candle) {
+                    const c = log.validator_candle;
+                    proof = `O:${c.open} H:${c.high} L:${c.low} C:${c.close}`;
+                } else {
+                    proof = 'No Candle Data';
+                }
+
+                let meta = log.meta_data ? (typeof log.meta_data === 'string' ? log.meta_data : JSON.stringify(log.meta_data)) : '';
+
+                tr.innerHTML = `
+                    <td style="color:var(--text-secondary); font-family:var(--font-mono); font-size:0.75rem">${ts}</td>
+                    <td style="color:var(--quantix-accent)">${log.signal_id ? log.signal_id.slice(0, 4) : '--'}</td>
+                    <td>${log.check_type || 'UNKNOWN'}</td>
+                    <td style="font-family:var(--font-mono)">${Number(log.validator_price || 0).toFixed(5)}</td>
+                    <td style="color:${statusColor}; font-weight:700;">${statusIcon} ${statusText}</td>
+                    <td style="color:var(--text-secondary); font-size:0.7rem; font-family:var(--font-mono);">
+                        <div style="font-weight:bold; color:var(--text-primary)">Proof: ${proof}</div>
+                        <div style="margin-top:2px;">${meta}</div>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+    } catch (e) {
+        tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; padding:20px; color:var(--text-secondary)">Quantix AI Core is updating or offline. Retrying...</td></tr>`;
+    }
+}
+
+async function fetchHeartbeat() {
+    const hbody = document.getElementById('heartbeat-body');
+    if (!hbody) return;
+
+    try {
+        const res = await fetch(`${AI_CORE_API}/analysis-logs?limit=20`);
+        const json = await res.json();
+
+        if (json.success && json.data) {
+            hbody.innerHTML = '';
+            json.data.forEach(beat => {
+                const tr = document.createElement('tr');
+                const ts = new Date(beat.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
+                const conf = Math.round((beat.release_confidence || beat.confidence) * 100);
+                const strength = Math.round(beat.strength * 100);
+                const color = conf >= 65 ? 'var(--trade-up)' : 'var(--text-secondary)';
+
+                tr.innerHTML = `
+                    <td style="color:var(--text-secondary); font-family:var(--font-mono); font-size:0.75rem">${ts}</td>
+                    <td style="font-weight:700">${beat.asset}</td>
+                    <td style="color:${color}; font-weight:700">${beat.status}</td>
+                    <td style="font-family:var(--font-mono); font-weight:700; color:${color}">${conf}%</td>
+                    <td style="font-family:var(--font-mono); color:var(--text-secondary)">${strength}%</td>
+                    <td style="color:var(--text-secondary); font-size:0.7rem; font-style:italic">${beat.refinement || 'Standard scan'}</td>
+                `;
+                hbody.appendChild(tr);
+            });
+        }
+    } catch (e) {
+        console.warn("Heartbeat fetch failed");
+    }
+}
+
+// Export for HTML
+window.fetchLogs = fetchLogs;
+
 // Initial Run
 document.addEventListener('DOMContentLoaded', () => {
     updateHistoryClock();
@@ -344,7 +456,8 @@ document.addEventListener('DOMContentLoaded', () => {
     if (nextBtn) nextBtn.addEventListener('click', () => changePage(1));
 
     setInterval(() => {
-        if (activeTab === 'active') fetchLatestSignal();
+        if (activeTab === 'overview' || activeTab === 'active') fetchLatestSignal();
+        if (activeTab === 'logs') fetchLogs();
     }, 60000);
 
     initPriceFeed();

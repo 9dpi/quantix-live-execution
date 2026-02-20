@@ -942,76 +942,75 @@
                             System Operational
                         </div>
                     </div>
+                </div> <!-- Close history-container -->
+            </div> <!-- Close overview-tab -->
+
+            <!-- Logs Tab Content -->
+            <div id="logs-tab" class="tab-content">
+                <!-- Validation Table (Trades) -->
+                <div class="section-container" style="flex: 1; min-height: 0; display: flex; flex-direction: column;">
+                    <div class="section-header">
+                        <div class="section-title">Validation Events (Trader Proof)</div>
+                        <button onclick="fetchLogs()"
+                            style="background:transparent; border:none; color:var(--text-secondary); cursor:pointer;"
+                            title="Refresh Logs">
+                            <i data-lucide="refresh-cw" size="14"></i>
+                        </button>
+                    </div>
+                    <div class="content-scroller" style="flex: 1; overflow-y: auto;">
+                        <table class="history-table">
+                            <thead>
+                                <tr>
+                                    <th style="width:160px">Timestamp</th>
+                                    <th style="width:80px">Signal ID</th>
+                                    <th style="width:100px">Type</th>
+                                    <th style="width:90px">Val Price</th>
+                                    <th style="width:120px">Status</th>
+                                    <th>Details</th>
+                                </tr>
+                            </thead>
+                            <tbody id="logs-body"></tbody>
+                        </table>
+                    </div>
                 </div>
 
-                <!-- Logs Tab Content -->
-                <div id="logs-tab" class="tab-content">
-                    <!-- Validation Table (Trades) -->
-                    <div class="section-container"
-                        style="flex: 1; min-height: 0; display: flex; flex-direction: column;">
-                        <div class="section-header">
-                            <div class="section-title">Validation Events (Trader Proof)</div>
-                            <button onclick="fetchLogs()"
-                                style="background:transparent; border:none; color:var(--text-secondary); cursor:pointer;"
-                                title="Refresh Logs">
-                                <i data-lucide="refresh-cw" size="14"></i>
-                            </button>
-                        </div>
-                        <div class="content-scroller" style="flex: 1; overflow-y: auto;">
-                            <table class="history-table">
-                                <thead>
-                                    <tr>
-                                        <th style="width:160px">Timestamp</th>
-                                        <th style="width:80px">Signal ID</th>
-                                        <th style="width:100px">Type</th>
-                                        <th style="width:90px">Val Price</th>
-                                        <th style="width:120px">Status</th>
-                                        <th>Details</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="logs-body"></tbody>
-                            </table>
+                <!-- Heartbeat Table (Machine Mind) -->
+                <div class="section-container"
+                    style="flex: 1; min-height: 0; display: flex; flex-direction: column; border-top: 1px solid var(--border-subtle);">
+                    <div class="section-header">
+                        <div class="section-title">AI Machine Heartbeat (Thinking Mind)</div>
+                        <div style="font-size: 0.7rem; color: var(--text-secondary);">Real-time Market Evaluation
                         </div>
                     </div>
-
-                    <!-- Heartbeat Table (Machine Mind) -->
-                    <div class="section-container"
-                        style="flex: 1; min-height: 0; display: flex; flex-direction: column; border-top: 1px solid var(--border-subtle);">
-                        <div class="section-header">
-                            <div class="section-title">AI Machine Heartbeat (Thinking Mind)</div>
-                            <div style="font-size: 0.7rem; color: var(--text-secondary);">Real-time Market Evaluation
-                            </div>
-                        </div>
-                        <div class="content-scroller" style="flex: 1; overflow-y: auto;">
-                            <table class="history-table">
-                                <thead>
-                                    <tr>
-                                        <th style="width:160px">Timestamp</th>
-                                        <th style="width:100px">Asset</th>
-                                        <th style="width:100px">Action</th>
-                                        <th style="width:80px">Conf</th>
-                                        <th style="width:80px">Strong</th>
-                                        <th>Refinement Reason</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="heartbeat-body">
-                                    <tr>
-                                        <td colspan="6"
-                                            style="text-align:center; padding:20px; color:var(--text-secondary)">
-                                            Scanning
-                                            machine heartbeat...</td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
+                    <div class="content-scroller" style="flex: 1; overflow-y: auto;">
+                        <table class="history-table">
+                            <thead>
+                                <tr>
+                                    <th style="width:160px">Timestamp</th>
+                                    <th style="width:100px">Asset</th>
+                                    <th style="width:100px">Action</th>
+                                    <th style="width:80px">Conf</th>
+                                    <th style="width:80px">Strong</th>
+                                    <th>Refinement Reason</th>
+                                </tr>
+                            </thead>
+                            <tbody id="heartbeat-body">
+                                <tr>
+                                    <td colspan="6"
+                                        style="text-align:center; padding:20px; color:var(--text-secondary)">
+                                        Scanning
+                                        machine heartbeat...</td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </div>
+                </div>
 
-                    <div class="mini-footer" style="padding: 1.5rem 2rem;">
-                        <div>&copy; 2026 SIGNAL GENIUS AI. Professional Trading Intelligence.</div>
-                        <div class="footer-status">
-                            <span class="status-dot"></span>
-                            System Operational
-                        </div>
+                <div class="mini-footer" style="padding: 1.5rem 2rem;">
+                    <div>&copy; 2026 SIGNAL GENIUS AI. Professional Trading Intelligence.</div>
+                    <div class="footer-status">
+                        <span class="status-dot"></span>
+                        System Operational
                     </div>
                 </div>
         </section>

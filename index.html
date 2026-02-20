@@ -667,6 +667,18 @@
             flex: 1;
             overflow-y: auto;
         }
+
+        /* Tab Visibility */
+        .tab-content {
+            display: none;
+            flex-direction: column;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        .tab-content.active {
+            display: flex !important;
+        }
     </style>
 </head>
 
@@ -818,7 +830,7 @@
 
         <section class="viewport">
             <!-- Overview Tab (Existing History) -->
-            <div id="overview-tab" class="tab-content active" style="flex-direction: column;">
+            <div id="overview-tab" class="tab-content active">
                 <div class="history-container">
                     <div class="history-header">
                         <h2 class="history-title" id="dynamic-history-title">Live Executions [ --:-- UTC ]</h2>
@@ -933,8 +945,7 @@
                 </div>
 
                 <!-- Logs Tab Content -->
-                <div id="logs-tab" class="tab-content"
-                    style="padding:0; height: 100%; display: none; flex-direction: column; overflow: hidden;">
+                <div id="logs-tab" class="tab-content">
                     <!-- Validation Table (Trades) -->
                     <div class="section-container"
                         style="flex: 1; min-height: 0; display: flex; flex-direction: column;">

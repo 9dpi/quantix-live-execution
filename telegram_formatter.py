@@ -77,6 +77,34 @@ def format_signal_message(signal: dict) -> str:
     tp = signal.get("tp") or "N/A"
     sl = signal.get("sl") or "N/A"
 
+    # 3. SPECIAL STATUS: HITS
+    if status in ["TP_HIT", "CLOSED_TP", "TP HIT"]:
+        return (
+            f"🎯 *TAKE PROFIT HIT*\n\n"
+            f"{asset} | {direction} {dir_emoji}\n"
+            f"Target: {tp}\n\n"
+            f"💰 Result: 🟢 PROFIT\n"
+            f"Signal ID: {signal.get('id', 'N/A')}"
+        )
+
+    if status in ["SL_HIT", "CLOSED_SL", "SL HIT"]:
+        return (
+            f"🛑 *STOP LOSS HIT*\n\n"
+            f"{asset} | {direction} {dir_emoji}\n"
+            f"Exit: {sl}\n\n"
+            f"📉 Result: 🔴 DEFEAT\n"
+            f"Signal ID: {signal.get('id', 'N/A')}"
+        )
+
+    if status in ["ENTRY_HIT", "ENTRY HIT"]:
+        return (
+            f"🚀 *SIGNAL ACTIVATED*\n\n"
+            f"{asset} | {direction} {dir_emoji}\n"
+            f"Entry: {entry}\n\n"
+            f"Status: 🔵 LIVE TRADE\n"
+            f"Signal ID: {signal.get('id', 'N/A')}"
+        )
+
     # TEMPLATE 3 – SIGNAL ULTRA (95%+ FAST ALERT)
     if confidence >= 95 and status != "EXPIRED":
         return (

@@ -128,8 +128,10 @@ async function fetchLatestSignal() {
         const json = await res.json();
 
         if (json.active) {
+            currentActiveRecord = json.active;
             displayActiveSignal(json.active);
         } else {
+            currentActiveRecord = null;
             if (recordEl) recordEl.style.display = 'none';
             if (closedEl) closedEl.style.display = 'none';
             if (scanningEl) scanningEl.style.display = 'flex';
@@ -175,18 +177,27 @@ function displayActiveSignal(record) {
 
     const state = (record.status || record.state || 'WAITING').toUpperCase();
     const statusBadge = document.getElementById('record-status-badge');
+    const realTimeStatus = getStatusLabel(record, livePrice);
 
-    if (state === 'WAITING' || state === 'WAITING_FOR_ENTRY' || state === 'PUBLISHED') {
+    if (realTimeStatus === 'Waiting...') {
         statusBadge.textContent = 'WAITING FOR ENTRY';
         statusBadge.style.color = 'var(--quantix-accent)';
-    } else if (state === 'ACTIVE' || state === 'ENTRY_HIT') {
+    } else if (realTimeStatus === 'Entry Hit' || realTimeStatus === 'Live Trade') {
         statusBadge.textContent = 'LIVE TRADE';
         statusBadge.style.color = 'var(--trade-up)';
     } else {
-        statusBadge.textContent = state.replace(/_/g, ' ');
-        statusBadge.style.color = 'var(--text-secondary)';
+        statusBadge.textContent = realTimeStatus.toUpperCase();
+        statusBadge.style.color = (realTimeStatus === 'TP Hit') ? 'var(--trade-up)' : (realTimeStatus === 'SL Hit' ? 'var(--trade-down)' : 'var(--text-secondary)');
+    }
+
+    // TRIGGER NOTIFICATION IF HIT
+    if (['Entry Hit', 'TP Hit', 'SL Hit'].includes(realTimeStatus)) {
+        notifyStatusChange(record, realTimeStatus);
     }
 }
+
+// Global store for the active signal object to allow real-time monitoring
+let currentActiveRecord = null;
 
 async function loadHistory() {
     const tbody = document.getElementById('history-body');
@@ -233,7 +244,7 @@ function renderHistoryPage() {
     const endIndex = startIndex + itemsPerPage;
     const pageData = allHistory.slice(startIndex, endIndex);
 
-    pageData.forEach(sig => {
+    pageData.forEach((sig, index) => {
         const dt = new Date(sig.generated_at);
         const dStr = dt.toLocaleDateString('en-CA', { timeZone: 'UTC' });
         const tStr = dt.toLocaleTimeString('en-GB', { hour12: false, timeZone: 'UTC' }).slice(0, 5);
@@ -250,7 +261,7 @@ function renderHistoryPage() {
             closedStr = cdt.toLocaleTimeString('en-GB', { hour12: false, timeZone: 'UTC' }).slice(0, 5);
         }
 
-        const statusLabel = getStatusLabel(sig);
+        const statusLabel = getStatusLabel(sig, index === 0 ? livePrice : null);
         const pips = getPipsInfo(sig);
 
         let resClass = 'neut';
@@ -298,10 +309,37 @@ function changePage(dir) {
     }
 }
 
-function getStatusLabel(s) {
+function getStatusLabel(s, currentPrice = null) {
     if (!s) return '--';
     const status = (s.status || s.state || '').toUpperCase();
     const result = (s.result || '').toUpperCase();
+    const direction = (s.direction || s.side || 'BUY').toUpperCase();
+
+    // 1. Check Age Expiration (Safety Fallback)
+    const genTime = s.generated_at || s.timestamp;
+    if (genTime) {
+        const ageHours = (new Date() - new Date(genTime)) / (1000 * 60 * 60);
+        if (ageHours > 3 && (status === 'WAITING' || status === 'WAITING_FOR_ENTRY' || status === 'PUBLISHED' || status === 'ACTIVE' || status === 'ENTRY_HIT')) {
+            if (result === 'UNKNOWN' || result === '') return 'Expired';
+        }
+    }
+
+    // 2. Real-time Detection
+    if (currentPrice && (status === 'WAITING' || status === 'WAITING_FOR_ENTRY' || status === 'PUBLISHED' || status === 'ACTIVE' || status === 'ENTRY_HIT')) {
+        const entry = parseFloat(s.entry_price || s.entry || 0);
+        const tp = parseFloat(s.tp || s.take_profit || 0);
+        const sl = parseFloat(s.sl || s.stop_loss || 0);
+
+        if (direction === 'BUY') {
+            if (currentPrice >= tp) return 'TP Hit';
+            if (currentPrice <= sl) return 'SL Hit';
+            if (currentPrice >= entry || status === 'ACTIVE' || status === 'ENTRY_HIT') return 'Entry Hit';
+        } else {
+            if (currentPrice <= tp) return 'TP Hit';
+            if (currentPrice >= sl) return 'SL Hit';
+            if (currentPrice <= entry || status === 'ACTIVE' || status === 'ENTRY_HIT') return 'Entry Hit';
+        }
+    }
 
     if (result === 'PROFIT' || status === 'CLOSED_TP') return 'TP Hit';
     if (result === 'LOSS' || status === 'CLOSED_SL') return 'SL Hit';
@@ -310,6 +348,33 @@ function getStatusLabel(s) {
     if (status === 'ACTIVE' || status === 'ENTRY_HIT') return 'Live Trade';
     if (status === 'WAITING' || status === 'WAITING_FOR_ENTRY' || status === 'PUBLISHED') return 'Waiting...';
     return status.replace(/_/g, ' ');
+}
+
+// Track last known status to prevent duplicate notifications
+let lastStatusTriggered = null;
+let currentActiveSignalId = null;
+
+async function notifyStatusChange(signal, newStatus) {
+    if (lastStatusTriggered === newStatus && currentActiveSignalId === signal.id) return;
+
+    lastStatusTriggered = newStatus;
+    currentActiveSignalId = signal.id;
+
+    console.log(`🔔 Sending Telegram Alert: ${newStatus} for #${signal.id}`);
+
+    try {
+        await fetch(`${API_BASE}/api/v1/signal/notify`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                signal: signal,
+                status: newStatus,
+                price: livePrice
+            })
+        });
+    } catch (e) {
+        console.warn("Notification failed:", e);
+    }
 }
 
 function getPipsInfo(s) {
@@ -486,6 +551,16 @@ function updatePriceUI() {
     if (!priceEl || !livePrice) return;
     priceEl.textContent = livePrice.toFixed(5);
     priceEl.style.color = livePrice > prevPrice ? 'var(--trade-up)' : (livePrice < prevPrice ? 'var(--trade-down)' : 'var(--text-primary)');
+
+    // Update Active Signal View with livePrice
+    if (currentActiveRecord) {
+        displayActiveSignal(currentActiveRecord);
+    }
+
+    // Refresh history first page if needed
+    if (activeTab === 'overview' && currentPage === 1) {
+        renderHistoryPage();
+    }
 
     // Sparkline
     const linePath = document.getElementById('spark-line');

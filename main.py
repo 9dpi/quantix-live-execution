@@ -172,6 +172,33 @@ def execute():
     save_log(CURRENT_SIGNAL)
     return CURRENT_SIGNAL
 
+@app.post("/api/v1/signal/notify")
+async def notify_hit(request: Request):
+    """Trigger Telegram notification from Frontend detection"""
+    try:
+        data = await request.json()
+        signal = data.get("signal")
+        status = data.get("status")
+        price = data.get("price")
+        
+        chat_id = os.getenv("TELEGRAM_CHAT_ID")
+        if not chat_id:
+            # Fallback to a test chat ID or log warning
+            print("⚠️ TELEGRAM_CHAT_ID not set, cannot broadcast.")
+            return {"status": "error", "message": "TELEGRAM_CHAT_ID not set"}
+
+        # Add status to signal object for formatter
+        signal["status"] = status
+        signal["current_price"] = price
+        
+        print(f"📡 Broadcasting {status} for signal {signal.get('id')} to {chat_id}")
+        send_telegram(chat_id, signal)
+        
+        return {"status": "success"}
+    except Exception as e:
+        print(f"❌ Notification API Error: {e}")
+        return JSONResponse(status_code=500, content={"status": "error", "message": str(e)})
+
 def save_log(signal):
     with open("execution_log.json", "w") as f:
         json.dump(signal, f, indent=2)

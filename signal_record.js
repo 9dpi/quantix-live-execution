@@ -262,7 +262,7 @@ function renderHistoryPage() {
         }
 
         const statusLabel = getStatusLabel(sig, index === 0 ? livePrice : null);
-        const pips = getPipsInfo(sig);
+        const pips = getPipsInfo(sig, index === 0 ? livePrice : null);
 
         let resClass = 'neut';
         let confColor = 'var(--quantix-accent)';
@@ -377,24 +377,32 @@ async function notifyStatusChange(signal, newStatus) {
     }
 }
 
-function getPipsInfo(s) {
+function getPipsInfo(s, currentPrice = null) {
     const entry = parseFloat(s.entry_price || s.entry || 0);
     const tp = parseFloat(s.tp || s.take_profit || 0);
     const sl = parseFloat(s.sl || s.stop_loss || 0);
     const result = (s.result || '').toUpperCase();
+    const status = (s.status || s.state || '').toUpperCase();
+    const direction = (s.direction || s.side || 'BUY').toUpperCase();
 
     let dist = 0;
     let label = '--';
     let color = 'var(--text-secondary)';
 
-    if (result === 'PROFIT') {
+    if (result === 'PROFIT' || status === 'CLOSED_TP') {
         dist = Math.abs(entry - tp);
         label = `+${Math.round(dist * 10000 * 10) / 10} pips`;
         color = 'var(--trade-up)';
-    } else if (result === 'LOSS') {
+    } else if (result === 'LOSS' || status === 'CLOSED_SL') {
         dist = -Math.abs(entry - sl);
         label = `${Math.round(dist * 10000 * 10) / 10} pips`;
         color = 'var(--trade-down)';
+    } else if (currentPrice && (status === 'ACTIVE' || status === 'ENTRY_HIT')) {
+        // Floating Pips Calculation (Match Telesignal Logic)
+        const diff = direction === 'BUY' ? (currentPrice - entry) : (entry - currentPrice);
+        const pipsValue = Math.round(diff * 10000 * 10) / 10;
+        label = `${pipsValue >= 0 ? '+' : ''}${pipsValue} pips`;
+        color = pipsValue >= 0 ? 'var(--trade-up)' : 'var(--trade-down)';
     }
 
     return { label, color };
@@ -527,7 +535,7 @@ document.addEventListener('DOMContentLoaded', () => {
     setInterval(() => {
         if (activeTab === 'overview' || activeTab === 'active') fetchLatestSignal();
         if (activeTab === 'logs') fetchLogs();
-    }, 60000);
+    }, 10000); // Increased sync to 10s to match Telesignal
 
     initPriceFeed();
 });

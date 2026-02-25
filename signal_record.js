@@ -106,8 +106,74 @@ function isMarketOpen() {
     return true;
 }
 
-// Updated Core API Path
-const AI_CORE_API = `${API_BASE}/api/v1`;
+// Updated Core API Path using global CONFIG
+const AI_CORE_API = window.CONFIG?.AI_CORE_API || `${API_BASE}/api/v1`;
+
+// --- DATA FETCHING FALLBACK SYSTEM ---
+
+async function fetchWithFallback(endpoint, options = {}) {
+    try {
+        const url = endpoint.startsWith('http') ? endpoint : `${AI_CORE_API}${endpoint}`;
+
+        // Ensure JSON headers for POST
+        if (options.method === 'POST' && options.body && !options.headers) {
+            options.headers = { 'Content-Type': 'application/json' };
+        }
+
+        const res = await fetch(url, { ...options, timeout: 5000 });
+        if (res.ok) return await res.json();
+        throw new Error(`HTTP ${res.status}`);
+    } catch (error) {
+        if (window.CONFIG?.USE_SUPABASE_FALLBACK) {
+            console.warn(`⚠️ API failed for ${endpoint}, falling back to Supabase:`, error.message);
+            return await fetchFromSupabase(endpoint);
+        }
+        throw error;
+    }
+}
+
+async function fetchFromSupabase(endpoint) {
+    const baseUrl = window.CONFIG.SUPABASE_REST;
+    const headers = {
+        'apikey': window.CONFIG.SUPABASE_KEY,
+        'Authorization': `Bearer ${window.CONFIG.SUPABASE_KEY}`,
+        'Content-Type': 'application/json'
+    };
+
+    if (endpoint.includes('/signals/latest')) {
+        // Fetch active signals
+        const activeRes = await fetch(`${baseUrl}/fx_signals?state=in.("WAITING_FOR_ENTRY","ENTRY_HIT")&telegram_message_id=not.is.null&select=*&order=generated_at.desc&limit=1`, { headers });
+        const activeData = await activeRes.json();
+
+        // Fetch history
+        const histRes = await fetch(`${baseUrl}/fx_signals?state=not.in.("WAITING_FOR_ENTRY","ENTRY_HIT")&telegram_message_id=not.is.null&select=*&order=generated_at.desc&limit=50`, { headers });
+        const histData = await histRes.json();
+
+        return { success: true, active: activeData[0] || null, history: histData };
+    }
+
+    if (endpoint.includes('/telemetry')) {
+        const statsRes = await fetch(`${baseUrl}/fx_signals?select=state,ai_confidence`, { headers });
+        const data = await statsRes.json();
+
+        const total = data.length;
+        const wins = data.filter(s => s.state === 'TP_HIT').length;
+        const losses = data.filter(s => s.state === 'SL_HIT').length;
+        const win_rate = total > 0 ? (wins / (wins + losses) * 100).toFixed(1) : 0;
+
+        return {
+            total_samples: total,
+            performance: { total_signals: total, wins, losses, win_rate }
+        };
+    }
+
+    if (endpoint.includes('/analysis-logs')) {
+        const res = await fetch(`${baseUrl}/fx_analysis_log?select=*&order=timestamp.desc&limit=20`, { headers });
+        return { success: true, data: await res.json() };
+    }
+
+    return { success: false, error: "Cloud connection lost and no local fallback for this endpoint." };
+}
 
 async function fetchLatestSignal() {
     const recordEl = document.getElementById('signal-record');
@@ -122,10 +188,7 @@ async function fetchLatestSignal() {
     }
 
     try {
-        // Use Quantix Core unified endpoint
-        const res = await fetch(`${AI_CORE_API}/signals/latest`);
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        const json = await res.json();
+        const json = await fetchWithFallback('/signals/latest');
 
         if (json.active) {
             currentActiveRecord = json.active;
@@ -135,6 +198,12 @@ async function fetchLatestSignal() {
             if (recordEl) recordEl.style.display = 'none';
             if (closedEl) closedEl.style.display = 'none';
             if (scanningEl) scanningEl.style.display = 'flex';
+        }
+
+        // If history was returned in the same packet, update it
+        if (json.history && allHistory.length === 0) {
+            allHistory = json.history;
+            renderHistoryPage();
         }
     } catch (error) {
         console.error("Fetch failed:", error);
@@ -205,10 +274,7 @@ async function loadHistory() {
     tbody.innerHTML = '<tr><td colspan="9" style="text-align:center">⏳ Fetching History from Quantix Core...</td></tr>';
 
     try {
-        // Use Quantix Core unified endpoint
-        const res = await fetch(`${AI_CORE_API}/signals/latest`);
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        const json = await res.json();
+        const json = await fetchWithFallback('/signals/latest');
 
         // Check success flag or direct history array
         if (json.success === false) throw new Error(json.error || json.message);
@@ -325,19 +391,28 @@ function getStatusLabel(s, currentPrice = null) {
     }
 
     // 2. Real-time Detection
-    if (currentPrice && (status === 'WAITING' || status === 'WAITING_FOR_ENTRY' || status === 'PUBLISHED' || status === 'ACTIVE' || status === 'ENTRY_HIT')) {
+    const isWaiting = (status === 'WAITING' || status === 'WAITING_FOR_ENTRY' || status === 'PUBLISHED');
+    const isActive = (status === 'ACTIVE' || status === 'ENTRY_HIT');
+
+    if (currentPrice && (isWaiting || isActive)) {
         const entry = parseFloat(s.entry_price || s.entry || 0);
         const tp = parseFloat(s.tp || s.take_profit || 0);
         const sl = parseFloat(s.sl || s.stop_loss || 0);
 
         if (direction === 'BUY') {
-            if (currentPrice >= tp) return 'TP Hit';
-            if (currentPrice <= sl) return 'SL Hit';
-            if (currentPrice >= entry || status === 'ACTIVE' || status === 'ENTRY_HIT') return 'Entry Hit';
+            // Can only hit TP/SL if already active
+            if (isActive) {
+                if (currentPrice >= tp) return 'TP Hit';
+                if (currentPrice <= sl) return 'SL Hit';
+            }
+            // Check for entry hit while waiting
+            if (isWaiting && currentPrice <= entry) return 'Entry Hit';
         } else {
-            if (currentPrice <= tp) return 'TP Hit';
-            if (currentPrice >= sl) return 'SL Hit';
-            if (currentPrice <= entry || status === 'ACTIVE' || status === 'ENTRY_HIT') return 'Entry Hit';
+            if (isActive) {
+                if (currentPrice <= tp) return 'TP Hit';
+                if (currentPrice >= sl) return 'SL Hit';
+            }
+            if (isWaiting && currentPrice >= entry) return 'Entry Hit';
         }
     }
 
@@ -363,9 +438,8 @@ async function notifyStatusChange(signal, newStatus) {
     console.log(`🔔 Sending Telegram Alert: ${newStatus} for #${signal.id}`);
 
     try {
-        await fetch(`${API_BASE}/api/v1/signal/notify`, {
+        await fetchWithFallback('/signal/notify', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 signal: signal,
                 status: newStatus,
@@ -431,13 +505,8 @@ async function fetchLogs() {
 
     try {
         tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:20px; color:var(--text-secondary)">Loading validation data...</td></tr>';
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 8000);
 
-        let res = await fetch(`${AI_CORE_API}/validation-logs?limit=50`, { signal: controller.signal });
-        clearTimeout(timeoutId);
-
-        const json = await res.json();
+        const json = await fetchWithFallback('/validation-logs?limit=50');
         if (json.success && json.data) {
             tbody.innerHTML = '';
             if (json.data.length === 0) {
@@ -488,8 +557,7 @@ async function fetchHeartbeat() {
     if (!hbody) return;
 
     try {
-        const res = await fetch(`${AI_CORE_API}/analysis-logs?limit=20`);
-        const json = await res.json();
+        const json = await fetchWithFallback('/analysis-logs?limit=20');
 
         if (json.success && json.data) {
             hbody.innerHTML = '';

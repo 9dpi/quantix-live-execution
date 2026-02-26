@@ -530,24 +530,26 @@ async function fetchLogs() {
                 const statusIcon = isDisc ? '⚠️' : '✅';
                 const statusText = isDisc ? 'PRICE MISMATCH' : 'PRICE MATCHED';
 
-                let ts = new Date(log.created_at).toLocaleString('en-GB', { timeZone: 'UTC' });
+                let ts = new Date(log.created_at || log.timestamp).toLocaleString('en-GB', { timeZone: 'UTC' });
+                if (ts === "Invalid Date") ts = "--:--";
 
                 // Proof (Candle Data)
                 let proof = '';
-                if (log.validator_candle) {
-                    const c = log.validator_candle;
-                    proof = `O:${c.open} H:${c.high} L:${c.low} C:${c.close}`;
+                const candle = log.validator_candle || log.candle_data;
+                if (candle) {
+                    const c = candle;
+                    proof = `O:${c.open || '?'} H:${c.high || '?'} L:${c.low || '?'} C:${c.close || '?'}`;
                 } else {
                     proof = 'No Candle Data';
                 }
 
-                let meta = log.meta_data ? (typeof log.meta_data === 'string' ? log.meta_data : JSON.stringify(log.meta_data)) : '';
+                let meta = log.meta_data ? (typeof log.meta_data === 'string' ? log.meta_data : JSON.stringify(log.meta_data)) : (log.status || '');
 
                 tr.innerHTML = `
                     <td style="color:var(--text-secondary); font-family:var(--font-mono); font-size:0.75rem">${ts}</td>
-                    <td style="color:var(--quantix-accent)">${log.signal_id ? log.signal_id.slice(0, 4) : '--'}</td>
-                    <td>${log.check_type || 'UNKNOWN'}</td>
-                    <td style="font-family:var(--font-mono)">${Number(log.validator_price || 0).toFixed(5)}</td>
+                    <td style="color:var(--quantix-accent)">${log.signal_id ? (log.signal_id.length > 8 ? log.signal_id.slice(0, 4) : log.signal_id) : '--'}</td>
+                    <td>${log.check_type || 'VALIDATION'}</td>
+                    <td style="font-family:var(--font-mono)">${Number(log.validator_price || log.price || 0).toFixed(5)}</td>
                     <td style="color:${statusColor}; font-weight:700;">${statusIcon} ${statusText}</td>
                     <td style="color:var(--text-secondary); font-size:0.7rem; font-family:var(--font-mono);">
                         <div style="font-weight:bold; color:var(--text-primary)">Proof: ${proof}</div>

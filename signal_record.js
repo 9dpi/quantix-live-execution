@@ -173,7 +173,7 @@ async function fetchFromSupabase(endpoint) {
     }
 
     if (endpoint.includes('/validation-logs')) {
-        const res = await fetch(`${baseUrl}/fx_analysis_log?asset=eq.VALIDATOR&select=*&order=timestamp.desc&limit=20`, { headers });
+        const res = await fetch(`${baseUrl}/fx_signal_validation?select=*&order=created_at.desc&limit=20`, { headers });
         return { success: true, data: await res.json() };
     }
 
@@ -620,16 +620,30 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // === LIVE PRICE FEED ===
 function initPriceFeed() {
-    const socket = new WebSocket('wss://stream.binance.com:9443/ws/eurusdt@trade');
+    console.log("🔌 Initializing Binance Feed...");
+    const socket = new WebSocket('wss://stream.binance.com:9443/ws/eurusdt@ticker');
+
     socket.onmessage = (event) => {
-        const trade = JSON.parse(event.data);
-        const price = parseFloat(trade.p);
-        livePrice = price;
-        pHistory.push(price);
-        if (pHistory.length > 50) pHistory.shift();
-        updatePriceUI();
+        const data = JSON.parse(event.data);
+        // ticker uses 'c' for close price
+        const price = parseFloat(data.c);
+        if (!isNaN(price)) {
+            livePrice = price;
+            pHistory.push(price);
+            if (pHistory.length > 50) pHistory.shift();
+            updatePriceUI();
+        }
     };
-    socket.onerror = (error) => { console.warn("Pricing Feed Error:", error); };
+
+    socket.onclose = () => {
+        console.warn("🔌 Price Feed Closed. Reconnecting in 5s...");
+        setTimeout(initPriceFeed, 5000);
+    };
+
+    socket.onerror = (error) => {
+        console.error("🔌 Pricing Feed Error:", error);
+        socket.close();
+    };
 }
 
 function updatePriceUI() {

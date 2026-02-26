@@ -172,6 +172,16 @@ async function fetchFromSupabase(endpoint) {
         return { success: true, data: await res.json() };
     }
 
+    if (endpoint.includes('/validation-logs')) {
+        const res = await fetch(`${baseUrl}/fx_analysis_log?asset=eq.VALIDATOR&select=*&order=timestamp.desc&limit=20`, { headers });
+        return { success: true, data: await res.json() };
+    }
+
+    if (endpoint.includes('/signal/notify')) {
+        console.log("ℹ️ Signal notification (Fallback Mode): Supabase record exists, but direct API notification skipped.");
+        return { success: true };
+    }
+
     return { success: false, error: "Cloud connection lost and no local fallback for this endpoint." };
 }
 

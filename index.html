@@ -14,23 +14,24 @@
         rel="stylesheet">
     <style>
         :root {
-            /* White Premium Theme - Accessibility Optimized */
+            /* White Premium Theme - Ultra Contrast & Clarity */
             --bg-base: #f1f5f9;
             --bg-surface: #ffffff;
             --bg-card: #ffffff;
             --bg-hover: #e2e8f0;
             --border-subtle: #cbd5e1;
+            --text-header: #020617;
+            /* Ultra dark for focal points */
             --text-primary: #0f172a;
+            /* Deep slate for main body */
             --text-secondary: #475569;
-            /* Darkened for accessibility */
+            /* Balanced slate for secondary */
             --quantix-accent: #0284c7;
-            /* Darkened blue for better contrast */
             --quantix-purple: #7c3aed;
-            /* Darkened purple */
-            --trade-up: #059669;
-            /* Darker green */
-            --trade-down: #dc2626;
-            /* Darker red */
+            --trade-up: #047857;
+            /* Sharpened Green */
+            --trade-down: #be123c;
+            /* Sharpened Red */
             --font-main: 'Inter', sans-serif;
             --font-mono: 'JetBrains Mono', monospace;
         }
@@ -371,11 +372,11 @@
         }
 
         .section-title {
-            font-size: 0.75rem;
-            font-weight: 800;
-            color: var(--text-secondary);
+            font-size: 0.775rem;
+            font-weight: 900;
+            color: var(--text-header);
             text-transform: uppercase;
-            letter-spacing: 1px;
+            letter-spacing: 1.2px;
         }
 
         .content-scroller {
@@ -397,15 +398,17 @@
 
         th {
             text-align: left;
-            padding: 0.85rem 1.5rem;
-            font-size: 0.65rem;
+            padding: 1.1rem 1.5rem;
+            font-size: 0.675rem;
             color: var(--text-secondary);
             text-transform: uppercase;
-            font-weight: 700;
-            border-bottom: 1px solid var(--border-subtle);
+            font-weight: 800;
+            border-bottom: 2.5px solid var(--bg-base);
+            /* Sharper separation */
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
+            background: #fff;
         }
 
         /* Column Widths Definition (10 columns total) */
@@ -890,22 +893,24 @@
             }
         }
 
-        /* Custom Scrollbar for Neural Feed */
-        .custom-scroll::-webkit-scrollbar {
-            width: 4px;
+        /* Global High-Contrast Scrollbar */
+        *::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
         }
 
-        .custom-scroll::-webkit-scrollbar-track {
-            background: rgba(255, 255, 255, 0.02);
+        *::-webkit-scrollbar-track {
+            background: var(--bg-base);
         }
 
-        .custom-scroll::-webkit-scrollbar-thumb {
-            background: rgba(56, 189, 248, 0.2);
-            border-radius: 10px;
+        *::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+            border: 2px solid var(--bg-base);
         }
 
-        .custom-scroll::-webkit-scrollbar-thumb:hover {
-            background: rgba(56, 189, 248, 0.4);
+        *::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
         }
 
         /* --- Reference-Matched Mobile Trading UI --- */
@@ -1272,8 +1277,9 @@
 
         /* Spice: Neural Thinking Line */
         .neural-line {
-            font-size: 0.6rem;
-            color: #64748b;
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+            font-weight: 500;
             animation: fadeInBlur 0.4s ease forwards;
             white-space: nowrap;
             overflow: hidden;
@@ -1883,7 +1889,7 @@
                                 <div style="display:flex; align-items:center; gap:10px;">
                                     <i data-lucide="info" size="16" style="color:var(--quantix-purple)"></i>
                                     <span
-                                        style="font-size:0.75rem; font-weight:700; color:var(--text-primary); text-transform:uppercase;">Advisory
+                                        style="font-size:0.775rem; font-weight:800; color:var(--text-header); text-transform:uppercase; letter-spacing:0.5px;">Advisory
                                         for Traders</span>
                                 </div>
                                 <i data-lucide="chevron-down" size="14" style="color:#848e9c"></i>

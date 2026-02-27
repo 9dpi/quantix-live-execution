@@ -14,18 +14,23 @@
         rel="stylesheet">
     <style>
         :root {
-            /* White Premium Theme */
-            --bg-base: #f8fafc;
+            /* White Premium Theme - Accessibility Optimized */
+            --bg-base: #f1f5f9;
             --bg-surface: #ffffff;
             --bg-card: #ffffff;
-            --bg-hover: #f1f5f9;
-            --border-subtle: #e2e8f0;
+            --bg-hover: #e2e8f0;
+            --border-subtle: #cbd5e1;
             --text-primary: #0f172a;
-            --text-secondary: #64748b;
-            --quantix-accent: #0ea5e9;
-            --quantix-purple: #a855f7;
-            --trade-up: #10b981;
-            --trade-down: #ef4444;
+            --text-secondary: #475569;
+            /* Darkened for accessibility */
+            --quantix-accent: #0284c7;
+            /* Darkened blue for better contrast */
+            --quantix-purple: #7c3aed;
+            /* Darkened purple */
+            --trade-up: #059669;
+            /* Darker green */
+            --trade-down: #dc2626;
+            /* Darker red */
             --font-main: 'Inter', sans-serif;
             --font-mono: 'JetBrains Mono', monospace;
         }
@@ -498,24 +503,25 @@
 
         .log-line.type-success {
             border-left-color: var(--trade-up);
-            color: #e2e8f0;
+            color: var(--trade-up);
         }
 
         .log-line.type-danger {
             border-left-color: var(--trade-down);
-            color: #fecaca;
+            color: var(--trade-down);
         }
 
         .log-line.type-warning {
-            border-left-color: #eab308;
+            border-left-color: #ca8a04;
+            color: #ca8a04;
         }
 
         .log-msg {
-            color: #cbd5e1;
+            color: var(--text-primary);
         }
 
         .log-line.type-success .log-msg {
-            color: #fff;
+            color: var(--text-primary);
         }
 
         .tab-content {
@@ -538,7 +544,7 @@
         }
 
         .audit-card {
-            background: rgba(15, 23, 42, 0.2);
+            background: var(--bg-surface);
             border: 1px solid var(--border-subtle);
             border-radius: 8px;
             padding: 1.25rem;
@@ -595,7 +601,7 @@
         }
 
         .tab-btn:hover:not(.active) {
-            color: #fff;
+            color: var(--quantix-accent);
         }
 
         /* Action Buttons */
@@ -764,12 +770,12 @@
             align-items: center;
             gap: 6px;
             padding: 4px 10px;
-            background: rgba(255, 255, 255, 0.05);
+            background: var(--bg-hover);
             border-radius: 100px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 1px solid var(--border-subtle);
             font-size: 0.65rem;
-            font-weight: 600;
-            color: #848e9c;
+            font-weight: 700;
+            color: var(--text-secondary);
             white-space: nowrap;
         }
 
@@ -1665,11 +1671,10 @@
                     <span id="live-pnl-text" style="font-weight:bold;">NEUTRAL</span>
                     <span>TP</span>
                 </div>
-                <div
-                    style="position:relative; height:6px; background:rgba(255,255,255,0.1); border-radius:3px; width:100%;">
+                <div style="position:relative; height:6px; background:var(--bg-hover); border-radius:3px; width:100%;">
                     <!-- Entry Marker -->
                     <div id="entry-marker"
-                        style="position:absolute; top:-2px; bottom:-2px; width:2px; background:white; opacity:0.5; z-index:1;">
+                        style="position:absolute; top:-2px; bottom:-2px; width:2px; background:var(--text-primary); opacity:0.5; z-index:1;">
                     </div>
                     <!-- Progress Fill -->
                     <div id="tp-bar-fill"
@@ -1677,7 +1682,7 @@
                     </div>
                     <!-- Current Price Marker -->
                     <div id="price-marker"
-                        style="position:absolute; top:-4px; width:8px; height:14px; background:white; border-radius:2px; transform:translateX(-50%); box-shadow:0 0 5px rgba(255,255,255,0.5); z-index:2; transition: left 0.3s ease;">
+                        style="position:absolute; top:-4px; width:8px; height:14px; background:var(--text-primary); border-radius:2px; transform:translateX(-50%); box-shadow:0 0 5px rgba(0,0,0,0.2); z-index:2; transition: left 0.3s ease;">
                     </div>
                 </div>
             </div>
@@ -1844,7 +1849,7 @@
                                 <span>Spread</span>
                             </div>
                             <div id="sim-spread"
-                                style="font-family:var(--font-mono); font-weight:700; color:white; font-size:0.75rem;">
+                                style="font-family:var(--font-mono); font-weight:700; color:var(--text-primary); font-size:0.75rem;">
                                 0.0</div>
                         </div>
 
@@ -1878,7 +1883,7 @@
                                 <div style="display:flex; align-items:center; gap:10px;">
                                     <i data-lucide="info" size="16" style="color:var(--quantix-purple)"></i>
                                     <span
-                                        style="font-size:0.75rem; font-weight:700; color:white; text-transform:uppercase;">Advisory
+                                        style="font-size:0.75rem; font-weight:700; color:var(--text-primary); text-transform:uppercase;">Advisory
                                         for Traders</span>
                                 </div>
                                 <i data-lucide="chevron-down" size="14" style="color:#848e9c"></i>
@@ -1902,7 +1907,7 @@
                             <div style="font-size:0.75rem; color:#848e9c;">
                                 <span data-tooltip="Balance: Funds currently in your account.">Balance:</span> <span
                                     id="sim-balance-app"
-                                    style="color:var(--quantix-accent); font-weight:700">$50,000.00</span>
+                                    style="color:var(--text-primary); font-weight:700">$50,000.00</span>
                                 | <span
                                     data-tooltip="PnL: Current unrealized profit or loss from your open trades.">PnL:</span>
                                 <span id="sim-pnl-app" style="color:#0ecb81">$0.00</span>
@@ -2740,7 +2745,7 @@
                 bid.textContent = (data.price - 0.0001).toFixed(5);
                 ask.textContent = (data.price + 0.0001).toFixed(5);
             }
-            priceEl.style.color = data.price > data.prevPrice ? 'var(--trade-up)' : (data.price < data.prevPrice ? 'var(--trade-down)' : 'white');
+            priceEl.style.color = data.price > data.prevPrice ? 'var(--trade-up)' : (data.price < data.prevPrice ? 'var(--trade-down)' : 'var(--text-primary)');
 
             // Simulator Updates
             const sellPriceEl = document.getElementById('sim-price-sell');
@@ -3169,8 +3174,14 @@
 
         function switchSimSubTab(tab, btn) {
             const tabs = btn.parentElement.querySelectorAll('.sim-pos-tab');
-            tabs.forEach(t => t.classList.remove('active'));
+            tabs.forEach(t => {
+                t.classList.remove('active');
+                t.style.background = 'transparent';
+                t.style.color = 'var(--text-secondary)';
+            });
             btn.classList.add('active');
+            btn.style.background = 'var(--text-primary)';
+            btn.style.color = 'var(--bg-surface)';
 
             const list = document.getElementById('sim-positions-list');
             const histList = document.getElementById('sim-history-list');

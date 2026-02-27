@@ -141,6 +141,17 @@
             color: var(--quantix-accent);
         }
 
+        .nav-link.disabled-link {
+            opacity: 0.5;
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+
+        .nav-link.active-link {
+            color: var(--quantix-accent) !important;
+            border-bottom: 2px solid var(--quantix-accent);
+        }
+
         .stat-item {
             display: flex;
             flex-direction: column;
@@ -1528,14 +1539,12 @@
         </button>
 
         <div class="nav-links" id="mobile-nav">
-            <a href="https://9dpi.github.io/quantix-ai-core/index.html" target="_blank" class="nav-link">Overview</a>
-            <a href="#" class="nav-link" style="color:#fff">Live System</a>
+            <a href="javascript:void(0)" class="nav-link disabled-link">Overview</a>
+            <a href="#" class="nav-link active-link">Live System</a>
 
-            <a href="https://9dpi.github.io/quantix-ai-core/api/index.html" target="_blank" class="nav-link">API</a>
-            <a href="https://9dpi.github.io/quantix-ai-core/contact/index.html" target="_blank"
-                class="nav-link">Contact</a>
-            <a href="https://9dpi.github.io/quantix-ai-core/disclaimer/index.html" target="_blank"
-                class="nav-link">Legal</a>
+            <a href="javascript:void(0)" class="nav-link disabled-link">API</a>
+            <a href="javascript:void(0)" class="nav-link disabled-link">Contact</a>
+            <a href="javascript:void(0)" class="nav-link disabled-link">Legal</a>
         </div>
     </header>
 
@@ -1775,7 +1784,7 @@
                     <footer
                         style="padding: 1.5rem 0; border-top: 1px solid var(--border-subtle); margin-top: auto; text-align: center;">
                         <div style="font-family: var(--font-mono); font-size: 0.7rem; color: #475569;">
-                            &copy; 2026 QUANTIX AI CORE. All systems nominal.
+                            &copy; 2026 SIGNAL GENIUS AI. All systems nominal.
                         </div>
                         <div style="margin-top: 6px; display: flex; justify-content: center; gap: 16px;">
                             <a href="#"

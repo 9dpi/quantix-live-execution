@@ -2,7 +2,7 @@
 window.CONFIG = {
     API_BASE: "https://quantixaicore-production.up.railway.app",
     SUPABASE_URL: "https://wttsaprezgvircanthbk.supabase.co",
-    SUPABASE_KEY: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind0dHNhcHJlemd2aXJjYW50aGJrIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc2ODM2ODA3MCwiZXhwIjoyMDgzOTQ0MDcwfQ.QGewz8bDfBC6vJce6g4-sHA164bL1y0u71d6HH7PYVk",
+    SUPABASE_KEY: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind0dHNhcHJlemd2aXJjYW50aGJrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjgzNjgwNzAsImV4cCI6MjA4Mzk0NDA3MH0.Ql8pjXH-43_miOVTTWZYgiNOfNtBQVISViYOBrh6vfM",
 
     // Feature Flags & Settings
     USE_SUPABASE_FALLBACK: true,

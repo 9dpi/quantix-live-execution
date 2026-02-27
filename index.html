@@ -1588,8 +1588,7 @@
             </div>
 
             <!-- Signal Template Container -->
-            <div id="signal-view"
-                style="display:none; flex-direction:column; background:rgba(15, 23, 42, 0.2); border:1px solid var(--border-subtle); border-radius:8px; padding:1.5rem;">
+            <div id="signal-view" style="display:none; flex-direction:column; padding:1.5rem 0;">
                 <div class="card-header">
                     <div style="display:flex; align-items:center; gap:10px;">
                         <i data-lucide="brain-circuit" size="20" style="color:var(--quantix-accent)"></i>
@@ -1721,18 +1720,6 @@
                     <div class="tab-btn active" onclick="switchTab('terminal', this)">Execution Terminal</div>
                     <div class="tab-btn" onclick="switchTab('simulator', this)">Trading Simulator</div>
                     <div class="tab-btn" onclick="switchTab('logs', this)">Logs</div>
-                </div>
-                <div class="tg-connector">
-                    <div style="display:flex; align-items:center; gap:8px;">
-                        <i data-lucide="send" size="14" style="color:var(--quantix-accent)"></i>
-                        <div style="font-size: 0.7rem; font-weight: 600; color: var(--text-secondary);">Recipients:
-                        </div>
-                    </div>
-                    <div class="tg-input-group">
-                        <input type="text" class="tg-input" style="width: 240px;"
-                            placeholder="Enter Telegram to get Signals" id="tg-phone">
-                        <button class="tg-btn" onclick="connectTelegram()">CONNECT</button>
-                    </div>
                 </div>
             </nav>
 
@@ -2025,36 +2012,6 @@
                         </table>
                     </div>
                 </div>
-
-                <!-- Heartbeat Table (Machine Mind) -->
-                <div class="section-container"
-                    style="flex: 1; min-height: 0; display: flex; flex-direction: column; border-top: 1px solid var(--border-subtle);">
-                    <div class="section-header">
-                        <div class="section-title">AI Machine Heartbeat (Thinking Mind)</div>
-                        <div style="font-size: 0.7rem; color: var(--text-secondary);">Real-time Market Evaluation</div>
-                    </div>
-                    <div class="content-scroller">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th style="width:120px">Timestamp</th>
-                                    <th style="width:80px">Asset</th>
-                                    <th style="width:80px">Action</th>
-                                    <th style="width:60px">Conf</th>
-                                    <th style="width:60px">Strong</th>
-                                    <th>Refinement Reason</th>
-                                </tr>
-                            </thead>
-                            <tbody id="heartbeat-body">
-                                <tr>
-                                    <td colspan="6"
-                                        style="text-align:center; padding:20px; color:var(--text-secondary)">Scanning
-                                        machine heartbeat...</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
             </div>
 
         </section>
@@ -2068,24 +2025,6 @@
                 <span
                     style="font-family: var(--font-mono); font-size: 0.65rem; color: #475569; text-transform: uppercase; letter-spacing: 0.5px;">Live
                     Stream info:</span>
-                <a href="https://www.facebook.com/sharer/sharer.php?u=https://9dpi.github.io/telesignal/"
-                    target="_blank" class="social-link" title="Share on Facebook"><i data-lucide="facebook"
-                        size="16"></i></a>
-                <a href="https://twitter.com/intent/tweet?url=https://9dpi.github.io/telesignal/&text=Check%20out%20Quantix%20Tele%20Signal%20-%20AI%20Trading%20Signals!"
-                    target="_blank" class="social-link" title="Share on X">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
-                        <path
-                            d="M18.901 1.153h3.68l-8.04 9.19L24 22.846h-7.406l-5.8-7.584-6.638 7.584H.474l8.6-9.83L0 1.154h7.594l5.243 6.932 6.064-6.932zm-1.292 19.49h2.039L6.486 3.24H4.298l13.311 17.403z" />
-                    </svg>
-                </a>
-                <a href="javascript:void(0)" onclick="shareTikTok()" class="social-link" title="Copy Link for TikTok">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
-                        <path
-                            d="M12.525.02c1.31-.032 2.512.352 3.477 1.058.022.016.03.02.046.035a6.604 6.604 0 0 0 .97.697 6.476 6.476 0 0 0 2.457.854v3.633a9.924 9.924 0 0 1-4.832-1.25v10.518c0 4.636-3.758 8.394-8.394 8.394S0 20.198 0 15.562s3.758-8.394 8.394-8.394c.484 0 .95.044 1.403.125V10.97a4.704 4.704 0 0 0-1.403-.213 4.75 4.75 0 0 0-4.75 4.75 4.75 4.75 0 0 0 4.75 4.75c2.624 0 4.75-2.126 4.75-4.75V0h3.382z" />
-                    </svg>
-                </a>
-                <a href="https://www.youtube.com/channel/UChV2kQku-EY7f-hrbtJKuDA" target="_blank" class="social-link"
-                    title="Join YouTube Channel"><i data-lucide="youtube" size="16"></i></a>
             </div>
 
             <div id="neural-console"

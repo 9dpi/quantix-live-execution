@@ -393,23 +393,25 @@
         .content-scroller {
             flex: 1;
             overflow-y: auto;
+            overflow-x: auto;
+            /* Safety for small screens */
+            width: 100%;
         }
 
         /* Table Reset */
         table {
-            width: 98%;
-            margin: 0 auto;
-            /* Center the table */
-            min-width: 1000px;
-            /* Ensure table has breathing room */
+            width: 100%;
+            margin: 0;
             border-collapse: collapse;
             table-layout: fixed;
-            /* Force column widths */
+            min-width: 850px;
+            /* Reduced from 1000px to fit better */
         }
 
         th {
             text-align: left;
-            padding: 1.1rem 1.5rem;
+            padding: 0.85rem 0.75rem;
+            /* Compact padding */
             font-size: 0.675rem;
             color: var(--text-secondary);
             text-transform: uppercase;
@@ -422,55 +424,57 @@
             background: #fff;
         }
 
-        /* Column Widths Definition (10 columns total) */
+        /* Optimal Column Widths for responsive fit */
         th:nth-child(1) {
-            width: 80px;
+            width: 50px;
         }
 
-        /* ID */
+        /* ID icon/dot */
         th:nth-child(2) {
-            width: 90px;
+            width: 85px;
+        }
+
+        /* ID text */
+        th:nth-child(3) {
+            width: 65px;
         }
 
         /* Created */
-        th:nth-child(3) {
-            width: 70px;
+        th:nth-child(4) {
+            width: 60px;
         }
 
         /* Side */
-        th:nth-child(4) {
-            width: 80px;
+        th:nth-child(5) {
+            width: 85px;
         }
 
         /* AI Score */
-        th:nth-child(5) {
-            width: 100px;
-        }
-
-        /* Entry */
         th:nth-child(6) {
-            width: 100px;
-        }
-
-        /* TP */
-        th:nth-child(7) {
-            width: 100px;
-        }
-
-        /* SL */
-        th:nth-child(8) {
-            width: 110px;
-        }
-
-        /* Win/Loss */
-        th:nth-child(9) {
             width: 90px;
         }
 
-        /* Closed */
+        /* Entry */
+        th:nth-child(7) {
+            width: 90px;
+        }
+
+        /* TP */
+        th:nth-child(8) {
+            width: 90px;
+        }
+
+        /* SL */
+        th:nth-child(9) {
+            width: 100px;
+        }
+
+        /* Win/Loss */
         th:nth-child(10) {
             width: 120px;
         }
+
+        /* Status/Closing */
 
         /* Status */
 

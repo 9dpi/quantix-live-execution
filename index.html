@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="dark">
+<html lang="en" data-theme="light">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tele Signal | Powered by Quantix AI</title>
+    <title>Signal Genius AI | Institutional Trading</title>
     <link rel="stylesheet" href="command-center.css">
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="./signal_record_config.js"></script>
@@ -14,20 +14,18 @@
         rel="stylesheet">
     <style>
         :root {
-            /* Pure Black Trading Palette - Reference Image Match */
-            --bg-base: #000000;
-            --bg-surface: #000000;
-            --bg-card: rgba(15, 23, 42, 0.4);
-            --quantix-accent: #38bdf8;
-            /* Cyan Link/Logo */
+            /* White Premium Theme */
+            --bg-base: #f8fafc;
+            --bg-surface: #ffffff;
+            --bg-card: #ffffff;
+            --bg-hover: #f1f5f9;
+            --border-subtle: #e2e8f0;
+            --text-primary: #0f172a;
+            --text-secondary: #64748b;
+            --quantix-accent: #0ea5e9;
             --quantix-purple: #a855f7;
-            /* Purple Logo Suffix */
-            --trade-up: #38bdf8;
-            /* Matches blue accent */
-            --trade-down: #f43f5e;
-            --text-primary: #ffffff;
-            --text-secondary: #94a3b8;
-            --border-subtle: #1e293b;
+            --trade-up: #10b981;
+            --trade-down: #ef4444;
             --font-main: 'Inter', sans-serif;
             --font-mono: 'JetBrains Mono', monospace;
         }
@@ -62,8 +60,8 @@
             align-items: center;
             justify-content: space-between;
             padding: 0 2rem;
-            border-bottom: 1px solid #0f172a;
-            background: #000;
+            border-bottom: 1px solid var(--border-subtle);
+            background: var(--bg-surface);
             z-index: 100;
         }
 
@@ -90,7 +88,7 @@
         }
 
         .name-prefix {
-            color: #fff;
+            color: var(--text-primary);
         }
 
         .name-suffix {
@@ -106,7 +104,7 @@
             margin-left: 4px;
             align-self: center;
             font-family: var(--font-mono);
-            border-left: 1px solid #1e293b;
+            border-left: 1px solid var(--border-subtle);
             padding-left: 10px;
         }
 
@@ -114,7 +112,7 @@
             display: none;
             background: none;
             border: none;
-            color: white;
+            color: var(--text-primary);
             cursor: pointer;
         }
 
@@ -126,7 +124,7 @@
 
 
         .nav-link {
-            color: var(--quantix-accent);
+            color: var(--text-secondary);
             text-decoration: none;
             font-size: 0.85rem;
             font-weight: 600;
@@ -134,7 +132,7 @@
         }
 
         .nav-link:hover {
-            filter: brightness(1.3);
+            color: var(--quantix-accent);
         }
 
         .stat-item {
@@ -243,7 +241,7 @@
             font-family: var(--font-mono);
             font-weight: 800;
             letter-spacing: -1.5px;
-            color: #fff;
+            color: var(--text-primary);
         }
 
 
@@ -626,8 +624,7 @@
         }
 
         .tg-input-group {
-            display: flex;
-            background: #000;
+            background: var(--bg-base);
             border: 1px solid var(--border-subtle);
             border-radius: 4px;
             padding: 2px;
@@ -679,9 +676,9 @@
             left: 50%;
             transform: translateX(-50%);
             padding: 4px 8px;
-            background: #1e2329;
+            background: var(--bg-surface);
             border: 1px solid var(--border-subtle);
-            color: white;
+            color: var(--text-primary);
             font-size: 0.6rem;
             border-radius: 4px;
             white-space: nowrap;
@@ -797,7 +794,7 @@
         .reasoning-title {
             font-size: 0.7rem;
             font-weight: 800;
-            color: white;
+            color: var(--text-primary);
             text-transform: uppercase;
             letter-spacing: 1px;
             margin-bottom: 10px;
@@ -1467,8 +1464,8 @@
                 <i data-lucide="atom" size="28"></i>
             </div>
             <div class="brand-name">
-                <span class="name-prefix">TELE</span>
-                <span class="name-suffix">SIGNAL</span>
+                <span class="name-prefix">Signal Genius</span>
+                <span class="name-suffix">AI</span>
                 <span class="powered-by">[Powered by Quantix AI Core]</span>
             </div>
         </div>

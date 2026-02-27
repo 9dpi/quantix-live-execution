@@ -769,7 +769,7 @@
 
         /* --- AI Agent System Styles --- */
         .agent-observation-bar {
-            background: rgba(0, 0, 0, 0.4);
+            background: transparent;
             border-bottom: 1px solid var(--border-subtle);
             padding: 8px 16px;
             display: flex;
@@ -1929,7 +1929,7 @@
                         <div id="sim-positions-list"></div>
                         <div id="sim-history-list" style="display:none; padding: 8px 16px; overflow-y: auto;"></div>
                         <div id="sim-guide-content"
-                            style="display:none; color:#848e9c; font-size:0.8rem; line-height:1.4; padding:12px; height: 100%; overflow-y: auto;">
+                            style="display:none; color:var(--text-secondary); font-size:0.8rem; line-height:1.4; padding:12px; height: 100%; overflow-y: auto;">
                             <h4
                                 style="color:var(--text-header); margin:0 0 15px 0; display:flex; align-items:center; gap:8px;">
                                 <i data-lucide="help-circle" size="18" style="color:var(--quantix-accent)"></i>
@@ -1938,39 +1938,46 @@
 
                             <div style="display:flex; flex-direction:column; gap:16px;">
                                 <div
-                                    style="display:flex; gap:12px; background:rgba(255,255,255,0.03); padding:10px; border-radius:8px; border-left:3px solid var(--quantix-accent);">
-                                    <i data-lucide="activity" size="18" style="color:white; flex-shrink:0;"></i>
+                                    style="display:flex; gap:12px; background:var(--bg-hover); padding:10px; border-radius:8px; border-left:3px solid var(--quantix-accent);">
+                                    <i data-lucide="activity" size="18"
+                                        style="color:var(--quantix-accent); flex-shrink:0;"></i>
                                     <div>
-                                        <b style="color:white; display:block; margin-bottom:2px;">Real-Time Pricing</b>
+                                        <b style="color:var(--text-header); display:block; margin-bottom:2px;">Real-Time
+                                            Pricing</b>
                                         Simulation nodes are synchronized with the <span
                                             style="color:var(--quantix-accent)">Live Market Price</span>.
                                     </div>
                                 </div>
 
                                 <div
-                                    style="display:flex; gap:12px; background:rgba(255,255,255,0.03); padding:10px; border-radius:8px; border-left:3px solid var(--trade-up);">
-                                    <i data-lucide="zap" size="18" style="color:white; flex-shrink:0;"></i>
+                                    style="display:flex; gap:12px; background:var(--bg-hover); padding:10px; border-radius:8px; border-left:3px solid var(--trade-up);">
+                                    <i data-lucide="zap" size="18" style="color:var(--trade-up); flex-shrink:0;"></i>
                                     <div>
-                                        <b style="color:white; display:block; margin-bottom:2px;">Instant Execution</b>
-                                        Adjust <b style="color:#fff">Lot Size</b> and click Buy/Sell to enter a trade
+                                        <b style="color:var(--text-header); display:block; margin-bottom:2px;">Instant
+                                            Execution</b>
+                                        Adjust <b style="color:var(--text-primary)">Lot Size</b> and click Buy/Sell to
+                                        enter a trade
                                         immediately.
                                     </div>
                                 </div>
 
                                 <div
-                                    style="display:flex; gap:12px; background:rgba(255,255,255,0.03); padding:10px; border-radius:8px; border-left:3px solid #facc15;">
-                                    <i data-lucide="bar-chart-2" size="18" style="color:white; flex-shrink:0;"></i>
+                                    style="display:flex; gap:12px; background:var(--bg-hover); padding:10px; border-radius:8px; border-left:3px solid #facc15;">
+                                    <i data-lucide="bar-chart-2" size="18" style="color:#facc15; flex-shrink:0;"></i>
                                     <div>
-                                        <b style="color:white; display:block; margin-bottom:2px;">Live PnL Tracking</b>
+                                        <b style="color:var(--text-header); display:block; margin-bottom:2px;">Live PnL
+                                            Tracking</b>
                                         Track the performance of your open positions with live profit/loss updates.
                                     </div>
                                 </div>
 
                                 <div
-                                    style="display:flex; gap:12px; background:rgba(255,255,255,0.03); padding:10px; border-radius:8px; border-left:3px solid var(--quantix-purple);">
-                                    <i data-lucide="shield" size="18" style="color:white; flex-shrink:0;"></i>
+                                    style="display:flex; gap:12px; background:var(--bg-hover); padding:10px; border-radius:8px; border-left:3px solid var(--quantix-purple);">
+                                    <i data-lucide="shield" size="18"
+                                        style="color:var(--quantix-purple); flex-shrink:0;"></i>
                                     <div>
-                                        <b style="color:white; display:block; margin-bottom:2px;">Risk Guards</b>
+                                        <b style="color:var(--text-header); display:block; margin-bottom:2px;">Risk
+                                            Guards</b>
                                         Every trade is initialized with automatic Take Profit and Stop Loss levels.
                                     </div>
                                 </div>
@@ -1979,7 +1986,7 @@
                                     style="display:flex; gap:12px; align-items:center; background:rgba(244,63,94,0.05); padding:10px; border-radius:8px; border:1px dashed rgba(244,63,94,0.2);">
                                     <i data-lucide="alert-circle" size="16"
                                         style="color:var(--trade-down); flex-shrink:0;"></i>
-                                    <span style="font-size:0.7rem;">This is a <b style="color:white;">Demo
+                                    <span style="font-size:0.7rem;">This is a <b style="color:var(--text-header);">Demo
                                             Environment</b>. No real capital or account data is affected.</span>
                                 </div>
                             </div>

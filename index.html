@@ -374,7 +374,7 @@
         }
 
         .section-header {
-            padding: 1.25rem 1.5rem;
+            padding: 0.85rem 1.5rem;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -1446,10 +1446,8 @@
             }
 
             /* HIDE EVERYTHING ELSE ON MOBILE */
-            .viewport,
             .right-panel,
             .sub-tabs,
-            #tab-terminal,
             #tab-logs {
                 display: none !important;
             }
@@ -2416,74 +2414,82 @@
                 lastAgentLog = now;
             }
 
-            if (data.price) {
+            if (data.price && regimeEl && volEl) {
                 // Simulate regime based on price movement
                 const change = Math.abs(data.price - data.prevPrice);
-                if (change > 0.0001) {
-                    regimeEl.querySelector('span').textContent = "Market: Volatile";
-                    regimeEl.className = "obs-badge active";
-                } else if (change > 0.00002) {
-                    regimeEl.querySelector('span').textContent = "Market: Trending";
-                    regimeEl.className = "obs-badge active";
-                } else {
-                    regimeEl.querySelector('span').textContent = "Market: Range";
-                    regimeEl.className = "obs-badge";
+                const regimeSpan = regimeEl.querySelector('span');
+                if (regimeSpan) {
+                    if (change > 0.0001) {
+                        regimeSpan.textContent = "Market: Volatile";
+                        regimeEl.className = "obs-badge active";
+                    } else if (change > 0.00002) {
+                        regimeSpan.textContent = "Market: Trending";
+                        regimeEl.className = "obs-badge active";
+                    } else {
+                        regimeSpan.textContent = "Market: Range";
+                        regimeEl.className = "obs-badge";
+                    }
                 }
 
                 // Simulate vol based on baseline
-                volEl.querySelector('span').textContent = change > 0.00005 ? "Volatility: High" : "Volatility: Low";
+                const volSpan = volEl.querySelector('span');
+                if (volSpan) volSpan.textContent = change > 0.00005 ? "Volatility: High" : "Volatility: Low";
             }
 
-            if (signal && !isHistorical) {
-                sigStateEl.querySelector('span').textContent = `Signal: ${signal.status}`;
-                sigStateEl.className = "obs-badge active";
-            } else {
-                sigStateEl.querySelector('span').textContent = "Signal: Pending";
-                sigStateEl.className = "obs-badge";
+            if (sigStateEl) {
+                const sigSpan = sigStateEl.querySelector('span');
+                if (sigSpan) {
+                    if (signal && !isHistorical) {
+                        sigSpan.textContent = `Signal: ${signal.status}`;
+                        sigStateEl.className = "obs-badge active";
+                    } else {
+                        sigSpan.textContent = "Signal: Pending";
+                        sigStateEl.className = "obs-badge";
+                    }
+                }
             }
 
             // Layer 2: Financial Reasoning (Structured Snapshot)
+            const rContext = document.getElementById('reasoning-context');
+            const rSupporting = document.getElementById('reasoning-supporting');
+            const rAgainst = document.getElementById('reasoning-against');
+            const rRisk = document.getElementById('reasoning-risk-interp');
+            const rNote = document.getElementById('reasoning-note');
+
             if (signal) {
                 const type = signal.side;
                 const change = data.price - data.prevPrice;
 
-                // 1. Market Context
                 let context = "Range / Neutral";
                 if (Math.abs(change) > 0.0001) context = "Trending / Volatile";
                 else if (Math.abs(change) > 0.00003) context = "Trending / Normal";
-                document.getElementById('reasoning-context').textContent = context;
-
-                // 2. Evidence Supporting Signal
-                document.getElementById('reasoning-supporting').textContent = type === 'BUY'
+                if (rContext) rContext.textContent = context;
+                if (rSupporting) rSupporting.textContent = type === 'BUY'
                     ? "Bullish engulfing on M15. Price holding above VWAP and local support cluster."
                     : "Resistance rejected at H1 pivot. Increasing sell volume confirming downward shift.";
-
-                // 3. Evidence Against Signal
-                document.getElementById('reasoning-against').textContent = type === 'BUY'
+                if (rAgainst) rAgainst.textContent = type === 'BUY'
                     ? "Major resistance zone at 1.0855 could stall momentum. RSI approaching overbought."
                     : "Strong demand tail observed on lower timeframe. Bullish divergence on M5.";
-
-                // 4. Risk Interpretation
-                document.getElementById('reasoning-risk-interp').textContent = `High risk if ATR expands beyond current average. Stop-loss at ${signal.sl} is critical logic-invalid point.`;
-
-                // 5. Trader Awareness Note
-                document.getElementById('reasoning-note').textContent = type === 'BUY'
+                if (rRisk) rRisk.textContent = `High risk if ATR expands beyond current average. Stop-loss at ${signal.sl} is critical logic-invalid point.`;
+                if (rNote) rNote.textContent = type === 'BUY'
                     ? "Monitor 1.0855 level. If price consolidates below it, partial profit taking is advised."
                     : "Look for impulsive breakdowns only. Avoid selling into drying volume at local lows.";
             } else {
-                document.getElementById('reasoning-context').textContent = "Scanning...";
-                document.getElementById('reasoning-supporting').textContent = "--";
-                document.getElementById('reasoning-against').textContent = "--";
-                document.getElementById('reasoning-risk-interp').textContent = "--";
-                document.getElementById('reasoning-note').textContent = "--";
+                if (rContext) rContext.textContent = "Scanning...";
+                if (rSupporting) rSupporting.textContent = "--";
+                if (rAgainst) rAgainst.textContent = "--";
+                if (rRisk) rRisk.textContent = "--";
+                if (rNote) rNote.textContent = "--";
             }
 
             // Layer 3: Advisory Agent
             const advisoryText = document.getElementById('advisory-text');
-            if (signal && signal.conf > 85) {
-                advisoryText.textContent = "High confidence pattern detected. However, professional traders should still verify economic calendar for unexpected news impact. Avoid over-leveraging based solely on probability scores.";
-            } else {
-                advisoryText.textContent = "Current market conditions favor defensive strategies. Risk management is more critical than entry optimization in high-volatility environments. Consistency in lot-sizing is recommended over chasing impulse moves.";
+            if (advisoryText) {
+                if (signal && signal.conf > 85) {
+                    advisoryText.textContent = "High confidence pattern detected. However, professional traders should still verify economic calendar for unexpected news impact. Avoid over-leveraging based solely on probability scores.";
+                } else {
+                    advisoryText.textContent = "Current market conditions favor defensive strategies. Risk management is more critical than entry optimization in high-volatility environments. Consistency in lot-sizing is recommended over chasing impulse moves.";
+                }
             }
         }
 

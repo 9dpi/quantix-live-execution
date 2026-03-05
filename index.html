@@ -3281,6 +3281,178 @@
 
         // Security protections disabled for development
     </script>
+
+    <!-- 5W1H SIGNAL INTELLIGENCE MODAL (v3.8) -->
+    <div id="signal-detail-modal" style="
+        display:none; position:fixed; top:0; left:0; right:0; bottom:0; z-index:9999;
+        background:rgba(15,23,42,0.6); backdrop-filter:blur(4px);
+        align-items:center; justify-content:center;">
+        <div id="signal-detail-card" style="
+            background: var(--bg-surface); border:1px solid var(--border-subtle);
+            border-radius:12px; width:580px; max-width:90vw; max-height:85vh;
+            overflow-y:auto; box-shadow:0 25px 50px -12px rgba(0,0,0,0.25);
+            animation: modalSlideIn 0.25s ease-out;">
+
+            <!-- Header -->
+            <div
+                style="padding:1.25rem 1.5rem; border-bottom:1px solid var(--border-subtle); display:flex; justify-content:space-between; align-items:center;">
+                <div>
+                    <div
+                        style="font-size:0.6rem; font-weight:800; text-transform:uppercase; letter-spacing:1.5px; color:var(--quantix-accent); margin-bottom:4px;">
+                        Signal Intelligence Report</div>
+                    <div style="font-size:1.1rem; font-weight:800; color:var(--text-header);" id="modal-signal-id">--
+                    </div>
+                </div>
+                <div style="display:flex; align-items:center; gap:12px;">
+                    <span id="modal-status-badge"
+                        style="padding:4px 12px; border-radius:100px; font-size:0.7rem; font-weight:800;"></span>
+                    <button onclick="closeSignalModal()"
+                        style="background:none; border:none; cursor:pointer; color:var(--text-secondary); font-size:1.2rem; padding:4px;">&times;</button>
+                </div>
+            </div>
+
+            <!-- Price Bar -->
+            <div
+                style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:0; border-bottom:1px solid var(--border-subtle);">
+                <div style="padding:12px 16px; text-align:center; border-right:1px solid var(--border-subtle);">
+                    <div
+                        style="font-size:0.6rem; font-weight:700; color:var(--text-secondary); text-transform:uppercase; margin-bottom:4px;">
+                        Entry</div>
+                    <div id="modal-entry"
+                        style="font-family:var(--font-mono); font-weight:800; font-size:0.95rem; color:var(--text-primary);">
+                        --</div>
+                </div>
+                <div style="padding:12px 16px; text-align:center; border-right:1px solid var(--border-subtle);">
+                    <div
+                        style="font-size:0.6rem; font-weight:700; color:var(--trade-up); text-transform:uppercase; margin-bottom:4px;">
+                        Take Profit</div>
+                    <div id="modal-tp"
+                        style="font-family:var(--font-mono); font-weight:800; font-size:0.95rem; color:var(--trade-up);">
+                        --</div>
+                </div>
+                <div style="padding:12px 16px; text-align:center;">
+                    <div
+                        style="font-size:0.6rem; font-weight:700; color:var(--trade-down); text-transform:uppercase; margin-bottom:4px;">
+                        Stop Loss</div>
+                    <div id="modal-sl"
+                        style="font-family:var(--font-mono); font-weight:800; font-size:0.95rem; color:var(--trade-down);">
+                        --</div>
+                </div>
+            </div>
+
+            <!-- 5W1H Grid -->
+            <div style="padding:1.25rem 1.5rem; display:flex; flex-direction:column; gap:16px;">
+
+                <!-- WHO -->
+                <div class="wh-section">
+                    <div class="wh-label"><span class="wh-icon" style="background:var(--quantix-accent);">W</span> WHO —
+                        AI Model</div>
+                    <div class="wh-content" id="modal-who">Quantix v3.8 SMC | StructureEngine v1</div>
+                </div>
+
+                <!-- WHAT -->
+                <div class="wh-section">
+                    <div class="wh-label"><span class="wh-icon" style="background:#7c3aed;">W</span> WHAT — Trade
+                        Specification</div>
+                    <div class="wh-content" id="modal-what">--</div>
+                </div>
+
+                <!-- WHERE -->
+                <div class="wh-section">
+                    <div class="wh-label"><span class="wh-icon" style="background:#059669;">W</span> WHERE — Market
+                        Context</div>
+                    <div class="wh-content" id="modal-where">--</div>
+                </div>
+
+                <!-- WHEN -->
+                <div class="wh-section">
+                    <div class="wh-label"><span class="wh-icon" style="background:#d97706;">W</span> WHEN — Timeline
+                    </div>
+                    <div class="wh-content" id="modal-when">--</div>
+                </div>
+
+                <!-- WHY (most important) -->
+                <div class="wh-section"
+                    style="border:1px solid var(--quantix-accent); border-radius:8px; padding:12px; background:rgba(2,132,199,0.04);">
+                    <div class="wh-label"><span class="wh-icon" style="background:var(--quantix-accent);">W</span> WHY —
+                        Technical Reasoning</div>
+                    <div class="wh-content" id="modal-why"
+                        style="font-size:0.8rem; line-height:1.6; color:var(--text-primary);">--</div>
+                </div>
+
+                <!-- HOW -->
+                <div class="wh-section">
+                    <div class="wh-label"><span class="wh-icon" style="background:#475569;">H</span> HOW — Execution
+                        Method</div>
+                    <div class="wh-content" id="modal-how">--</div>
+                </div>
+
+                <!-- Result Banner (if closed) -->
+                <div id="modal-result-banner"
+                    style="display:none; padding:12px 16px; border-radius:8px; text-align:center; font-weight:800; font-family:var(--font-mono); font-size:0.9rem;">
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <style>
+        @keyframes modalSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px) scale(0.98);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .wh-section {}
+
+        .wh-label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.65rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            color: var(--text-secondary);
+            margin-bottom: 6px;
+        }
+
+        .wh-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 20px;
+            height: 20px;
+            border-radius: 4px;
+            color: white;
+            font-size: 0.6rem;
+            font-weight: 900;
+            flex-shrink: 0;
+        }
+
+        .wh-content {
+            font-size: 0.78rem;
+            color: var(--text-primary);
+            line-height: 1.5;
+            padding-left: 28px;
+            font-weight: 500;
+        }
+
+        #signal-history tr {
+            cursor: pointer;
+            transition: background 0.15s;
+        }
+
+        #signal-history tr:hover {
+            background: var(--bg-hover) !important;
+        }
+    </style>
 </body>
 
 </html>

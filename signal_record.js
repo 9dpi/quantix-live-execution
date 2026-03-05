@@ -355,6 +355,8 @@ function renderHistoryPage() {
         }
 
         const row = document.createElement('tr');
+        row.style.cursor = 'pointer';
+        row.addEventListener('click', () => openSignalDetail(sig));
         row.innerHTML = `
             <td class="mono" style="font-size: 0.8rem">${dStr} ${tStr}</td>
             <td><span class="pill ${direction === 'BUY' ? 'up' : 'down'}">${direction}</span></td>
@@ -682,4 +684,164 @@ function updatePriceUI() {
         fillPath.setAttribute('d', fillD);
     }
     prevPrice = livePrice;
+}
+
+// ============================================
+// 5W1H SIGNAL DETAIL MODAL
+// ============================================
+
+function openSignalDetail(sig) {
+    const modal = document.getElementById('signal-detail-modal');
+    if (!modal) return;
+
+    const entry = parseFloat(sig.entry_price || sig.entry || 0);
+    const tp = parseFloat(sig.tp || sig.take_profit || 0);
+    const sl = parseFloat(sig.sl || sig.stop_loss || 0);
+    const direction = (sig.direction || sig.side || 'BUY').toUpperCase();
+    const conf = calcConfidence(sig.release_confidence || sig.ai_confidence || 0);
+    const rrr = sig.reward_risk_ratio || (sl !== entry ? (Math.abs(tp - entry) / Math.abs(sl - entry)).toFixed(2) : 'n/a');
+    const statusLabel = getStatusLabel(sig, livePrice);
+    const meta = sig.signal_metadata || {};
+
+    // Pips calculations
+    const tpPips = Math.round(Math.abs(tp - entry) * 100000) / 10;
+    const slPips = Math.round(Math.abs(sl - entry) * 100000) / 10;
+
+    // --- HEADER ---
+    document.getElementById('modal-signal-id').textContent =
+        `${sig.asset || 'EURUSD'} ${direction} · ${sig.timeframe || 'M15'} · #${(sig.id || '').slice(0, 8)}`;
+
+    const badge = document.getElementById('modal-status-badge');
+    badge.textContent = statusLabel;
+    if (statusLabel === 'TP Hit') {
+        badge.style.background = 'rgba(4,120,87,0.1)'; badge.style.color = 'var(--trade-up)';
+    } else if (statusLabel === 'SL Hit') {
+        badge.style.background = 'rgba(190,18,60,0.1)'; badge.style.color = 'var(--trade-down)';
+    } else if (statusLabel === 'Live Trade' || statusLabel === 'Entry Hit') {
+        badge.style.background = 'rgba(2,132,199,0.1)'; badge.style.color = 'var(--quantix-accent)';
+    } else {
+        badge.style.background = 'var(--bg-hover)'; badge.style.color = 'var(--text-secondary)';
+    }
+
+    // --- PRICE BAR ---
+    document.getElementById('modal-entry').textContent = entry.toFixed(5);
+    document.getElementById('modal-tp').textContent = tp.toFixed(5);
+    document.getElementById('modal-sl').textContent = sl.toFixed(5);
+
+    // --- WHO ---
+    const model = meta.model || sig.strategy || 'Quantix AI Core';
+    const engine = meta.engine || 'StructureEngine v1';
+    document.getElementById('modal-who').textContent = `${model} | ${engine}`;
+
+    // --- WHAT ---
+    const strengthLabel = meta.strength_label || (conf >= 95 ? 'ULTRA' : conf >= 85 ? 'HIGH' : 'NORMAL');
+    document.getElementById('modal-what').innerHTML =
+        `<span style="font-weight:800; color:${direction === 'BUY' ? 'var(--trade-up)' : 'var(--trade-down)'}">${direction}</span> · ` +
+        `Confidence: <strong>${conf}%</strong> (${strengthLabel}) · ` +
+        `TP: <span style="color:var(--trade-up)">+${tpPips} pips</span> · ` +
+        `SL: <span style="color:var(--trade-down)">-${slPips} pips</span> · ` +
+        `R:R = <strong>1:${typeof rrr === 'number' ? rrr.toFixed(2) : rrr}</strong>`;
+
+    // --- WHERE ---
+    const session = meta.session || detectSession(sig.generated_at);
+    const zone = meta.zone || (direction === 'BUY' ? 'Discount Zone' : 'Premium Zone');
+    const structure = meta.structure_state || (sig.explainability ? sig.explainability.split('|')[0].trim() : 'Analyzed');
+    const atr = meta.atr_value ? `ATR: ${meta.atr_value}` : '';
+    document.getElementById('modal-where').innerHTML =
+        `Session: <strong>${session}</strong> · ` +
+        `${zone} · ${structure}` + (atr ? ` · ${atr}` : '');
+
+    // --- WHEN ---
+    const genDt = new Date(sig.generated_at);
+    const genStr = genDt.toLocaleString('en-GB', { timeZone: 'UTC', hour12: false });
+    let whenHtml = `Generated: <strong>${genStr} UTC</strong>`;
+
+    if (sig.entry_hit_at) {
+        const hitDt = new Date(sig.entry_hit_at);
+        const diffMs = hitDt - genDt;
+        const diffMin = Math.round(diffMs / 60000);
+        whenHtml += ` · Entry Hit: ${hitDt.toLocaleTimeString('en-GB', { timeZone: 'UTC', hour12: false })} (${diffMin}m)`;
+    }
+    if (sig.closed_at) {
+        const closeDt = new Date(sig.closed_at);
+        const startDt = sig.entry_hit_at ? new Date(sig.entry_hit_at) : genDt;
+        const duration = Math.round((closeDt - startDt) / 60000);
+        whenHtml += ` · Closed: ${closeDt.toLocaleTimeString('en-GB', { timeZone: 'UTC', hour12: false })} (${duration}m trade)`;
+    }
+    const maxTrade = sig.max_monitoring_mins || meta.max_trade_mins || 180;
+    whenHtml += ` · Max Duration: ${maxTrade}m`;
+    document.getElementById('modal-when').innerHTML = whenHtml;
+
+    // --- WHY (most important) ---
+    let whyText = '';
+    if (meta.why) {
+        whyText = meta.why;
+    } else {
+        // Generate from available data for legacy signals
+        const structureInfo = sig.explainability || `${direction} signal`;
+        const refinement = sig.refinement_reason || sig.refinement || '';
+        whyText = `${structureInfo}. AI confidence ${conf}% passed release gate. `;
+        if (refinement) whyText += `Refinement: ${refinement}. `;
+        whyText += `TP target: ${tpPips} pips, SL protection: ${slPips} pips (R:R 1:${typeof rrr === 'number' ? rrr.toFixed(2) : rrr}).`;
+    }
+    document.getElementById('modal-why').textContent = whyText;
+
+    // --- HOW ---
+    const execMethod = meta.execution_method || (sig.is_market_entry ? 'MARKET_EXECUTION' : 'PENDING_ORDER');
+    const dataSource = meta.data_source || 'TwelveData/Binance';
+    document.getElementById('modal-how').innerHTML =
+        `Execution: <strong>${execMethod.replace(/_/g, ' ')}</strong> · ` +
+        `Data Feed: ${dataSource} · ` +
+        `Price Validation: Multi-Source Cross-Check`;
+
+    // --- RESULT BANNER ---
+    const banner = document.getElementById('modal-result-banner');
+    const pipsInfo = getPipsInfo(sig, livePrice);
+    if (sig.result === 'PROFIT' || sig.status === 'CLOSED_TP') {
+        banner.style.display = 'block';
+        banner.style.background = 'rgba(4,120,87,0.08)';
+        banner.style.color = 'var(--trade-up)';
+        banner.style.border = '1px solid rgba(4,120,87,0.2)';
+        banner.textContent = `PROFIT ${pipsInfo.label}`;
+    } else if (sig.result === 'LOSS' || sig.status === 'CLOSED_SL') {
+        banner.style.display = 'block';
+        banner.style.background = 'rgba(190,18,60,0.08)';
+        banner.style.color = 'var(--trade-down)';
+        banner.style.border = '1px solid rgba(190,18,60,0.2)';
+        banner.textContent = `LOSS ${pipsInfo.label}`;
+    } else {
+        banner.style.display = 'none';
+    }
+
+    // Show modal
+    modal.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+}
+
+function closeSignalModal() {
+    const modal = document.getElementById('signal-detail-modal');
+    if (modal) {
+        modal.style.display = 'none';
+        document.body.style.overflow = '';
+    }
+}
+
+// Close on backdrop click
+document.addEventListener('click', (e) => {
+    const modal = document.getElementById('signal-detail-modal');
+    if (e.target === modal) closeSignalModal();
+});
+
+// Close on ESC key
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') closeSignalModal();
+});
+
+function detectSession(dateStr) {
+    if (!dateStr) return 'Unknown';
+    const h = new Date(dateStr).getUTCHours();
+    if (h >= 13 && h < 17) return 'PEAK (London-NY Overlap)';
+    if (h >= 6 && h < 13) return 'HIGH (London)';
+    if (h >= 17 && h < 22) return 'MEDIUM (New York)';
+    return 'LOW (Asia/Late NY)';
 }

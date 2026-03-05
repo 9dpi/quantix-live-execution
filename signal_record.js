@@ -1,5 +1,5 @@
 // UPDATED: Pointing to Quantix Core (Validation Backend)
-const API_BASE = 'https://quantixaicore-production.up.railway.app';
+const API_BASE = 'https://quantixapiserver-production.up.railway.app';
 let pHistory = [];
 let livePrice = null;
 let prevPrice = 0;

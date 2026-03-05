@@ -106,7 +106,7 @@ def list_signals(
     try:
         # Forward the request to the real AI Core
         # Note: In a real production bridge, you might want to cache this
-        AI_CORE_BASE = "https://quantixaicore-production.up.railway.app/api/v1/signals"
+        AI_CORE_BASE = "https://quantixapiserver-production.up.railway.app/api/v1/signals"
         params = {"limit": limit, "offset": offset}
         if asset: params["asset"] = asset
         if state: params["state"] = state

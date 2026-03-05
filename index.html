@@ -7,8 +7,9 @@
     <title>Signal Genius AI | Institutional Trading</title>
     <link rel="stylesheet" href="command-center.css">
     <script src="https://unpkg.com/lucide@latest"></script>
-    <script src="./signal_record_config.js"></script>
-    <script src="simulator.js"></script>
+    <script src="./signal_record_config.js?v=3.8"></script>
+    <script src="simulator.js?v=3.8"></script>
+    <script src="signal_record.js?v=3.8"></script>
     <link
         href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap"
         rel="stylesheet">
@@ -3278,6 +3279,71 @@
         syncDatabase();
 
         addLog("Quantix AI Core Link: ACTIVE", "success");
+
+        // 5W1H POPUP LOGIC (Inlined to bypass cache)
+        function openSignalDetail(sig) {
+            const modal = document.getElementById('signal-detail-modal');
+            if (!modal) return;
+
+            const entry = parseFloat(sig.entry_price || sig.entry || 0);
+            const tp = parseFloat(sig.tp || sig.take_profit || 0);
+            const sl = parseFloat(sig.sl || sig.stop_loss || 0);
+            const direction = (sig.direction || sig.side || 'BUY').toUpperCase();
+            const conf = Math.round((sig.release_confidence || sig.ai_confidence || 0) * 100);
+            const rrr = sig.reward_risk_ratio || (sl !== entry ? (Math.abs(tp - entry) / Math.abs(sl - entry)).toFixed(2) : 'n/a');
+
+            // Pips calculations
+            const tpPips = Math.round(Math.abs(tp - entry) * 100000) / 10;
+            const slPips = Math.round(Math.abs(sl - entry) * 100000) / 10;
+
+            document.getElementById('modal-signal-id').textContent = `${sig.asset || 'EURUSD'} ${direction} · #${(sig.id || '').slice(0, 8)}`;
+
+            // Badge Status
+            const badge = document.getElementById('modal-status-badge');
+            badge.textContent = sig.status || 'Active';
+            badge.style.background = 'rgba(2,132,199,0.1)'; badge.style.color = 'var(--quantix-accent)';
+
+            document.getElementById('modal-entry').textContent = entry.toFixed(5);
+            document.getElementById('modal-tp').textContent = tp.toFixed(5);
+            document.getElementById('modal-sl').textContent = sl.toFixed(5);
+
+            const meta = sig.signal_metadata || {};
+            document.getElementById('modal-what').innerHTML = `${direction} · Conf: <b>${conf}%</b> · TP: <span style="color:var(--trade-up)">+${tpPips} p</span> · SL: <span style="color:var(--trade-down)">-${slPips} p</span>`;
+            document.getElementById('modal-where').innerHTML = `Session: <b>${meta.session || 'London/NY'}</b> · Zone: ${meta.zone || (direction === 'BUY' ? 'Discount' : 'Premium')}`;
+            document.getElementById('modal-when').innerHTML = `Generated: ${new Date(sig.generated_at).toLocaleTimeString()} · Source: ${meta.data_source || 'Quantix AI'}`;
+            document.getElementById('modal-why').textContent = meta.why || sig.explainability || `SMC Structure detected. Market analysis points to ${direction} continuation based on institutional order flow.`;
+            document.getElementById('modal-how').textContent = `Execution: ${sig.is_market_entry ? 'MARKET' : 'PENDING'} · Engine: ${meta.engine || 'StructureEngine v1'}`;
+
+            modal.style.display = 'flex';
+        }
+
+        function closeSignalModal() {
+            document.getElementById('signal-detail-modal').style.display = 'none';
+        }
+
+        // Event Delegation for Signal Rows
+        document.getElementById('signal-history').addEventListener('click', function (e) {
+            const row = e.target.closest('tr');
+            if (!row) return;
+
+            // Find the signal object from allHistory (assuming it's global)
+            // If allHistory isn't directly usable, we'll try to get data from row or script
+            if (typeof allHistory !== 'undefined' && allHistory.length > 0) {
+                // For simplicity in this fix, we find by ID which is usually in the first/invisible cell
+                // But since we want to be 100% sure, let's just use the index if available
+                const rowIndex = Array.from(row.parentNode.children).indexOf(row);
+                const itemsPerPage = window.itemsPerPage || 10;
+                const currentPage = window.currentPage || 1;
+                const actualIndex = ((currentPage - 1) * itemsPerPage) + rowIndex;
+
+                if (allHistory[actualIndex]) {
+                    openSignalDetail(allHistory[actualIndex]);
+                }
+            }
+        });
+
+        // Close on ESC
+        document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeSignalModal(); });
 
         // Security protections disabled for development
     </script>

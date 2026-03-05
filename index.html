@@ -8,7 +8,6 @@
     <link rel="stylesheet" href="command-center.css">
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="./signal_record_config.js?v=3.8"></script>
-    <script src="simulator.js?v=3.8"></script>
     <link
         href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap"
         rel="stylesheet">
@@ -1592,7 +1591,7 @@
         <div class="nav-links" id="mobile-nav">
             <a href="javascript:void(0)" class="nav-link disabled-link">Overview</a>
             <a href="#" class="nav-link active-link" style="display:flex; align-items:center; gap:8px;">
-                Live System
+                Live Execution
                 <span
                     style="font-size:0.55rem; background:var(--quantix-accent); color:white; padding:2px 6px; border-radius:4px; font-weight:800; letter-spacing:0.5px;">INSTITUTIONAL
                     v3.5</span>
@@ -1777,9 +1776,7 @@
         <section class="viewport">
             <nav class="sub-tabs">
                 <div style="display:flex; gap: 4px;">
-                    <div class="tab-btn active" onclick="switchTab('terminal', this)">Execution Terminal</div>
-                    <div class="tab-btn" onclick="switchTab('simulator', this)">Trading Simulator</div>
-                    <div class="tab-btn" onclick="switchTab('logs', this)">Logs</div>
+                    <div class="tab-btn active" onclick="switchTab('terminal', this)">Live Execution</div>
                 </div>
             </nav>
 
@@ -1849,235 +1846,6 @@
                                 Status</a>
                         </div>
                     </footer>
-                </div>
-            </div>
-
-            <div id="tab-simulator" class="tab-content"
-                style="padding:0; height: 100%; display: none; flex-direction: column;">
-                <div class="sim-app-container" style="flex: 1; display: flex; flex-direction: column; height: 100%;">
-                    <div class="sim-app-header"
-                        style="padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--border-subtle);">
-                        <div style="display:flex; justify-content:space-between; align-items:center;">
-                            <div style="display:flex; align-items:center; gap:8px;">
-                                <div class="section-title">
-                                    Signal Validation Environment
-                                </div>
-                            </div>
-                            <div style="display:flex; gap:16px; align-items:center;">
-                                <i data-lucide="activity" size="14" style="color:var(--text-secondary)"></i>
-                                <button onclick="simulator.resetAccount()"
-                                    style="background:transparent; border:none; color:#848e9c; cursor:pointer;"><i
-                                        data-lucide="refresh-cw" size="18"></i></button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Layer 1: Observation Agents -->
-                    <div class="agent-observation-bar">
-                        <div class="obs-badge active" id="agent-market-regime">
-                            <i data-lucide="layout-grid" size="12"></i>
-                            <span>Market: Range</span>
-                        </div>
-                        <div class="obs-badge" id="agent-vol-monitor">
-                            <i data-lucide="activity" size="12"></i>
-                            <span>Volatility: Low</span>
-                        </div>
-                        <div class="obs-badge" id="agent-sig-state">
-                            <i data-lucide="timer" size="12"></i>
-                            <span>Signal: Valid (14m)</span>
-                        </div>
-                    </div>
-
-
-                    <div class="sim-action-bar"
-                        style="border-top:none; border-bottom:1px solid var(--border-subtle); background: var(--bg-surface); padding: 10px 16px; display: flex; align-items: center; gap: 12px; flex-wrap: nowrap; overflow-x: auto;">
-
-                        <!-- Lot Size -->
-                        <div style="display:flex; align-items:center; gap:8px; flex-shrink: 0;"
-                            data-tooltip="Trade Volume: 1.00 lot = 100,000 units. A 1-pip movement equals approximately $10 profit/loss.">
-                            <div
-                                style="font-size:0.6rem; color:#848e9c; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; white-space:nowrap;">
-                                Lot</div>
-                            <div
-                                style="display:flex; align-items:center; gap:2px; background:var(--bg-hover); border-radius:4px; padding:2px;">
-                                <button onclick="updateLot(-0.01)"
-                                    style="background:transparent; border:none; color:var(--text-primary); width:20px; height:20px; cursor:pointer; font-weight:bold;">-</button>
-                                <input type="text" id="sim-lot-input" value="1.00"
-                                    style="background:transparent; border:none; color:var(--text-primary); width:35px; text-align:center; font-weight:700; font-family:var(--font-mono); font-size:0.7rem;">
-                                <button onclick="updateLot(0.01)"
-                                    style="background:transparent; border:none; color:var(--text-primary); width:20px; height:20px; cursor:pointer; font-weight:bold;">+</button>
-                            </div>
-                        </div>
-
-                        <!-- Spread -->
-                        <div style="display:flex; align-items:center; gap:6px; flex-shrink: 0;"
-                            data-tooltip="The difference between Buy (Ask) and Sell (Bid) price. This is the broker's fee for executing your trade.">
-                            <div
-                                style="font-size:0.6rem; color:#848e9c; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; white-space:nowrap; display:flex; flex-direction:column;">
-                                <span>Spread</span>
-                            </div>
-                            <div id="sim-spread"
-                                style="font-family:var(--font-mono); font-weight:700; color:var(--text-primary); font-size:0.75rem;">
-                                0.0</div>
-                        </div>
-
-                        <!-- Action Buttons -->
-                        <div
-                            style="display:flex; gap:8px; flex:1; justify-content:flex-end; align-items:center; position:relative;">
-                            <button onclick="manualTrade('SELL')"
-                                data-tooltip="Sell (Short): Profit if price goes DOWN. Executed at the BID price."
-                                style="background:#f6465d; border:none; color:white; padding:6px 14px; border-radius:6px; cursor:pointer; min-width:85px; text-align:center; transition: 0.2s;">
-                                <div style="font-size:0.85rem; font-weight:800; line-height:1;">SELL</div>
-                                <div id="sim-price-sell"
-                                    style="font-size:0.7rem; opacity:0.8; font-family:var(--font-mono); margin-top:2px;">
-                                    --.-----</div>
-                            </button>
-                            <button onclick="manualTrade('BUY')"
-                                data-tooltip="Buy (Long): Profit if price goes UP. Executed at the ASK price."
-                                style="background:#0ecb81; border:none; color:white; padding:6px 14px; border-radius:6px; cursor:pointer; min-width:85px; text-align:center; transition: 0.2s;">
-                                <div style="font-size:0.85rem; font-weight:800; line-height:1;">BUY</div>
-                                <div id="sim-price-buy"
-                                    style="font-size:0.7rem; opacity:0.8; font-family:var(--font-mono); margin-top:2px;">
-                                    --.-----</div>
-                            </button>
-                        </div>
-                    </div>
-
-                    <div class="sim-positions-section" style="flex:1; overflow-y:auto;">
-
-                        <!-- Layer 3: Advisory Agent (Human-facing) -->
-                        <div class="advisory-panel" id="advisory-for-traders">
-                            <div class="advisory-header" onclick="this.parentElement.classList.toggle('expanded')">
-                                <div style="display:flex; align-items:center; gap:10px;">
-                                    <i data-lucide="info" size="16" style="color:var(--quantix-purple)"></i>
-                                    <span
-                                        style="font-size:0.775rem; font-weight:800; color:var(--text-header); text-transform:uppercase; letter-spacing:0.5px;">Advisory
-                                        for Traders</span>
-                                </div>
-                                <i data-lucide="chevron-down" size="14" style="color:#848e9c"></i>
-                            </div>
-                            <div class="advisory-content">
-                                <p id="advisory-text">New traders should note that current market conditions favor
-                                    defensive strategies. Risk management is more critical than entry optimization in
-                                    high-volatility environments. Consistency in lot-sizing is recommended over chasing
-                                    impulse moves.</p>
-                            </div>
-                        </div>
-
-                        <div
-                            style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; padding: 0 16px;">
-                            <div class="sim-pos-tabs">
-                                <div class="sim-pos-tab active" onclick="switchSimSubTab('positions', this)">Open
-                                    Positions (<span id="sim-pos-count">0</span>)</div>
-                                <div class="sim-pos-tab" onclick="switchSimSubTab('history', this)">Trade History</div>
-                                <div class="sim-pos-tab" onclick="switchSimSubTab('guide', this)">Simulator Guide</div>
-                            </div>
-                            <div style="font-size:0.75rem; color:#848e9c;">
-                                <span data-tooltip="Balance: Funds currently in your account.">Balance:</span> <span
-                                    id="sim-balance-app"
-                                    style="color:var(--text-primary); font-weight:700">$50,000.00</span>
-                                | <span
-                                    data-tooltip="PnL: Current unrealized profit or loss from your open trades.">PnL:</span>
-                                <span id="sim-pnl-app" style="color:#0ecb81">$0.00</span>
-                            </div>
-                        </div>
-                        <div id="sim-positions-list"></div>
-                        <div id="sim-history-list" style="display:none; padding: 8px 16px; overflow-y: auto;"></div>
-                        <div id="sim-guide-content"
-                            style="display:none; color:var(--text-secondary); font-size:0.8rem; line-height:1.4; padding:12px; height: 100%; overflow-y: auto;">
-                            <h4
-                                style="color:var(--text-header); margin:0 0 15px 0; display:flex; align-items:center; gap:8px;">
-                                <i data-lucide="help-circle" size="18" style="color:var(--quantix-accent)"></i>
-                                How to Use Simulator
-                            </h4>
-
-                            <div style="display:flex; flex-direction:column; gap:16px;">
-                                <div
-                                    style="display:flex; gap:12px; background:var(--bg-hover); padding:10px; border-radius:8px; border-left:3px solid var(--quantix-accent);">
-                                    <i data-lucide="activity" size="18"
-                                        style="color:var(--quantix-accent); flex-shrink:0;"></i>
-                                    <div>
-                                        <b style="color:var(--text-header); display:block; margin-bottom:2px;">Real-Time
-                                            Pricing</b>
-                                        Simulation nodes are synchronized with the <span
-                                            style="color:var(--quantix-accent)">Live Market Price</span>.
-                                    </div>
-                                </div>
-
-                                <div
-                                    style="display:flex; gap:12px; background:var(--bg-hover); padding:10px; border-radius:8px; border-left:3px solid var(--trade-up);">
-                                    <i data-lucide="zap" size="18" style="color:var(--trade-up); flex-shrink:0;"></i>
-                                    <div>
-                                        <b style="color:var(--text-header); display:block; margin-bottom:2px;">Instant
-                                            Execution</b>
-                                        Adjust <b style="color:var(--text-primary)">Lot Size</b> and click Buy/Sell to
-                                        enter a trade
-                                        immediately.
-                                    </div>
-                                </div>
-
-                                <div
-                                    style="display:flex; gap:12px; background:var(--bg-hover); padding:10px; border-radius:8px; border-left:3px solid #facc15;">
-                                    <i data-lucide="bar-chart-2" size="18" style="color:#facc15; flex-shrink:0;"></i>
-                                    <div>
-                                        <b style="color:var(--text-header); display:block; margin-bottom:2px;">Live PnL
-                                            Tracking</b>
-                                        Track the performance of your open positions with live profit/loss updates.
-                                    </div>
-                                </div>
-
-                                <div
-                                    style="display:flex; gap:12px; background:var(--bg-hover); padding:10px; border-radius:8px; border-left:3px solid var(--quantix-purple);">
-                                    <i data-lucide="shield" size="18"
-                                        style="color:var(--quantix-purple); flex-shrink:0;"></i>
-                                    <div>
-                                        <b style="color:var(--text-header); display:block; margin-bottom:2px;">Risk
-                                            Guards</b>
-                                        Every trade is initialized with automatic Take Profit and Stop Loss levels.
-                                    </div>
-                                </div>
-
-                                <div
-                                    style="display:flex; gap:12px; align-items:center; background:rgba(244,63,94,0.05); padding:10px; border-radius:8px; border:1px dashed rgba(244,63,94,0.2);">
-                                    <i data-lucide="alert-circle" size="16"
-                                        style="color:var(--trade-down); flex-shrink:0;"></i>
-                                    <span style="font-size:0.7rem;">This is a <b style="color:var(--text-header);">Demo
-                                            Environment</b>. No real capital or account data is affected.</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Logs Tab Content -->
-            <div id="tab-logs" class="tab-content"
-                style="padding:0; height: 100%; display: none; flex-direction: column; overflow: hidden;">
-                <!-- Validation Table (Trades) -->
-                <div class="section-container" style="flex: 1; min-height: 0; display: flex; flex-direction: column;">
-                    <div class="section-header">
-                        <div class="section-title">Validation Events (Trader Proof)</div>
-                        <button onclick="fetchLogs()"
-                            style="background:transparent; border:none; color:var(--text-secondary); cursor:pointer;"
-                            title="Refresh Logs">
-                            <i data-lucide="refresh-cw" size="14"></i>
-                        </button>
-                    </div>
-                    <div class="content-scroller">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th style="width:120px">Timestamp</th>
-                                    <th style="width:70px">Signal ID</th>
-                                    <th style="width:80px">Type</th>
-                                    <th style="width:80px">Val Price</th>
-                                    <th style="width:100px">Status</th>
-                                    <th>Details</th>
-                                </tr>
-                            </thead>
-                            <tbody id="logs-body"></tbody>
-                        </table>
-                    </div>
                 </div>
             </div>
 

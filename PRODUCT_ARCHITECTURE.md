@@ -212,7 +212,7 @@ Signal_Genius_AI/             (Web Dashboard)
 | Component | Location | Status | URL |
 |-----------|----------|--------|-----|
 | AI Core (Miner) | Local Machine | 🟢 Running | localhost:8000 |
-| AI Core (API) | Railway | 🟢 Online | quantixaicore-production.up.railway.app |
+| AI Core (API) | Railway | 🟢 Online | quantixapiserver-production.up.railway.app |
 | Web Dashboard | Railway | 🟢 Online | signalgeniusai-production.up.railway.app |
 | Frontend | GitHub Pages | 🟢 Live | www.signalgeniusai.com |
 | Database | Supabase | 🟢 Connected | Cloud Postgres |

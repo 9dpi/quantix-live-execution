@@ -9,7 +9,6 @@
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="./signal_record_config.js?v=3.8"></script>
     <script src="simulator.js?v=3.8"></script>
-    <script src="signal_record.js?v=3.8"></script>
     <link
         href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap"
         rel="stylesheet">
@@ -2227,6 +2226,8 @@
             price: null,
             prevPrice: 0,
             sigs: [],
+            rawHistory: [],
+            rawActive: null,
             pHistory: [],
             active: null,
             currentPage: 1,
@@ -2407,7 +2408,11 @@
                     }
                 } else {
                     data.active = null;
+                    data.rawActive = null;
                 }
+                // Save raw history for 5W1H popup
+                data.rawHistory = json.history || [];
+                data.rawActive = json.active || null;
                 data.sigs = (json.history || []).map(s => ({
                     id: s.id,
                     side: s.direction || s.side,
@@ -3322,28 +3327,42 @@
         }
 
         // Event Delegation for Signal Rows
-        document.getElementById('signal-history').addEventListener('click', function (e) {
-            const row = e.target.closest('tr');
-            if (!row) return;
+        const historyTbody = document.getElementById('signal-history');
+        if (historyTbody) {
+            historyTbody.addEventListener('click', function (e) {
+                const row = e.target.closest('tr');
+                if (!row) return;
 
-            // Find the signal object from allHistory (assuming it's global)
-            // If allHistory isn't directly usable, we'll try to get data from row or script
-            if (typeof allHistory !== 'undefined' && allHistory.length > 0) {
-                // For simplicity in this fix, we find by ID which is usually in the first/invisible cell
-                // But since we want to be 100% sure, let's just use the index if available
                 const rowIndex = Array.from(row.parentNode.children).indexOf(row);
-                const itemsPerPage = window.itemsPerPage || 10;
-                const currentPage = window.currentPage || 1;
-                const actualIndex = ((currentPage - 1) * itemsPerPage) + rowIndex;
 
-                if (allHistory[actualIndex]) {
-                    openSignalDetail(allHistory[actualIndex]);
+                // Row 0 might be the active signal
+                if (data.active && rowIndex === 0 && data.rawActive) {
+                    openSignalDetail(data.rawActive);
+                    return;
                 }
-            }
-        });
+
+                // Offset: if active signal exists, history starts from row 1
+                const offset = data.active ? 1 : 0;
+                const historyIndex = ((data.currentPage - 1) * data.itemsPerPage) + (rowIndex - offset);
+
+                if (data.rawHistory[historyIndex]) {
+                    openSignalDetail(data.rawHistory[historyIndex]);
+                }
+            });
+        }
 
         // Close on ESC
         document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeSignalModal(); });
+
+        // Close on backdrop click
+        document.addEventListener('click', (e) => {
+            if (e.target && e.target.id === 'signal-detail-modal') closeSignalModal();
+        });
+
+        // Add pointer cursor to signal rows via CSS
+        const rowStyle = document.createElement('style');
+        rowStyle.textContent = '#signal-history tr { cursor: pointer; transition: background 0.15s; } #signal-history tr:hover { background: var(--bg-hover) !important; }';
+        document.head.appendChild(rowStyle);
 
         // Security protections disabled for development
     </script>
